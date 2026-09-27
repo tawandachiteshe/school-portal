@@ -1,4 +1,4 @@
-"""Small, valid PDFs for seeded course notes, padded to the sizes shown in the designs."""
+"""Small, valid one-page PDFs: generated documents (results slips, statements) and seeded notes."""
 
 
 def _esc(text: str) -> str:

@@ -61,7 +61,8 @@ for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns
 
 ## Repo layout
 
-- `web/` — React app. `src/components/ui/` shadcn primitives restyled to `design/tcfl.css`; `src/pages/`, `src/routes.tsx`
+- `web/` — React app. `src/components/ui/` shadcn primitives restyled to `design/tcfl.css`; `src/api/generated/` (Orval
+  output, do not edit; mutator in `src/api/fetcher.ts`); `src/pages/`, `src/routes.tsx`
   (routes from docs/design-handoff.md); `src/lib/` (utils, theme). Fonts self-hosted via @fontsource (Latin only).
 - `api/` — FastAPI. `app/main.py`, `app/config.py`, `app/ocr/national_id.py` (mod-23 ID check), tests in `api/tests/`.
 - `design/` — the design spec (read-only). `docs/` — research, architecture, DB design (`docs/database/schema.sql`),
@@ -71,7 +72,9 @@ for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns
 ## Commands
 
 - Web (in `web/`): `bun install`, `bun run dev` (http://localhost:5173, proxies `/api` and `/auth`), `bun run build`,
-  `bun run test` (Vitest), `bun run lint` (oxlint), `bun run gen:api` (types from FastAPI OpenAPI).
+  `bun run test` (Vitest), `bun run lint` (oxlint), `bun run gen:api` (exports the FastAPI spec to `web/openapi.json`,
+  then Orval generates typed TanStack Query hooks into `src/api/generated/`; never hand-write API types or hooks,
+  and rerun it after any API change: an API test fails when the committed spec is stale).
 - API (in `api/`): `uv sync`, `uv run uvicorn app.main:app --reload`, `uv run pytest`, `uv run ruff check . && uv run ruff format .`
 - Full stack: `cp .env.example .env && docker compose up -d --build`.
 - Adding a shadcn component: `bunx --bun shadcn@latest add <name>`, then fix the import to `@/lib/utils` and strip

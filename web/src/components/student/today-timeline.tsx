@@ -1,4 +1,4 @@
-import type { TodayClass } from '@/lib/student'
+import type { TodayClass } from '@/api/generated/model'
 import { time } from '@/lib/format'
 import { cn } from '@/lib/utils'
 

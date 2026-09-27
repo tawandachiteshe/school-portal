@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import deadlines, library, me, modules, student
+from app.api import deadlines, library, me, modules, records, student
 from app.auth import routes as auth_routes
 from app.auth.csrf import CSRFMiddleware
 from app.config import get_settings
@@ -14,6 +14,9 @@ def create_app() -> FastAPI:
         title="TCFL Portal API",
         version="0.1.0",
         docs_url=None if settings.is_prod else "/docs",
+        # operationId = the route function's name, so generated web hooks read well (useDashboard).
+        # (Included routes arrive as a route context, not an APIRoute, so read `name` loosely.)
+        generate_unique_id_function=lambda route: getattr(route, "name", None) or route.path,
     )
     app.add_middleware(CSRFMiddleware)
 
@@ -27,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(library.router)
     app.include_router(modules.router)
     app.include_router(deadlines.router)
+    app.include_router(records.router)
     return app
 
 

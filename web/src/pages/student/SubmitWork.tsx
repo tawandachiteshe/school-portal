@@ -11,7 +11,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { SubPage } from '@/components/shell/sub-page'
 import { Empty } from '@/components/student/section'
 import { ApiError } from '@/lib/api'
-import { acceptedText, useAssessment, type AssessmentDetail } from '@/lib/deadlines'
+import { useAssessmentDetail } from '@/api/generated/deadlines/deadlines'
+import type { AssessmentOut as AssessmentDetail } from '@/api/generated/model'
+import { acceptedText } from '@/lib/deadlines'
 import { calendarDaysBetween, fileKind, fileSize, isUrgent, relativeDue, shortDate, shortDateTime, time } from '@/lib/format'
 import { KIND_LABEL } from '@/lib/student'
 import { cancelUpload, retryUpload, startUpload, useUpload, type UploadState } from '@/lib/uploads'
@@ -128,7 +130,7 @@ function Receipt({ a }: { a: AssessmentDetail }) {
 
 export default function SubmitWork() {
   const { id = '' } = useParams()
-  const { data: a, isPending, error } = useAssessment(id)
+  const { data: a, isPending, error } = useAssessmentDetail(id)
   const upload = useUpload(id)
   const now = useNow(15_000)
   const inputRef = useRef<HTMLInputElement>(null)

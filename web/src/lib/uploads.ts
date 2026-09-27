@@ -5,7 +5,13 @@
 // - The file is kept in IndexedDB until the upload finishes, so closing the tab doesn't lose it.
 // - Uploads live outside React, so leaving the page doesn't stop them.
 import { useSyncExternalStore } from 'react'
-import { api, ApiError, readCookie } from '@/lib/api'
+import {
+  cancelUpload as apiCancelUpload,
+  completeUpload as apiCompleteUpload,
+  startUpload as apiStartUpload,
+  uploadStatus,
+} from '@/api/generated/deadlines/deadlines'
+import { ApiError, readCookie } from '@/lib/api'
 import { idbAll, idbDelete, idbPut } from '@/lib/idb'
 
 export type Phase = 'uploading' | 'queued' | 'failed' | 'done'
@@ -58,8 +64,6 @@ export function useUpload(assessmentId: string): UploadState | undefined {
   )
 }
 
-type Chunk = { received_bytes: number; chunk_bytes: number }
-
 // PUT one chunk with progress. Resolves with the server's received_bytes.
 function putChunk(s: Saved, offset: number, blob: Blob, onProgress: (loaded: number) => void, ctl: { xhr?: XMLHttpRequest }) {
   return new Promise<number>((resolve, reject) => {
@@ -95,7 +99,7 @@ async function run(s: Saved) {
   running.set(s.assessmentId, ctl)
   let failures = 0
   try {
-    let { received_bytes: offset, chunk_bytes: chunk } = await api<Chunk>(`/student/uploads/${s.uploadId}`)
+    let { received_bytes: offset, chunk_bytes: chunk = 256 * 1024 } = await uploadStatus(s.uploadId)
     let lastT = performance.now()
     let lastB = offset
     let rate = 0 // bytes per second, smoothed
@@ -133,11 +137,11 @@ async function run(s: Saved) {
         if (!navigator.onLine) continue // loop waits for the signal
         if (++failures >= 3) throw e
         await new Promise((r) => setTimeout(r, 1000 * 2 ** failures))
-        ;({ received_bytes: offset, chunk_bytes: chunk } = await api<Chunk>(`/student/uploads/${s.uploadId}`))
+        ;({ received_bytes: offset, chunk_bytes: chunk = chunk } = await uploadStatus(s.uploadId))
       }
     }
     if (ctl.cancelled) return
-    await api(`/student/uploads/${s.uploadId}/complete`, { json: { note: s.note } })
+    await apiCompleteUpload(s.uploadId, { note: s.note || null })
     await idbDelete(s.assessmentId)
     set(s.assessmentId, { phase: 'done', received: s.size, secondsLeft: 0 })
     onComplete(s.assessmentId)
@@ -163,9 +167,7 @@ const saved = new Map<string, Saved>()
 
 export async function startUpload(assessmentId: string, file: File, note: string) {
   const mime = file.type || 'application/octet-stream'
-  const up = await api<{ id: string }>(`/student/assessments/${assessmentId}/uploads`, {
-    json: { filename: file.name, size_bytes: file.size, mime_type: mime },
-  })
+  const up = await apiStartUpload(assessmentId, { filename: file.name, size_bytes: file.size, mime_type: mime })
   const s: Saved = { assessmentId, uploadId: up.id, file, filename: file.name, size: file.size, mime, note }
   saved.set(assessmentId, s)
   await idbPut(assessmentId, s)
@@ -198,7 +200,7 @@ export async function cancelUpload(assessmentId: string) {
   saved.delete(assessmentId)
   clear(assessmentId)
   await idbDelete(assessmentId)
-  if (s) await api(`/student/uploads/${s.uploadId}`, { method: 'DELETE' }).catch(() => undefined)
+  if (s) await apiCancelUpload(s.uploadId).catch(() => undefined)
 }
 
 export function dismissUpload(assessmentId: string) {
@@ -212,7 +214,7 @@ export async function resumeSavedUploads(done: (assessmentId: string) => void) {
   for (const s of await idbAll<Saved>()) {
     if (saved.has(s.assessmentId)) continue
     try {
-      await api(`/student/uploads/${s.uploadId}`)
+      await uploadStatus(s.uploadId)
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) {
         await idbDelete(s.assessmentId) // finished or cancelled elsewhere

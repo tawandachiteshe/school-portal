@@ -77,6 +77,7 @@ class Person(Base):
     address: Mapped[str | None] = mapped_column(Text)
     next_of_kin_name: Mapped[str | None] = mapped_column(Text)
     next_of_kin_phone: Mapped[str | None] = mapped_column(Text)
+    photo_object_key: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at()
 
     user: Mapped[User | None] = relationship(back_populates="person")

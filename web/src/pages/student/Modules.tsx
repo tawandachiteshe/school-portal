@@ -3,7 +3,8 @@ import { Link } from 'react-router'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty } from '@/components/student/section'
 import { calendarDaysBetween, shortDate, time } from '@/lib/format'
-import { useModules, type ModuleSummary } from '@/lib/modules'
+import type { ModuleSummary } from '@/api/generated/model'
+import { useListModules } from '@/api/generated/modules/modules'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
 
@@ -16,7 +17,7 @@ function nextText(n: NonNullable<ModuleSummary['next_class']>, now: Date) {
 }
 
 export default function Modules() {
-  const { data, isPending, isError } = useModules()
+  const { data, isPending, isError } = useListModules()
   const now = useNow()
   const first = data?.modules.find((m) => m.next_class)
   return (

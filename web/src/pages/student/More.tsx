@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
@@ -6,14 +6,15 @@ import { toast } from 'sonner'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
 import { Initials } from '@/components/shell/wordmark'
-import { api } from '@/lib/api'
+import { getGetMySettingsQueryKey, useGetMySettings, useUpdateMySettings } from '@/api/generated/me/me'
+import { useFees } from '@/api/generated/records/records'
+import { useDashboard } from '@/api/generated/student/student'
 import { useMe, useSignOut } from '@/lib/auth'
 import { setDataSaver, useDataSaver } from '@/lib/data-saver'
-import { maskPhone } from '@/lib/format'
+import { maskPhone, shortDate } from '@/lib/format'
+import { onDay } from '@/lib/records'
 import { useTheme, type Theme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
-
-type Settings = { sms_reminders: boolean }
 
 const THEMES: { value: Theme; label: string }[] = [
   { value: 'system', label: 'Same as phone' },
@@ -70,15 +71,27 @@ export default function More() {
   const dataSaver = useDataSaver()
   const [appearanceOpen, setAppearanceOpen] = useState(false)
   const qc = useQueryClient()
-  const settings = useQuery({ queryKey: ['me', 'settings'], queryFn: () => api<Settings>('/me/settings') })
-  const saveSettings = useMutation({
-    mutationFn: (patch: Partial<Settings>) => api<Settings>('/me/settings', { method: 'PATCH', json: patch }),
-    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
-    onError: () => toast('Could not save the setting. Check your connection and try again.'),
+  const settings = useGetMySettings()
+  const saveSettings = useUpdateMySettings({
+    mutation: {
+      onSuccess: (s) => qc.setQueryData(getGetMySettingsQueryKey(), s),
+      onError: () => toast('Could not save the setting. Check your connection and try again.'),
+    },
   })
 
+  const dash = useDashboard()
+  const fees = useFees()
   if (!me) return null
   const st = me.student
+  const res = dash.data?.results
+  const resultsMeta = res
+    ? res.published
+      ? `${res.term_name} published`
+      : `${res.term_name?.replace(/ \d{4}$/, '') ?? 'Results'} not yet published`
+    : undefined
+  const next = fees.data?.next_payment
+  const feesMeta = next ? `${next.label} due ${shortDate(onDay(next.due_on))}` : undefined
+  const unread = dash.data?.announcements.unread
 
   return (
     <main className="flex grow flex-col gap-7 px-4 py-6">
@@ -105,10 +118,14 @@ export default function More() {
 
       <section aria-label="Student records">
         <ul className="border-y [&>li+li]:border-t">
-          <Row to="/results" title="Results" />
-          <Row to="/fees" title="Fees and statements" />
+          <Row to="/results" title="Results" meta={resultsMeta} />
+          <Row to="/fees" title="Fees and statements" meta={feesMeta} />
           <Row to="/timetable" title="Timetable" />
-          <Row to="/announcements" title="Announcements" />
+          <Row
+            to="/announcements"
+            title="Announcements"
+            trailing={unread ? <span className="text-sm text-muted-foreground">{unread} unread</span> : undefined}
+          />
           <Row to="/card" title="Student card" meta="Show at the library desk and exam rooms" />
         </ul>
       </section>
@@ -129,7 +146,7 @@ export default function More() {
             meta="A text 24 hours before tests and deadlines"
             checked={settings.data?.sms_reminders ?? true}
             disabled={!settings.data || saveSettings.isPending}
-            onChange={(on) => saveSettings.mutate({ sms_reminders: on })}
+            onChange={(on) => saveSettings.mutate({ data: { sms_reminders: on } })}
           />
           <li>
             <button

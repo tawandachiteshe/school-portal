@@ -21,7 +21,7 @@ class RenewOut(BaseModel):
 
 
 @router.post("/loans/{loan_id}/renew")
-async def renew(
+async def renew_loan(
     loan_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
 ) -> RenewOut:
     s = get_settings()

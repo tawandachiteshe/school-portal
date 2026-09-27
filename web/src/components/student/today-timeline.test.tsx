@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import type { TodayClass } from '@/lib/student'
+import type { TodayClass } from '@/api/generated/model'
 import { TodayTimeline } from './today-timeline'
 
 const cls = (code: string, name: string, start: string, end: string, extra: Partial<TodayClass> = {}): TodayClass => ({

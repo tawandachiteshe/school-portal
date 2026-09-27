@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     library_loan_days: int = 14
     library_max_renewals: int = 2
 
+    # Unknowns in the designs ([LIKE THIS]); shown only once the college confirms them.
+    fees_payment_options: str = ""  # design/Fees "How to pay"
+    results_remark_days: int = 14  # design/Results: published 16 July, re-mark until 30 July
+    results_notice: str = "These results are provisional until confirmed by HEXCO."
+
     ocr_llm_mode: str = "fallback"  # off | fallback | always
     claude_model: str = "claude-opus-5"
     assistant_enabled: bool = True

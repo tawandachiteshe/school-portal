@@ -11,7 +11,8 @@
     "test": "vitest",
     "e2e": "playwright test",
     "typecheck": "tsc -b",
-    "gen:api": "openapi-typescript http://localhost:8000/openapi.json -o src/lib/api-types.ts"
+    "gen:api": "cd ../api && uv run python -m app.openapi_export && cd ../web && orval",
+    "gen:api:check": "orval"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
@@ -43,7 +44,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "jsdom": "^30.1.1",
-    "openapi-typescript": "^7.13.0",
+    "orval": "^8.38.0",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",

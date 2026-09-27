@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.types import AssessmentKind, ClassKind, SubmissionMode
 from app.auth.deps import CurrentUser, current_user
 from app.config import get_settings
 from app.db import get_db
@@ -31,7 +32,7 @@ router = APIRouter(prefix="/student", tags=["student"])
 class TodayClass(BaseModel):
     module_code: str
     module_name: str
-    kind: str
+    kind: ClassKind
     starts_at: datetime
     ends_at: datetime
     venue: str | None
@@ -43,12 +44,12 @@ class TodayClass(BaseModel):
 
 class DueItem(BaseModel):
     id: uuid.UUID
-    kind: str
+    kind: AssessmentKind
     title: str
     module_code: str
     due_at: datetime
     venue: str | None
-    submission_mode: str
+    submission_mode: SubmissionMode
     submitted: bool
 
 
@@ -91,7 +92,7 @@ class ResultsStatus(BaseModel):
     published: bool
 
 
-class NextClass(BaseModel):
+class DashboardNextClass(BaseModel):
     module_code: str
     starts_at: datetime
     venue: str | None
@@ -99,7 +100,7 @@ class NextClass(BaseModel):
 
 class Dashboard(BaseModel):
     today: list[TodayClass]
-    next_class: NextClass | None  # set when there are no classes today
+    next_class: DashboardNextClass | None  # set when there are no classes today
     due: list[DueItem]
     announcements: Announcements
     notes: list[NoteItem]
@@ -157,7 +158,9 @@ async def dashboard(
         upcoming = await timetable.occurrences(db, ids, [now.date() + timedelta(days=i) for i in range(1, 8)])
         nxt = next((o for o in upcoming if not o.cancelled), None)
         if nxt:
-            next_class = NextClass(module_code=nxt.module_code, starts_at=nxt.starts_at, venue=nxt.venue)
+            next_class = DashboardNextClass(
+                module_code=nxt.module_code, starts_at=nxt.starts_at, venue=nxt.venue
+            )
 
     assessments = (
         (

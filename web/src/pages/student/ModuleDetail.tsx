@@ -8,7 +8,8 @@ import { Empty } from '@/components/student/section'
 import { useNoteDownload } from '@/components/student/use-note-download'
 import { ApiError } from '@/lib/api'
 import { calendarDaysBetween, isUrgent, relativeDue, shortDate, shortDateTime, time } from '@/lib/format'
-import { useModule, type ModuleAssessment, type ModuleDetail as Detail, type ModuleNote, type WeekClass } from '@/lib/modules'
+import type { ModuleAssessment, ModuleDetail as Detail, Note as ModuleNote, WeekClass } from '@/api/generated/model'
+import { useModuleDetail } from '@/api/generated/modules/modules'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
 
@@ -182,7 +183,7 @@ export default function ModuleDetail() {
   const [params, setParams] = useSearchParams()
   const tab: Tab = TABS.includes(params.get('tab') as Tab) ? (params.get('tab') as Tab) : 'overview'
   const setTab = (t: string) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })
-  const { data: m, isPending, error } = useModule(code.toUpperCase())
+  const { data: m, isPending, error } = useModuleDetail(code.toUpperCase())
   const now = useNow()
   const download = useNoteDownload()
   const get = (n: ModuleNote) => download.request({ ...n }, { ask: !n.downloaded })

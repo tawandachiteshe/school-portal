@@ -1,43 +1,21 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { api, ApiError } from '@/lib/api'
+import { logout } from '@/api/generated/auth/auth'
+import { getMeQueryKey, me as fetchMe } from '@/api/generated/me/me'
+import type { MeOut, Role } from '@/api/generated/model'
+import { ApiError } from '@/lib/api'
 
-export type Role =
-  | 'applicant'
-  | 'student'
-  | 'lecturer'
-  | 'admissions'
-  | 'registry'
-  | 'librarian'
-  | 'admin'
-  | 'student_affairs'
+export type { Role }
+export type Me = MeOut
 
-export type Me = {
-  id: string
-  display_name: string
-  given_name: string
-  initials: string
-  roles: Role[]
-  phone: string | null
-  student: {
-    student_number: string
-    programme_code: string
-    programme_name: string
-    class_group: string | null
-    year_of_study: number
-  } | null
-  staff: { staff_number: string; short_name: string; position: string | null } | null
-  term: { code: string; name: string; week: number | null; weeks: number } | null
-}
-
-export const meQueryKey = ['me'] as const
+export const meQueryKey = getMeQueryKey()
 
 // `null` means signed out (401); errors other than 401 are thrown to the error boundary.
 export function useMe() {
   return useQuery({
     queryKey: meQueryKey,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       try {
-        return await api<Me>('/me')
+        return await fetchMe({ signal })
       } catch (e) {
         if (e instanceof ApiError && e.status === 401) return null
         throw e
@@ -66,7 +44,7 @@ export function isStaff(me: Me): boolean {
 export function useSignOut() {
   const qc = useQueryClient()
   return async () => {
-    const { redirect } = await api<{ redirect: string }>('/auth/logout', { method: 'POST' })
+    const { redirect } = await logout()
     qc.clear()
     window.location.assign(redirect)
   }

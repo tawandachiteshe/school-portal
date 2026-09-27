@@ -12,7 +12,8 @@ import {
   shortDate,
   shortDateTime,
 } from '@/lib/format'
-import { KIND_LABEL, type AnnouncementItem, type DueItem, type LoanItem, type NoteItem } from '@/lib/student'
+import type { AnnouncementItem, DueItem, LoanItem, NoteItem } from '@/api/generated/model'
+import { KIND_LABEL } from '@/lib/student'
 import { cn } from '@/lib/utils'
 
 // Tests, assignments… (design/Main "Due in the next 7 days", Deadlines).

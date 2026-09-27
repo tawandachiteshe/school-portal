@@ -1,6 +1,7 @@
 """Development seed: the sample data from the design files (design/*.dc.html).
 
-    uv run python -m app.seed          # wipes portal data and re-creates it
+    uv run python -m app.seed                        # wipes portal data and re-creates it
+    uv run python -m app.seed --results-published    # …with this semester's results published
 
 Dates are relative to today so the dashboard always looks like the designs: the
 current term is in week 6 of 16. Never runs in production.
@@ -26,12 +27,15 @@ from app.models import (
     CourseMaterial,
     Department,
     Enrolment,
+    FeeDueDate,
+    FeeTransaction,
     Intake,
     LibraryCopy,
     LibraryItem,
     LibraryLoan,
     Module,
     ModuleOffering,
+    ModuleResult,
     OfferingLecturer,
     Person,
     Programme,
@@ -44,7 +48,7 @@ from app.models import (
     UserRole,
     Venue,
 )
-from app.seed_files import make_pdf
+from app.pdf import make_pdf
 from app.services import clock
 
 GROUPS = {
@@ -90,7 +94,8 @@ def term_start(today: date) -> date:
 
 
 class Seeder:
-    def __init__(self, db: AsyncSession, today: date):
+    def __init__(self, db: AsyncSession, today: date, results_published: bool = False):
+        self.results_published = results_published
         self.db = db
         self.today = today
         self._reads: list[Announcement] = []
@@ -305,6 +310,8 @@ class Seeder:
         self.materials(offerings, lecturers)
         self.announcements(author_staff=mushonga, lab3=lab3, start=start)
         self.library(tariro)
+        self.fees(student, term, start)
+        self.results(student, offerings, lecturers)
         await self.db.flush()
         for a in self._reads:
             self.db.add(AnnouncementRead(announcement_id=a.id, user_id=tariro.user.id))
@@ -611,6 +618,57 @@ class Seeder:
             if read:
                 self._reads.append(a)
 
+    def fees(self, student, term, start: date) -> None:
+        # design/Fees: tuition charged in week 1, first instalment paid a week later, second due in week 12.
+        self.db.add_all(
+            [
+                FeeTransaction(
+                    student=student,
+                    term=term,
+                    kind="charge",
+                    description="Semester 1 tuition",
+                    amount=620,
+                    occurred_on=start,
+                ),
+                FeeTransaction(
+                    student=student,
+                    term=term,
+                    kind="payment",
+                    description="Payment, instalment 1",
+                    amount=-310,
+                    occurred_on=start + timedelta(days=7),
+                    receipt_ref="R-27-01934",
+                ),
+                FeeDueDate(
+                    student=student,
+                    term=term,
+                    label="Second instalment",
+                    amount=310,
+                    due_on=start + timedelta(weeks=11, days=2),
+                ),
+            ]
+        )
+
+    # design/Results: coursework, exam, final.
+    RESULTS = {"DCN201": (72, 64, 68), "NET202": (78, 70, 74), "PRG101": (85, 77, 81), "MTH110": (61, 49, 55)}
+
+    def results(self, student, offerings, lecturers) -> None:
+        for code, (cw, ex, final) in self.RESULTS.items():
+            self.db.add(
+                ModuleResult(
+                    student=student,
+                    offering=offerings[code],
+                    coursework_mark=cw,
+                    exam_mark=ex,
+                    final_mark=final,
+                    grade="Pass",
+                    is_pass=True,
+                    entered_by=lecturers[code].person.user.id,
+                )
+            )
+            if self.results_published:
+                offerings[code].results_published_at = clock.now() - timedelta(days=1)
+
     def library(self, tariro: Person) -> None:
         now = clock.now()
         books = [
@@ -650,7 +708,7 @@ async def main() -> None:
         sys.exit("Refusing to seed a production database.")
     async with get_sessionmaker()() as db:
         await db.execute(text(f"TRUNCATE {', '.join(TABLES)} RESTART IDENTITY CASCADE"))
-        await Seeder(db, date.today()).run()
+        await Seeder(db, date.today(), results_published="--results-published" in sys.argv).run()
     print("Seeded. Sign in at http://localhost:5173/login (development sign-in).")
 
 

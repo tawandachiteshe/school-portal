@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
 import { watchWifiQueue } from '@/lib/downloads'
+import { invalidateStudentData } from '@/lib/student'
 import { dismissUpload, resumeSavedUploads } from '@/lib/uploads'
 import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
@@ -79,7 +80,7 @@ export function StudentRoot() {
     // Runs for every finished upload: refresh deadlines and receipts, then drop the progress state.
     void resumeSavedUploads((assessmentId) => {
       toast('Your work has been submitted.')
-      void qc.invalidateQueries({ queryKey: ['student'] }).then(() => dismissUpload(assessmentId))
+      void invalidateStudentData(qc).then(() => dismissUpload(assessmentId))
     })
   }, [qc])
   // Notes queued with "Download when I'm on Wi-Fi" start as soon as the phone is on Wi-Fi.

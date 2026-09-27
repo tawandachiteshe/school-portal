@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.types import Role
 from app.auth.deps import CurrentUser, current_user
 from app.db import get_db
 from app.models import AcademicTerm, NotificationPreference, Staff, Student
@@ -39,7 +40,7 @@ class MeOut(BaseModel):
     display_name: str
     given_name: str
     initials: str
-    roles: list[str]
+    roles: list[Role]
     phone: str | None
     student: StudentInfo | None
     staff: StaffInfo | None
@@ -98,14 +99,14 @@ async def _sms_reminders(db: AsyncSession, cu: CurrentUser) -> bool:
 
 
 @router.get("/me/settings")
-async def get_settings_(
+async def get_my_settings(
     cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends(get_db)
 ) -> SettingsOut:
     return SettingsOut(sms_reminders=await _sms_reminders(db, cu))
 
 
 @router.patch("/me/settings")
-async def update_settings(
+async def update_my_settings(
     body: SettingsIn, cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends(get_db)
 ) -> SettingsOut:
     if body.sms_reminders is not None:

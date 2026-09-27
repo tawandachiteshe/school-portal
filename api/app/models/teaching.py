@@ -149,6 +149,9 @@ class ModuleResult(Base):
     entered_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     approved_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
 
+    student: Mapped["Student"] = relationship()  # noqa: F821
+    offering: Mapped[ModuleOffering] = relationship()
+
 
 class UploadSession(Base):
     __tablename__ = "upload_sessions"

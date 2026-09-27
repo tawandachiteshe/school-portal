@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { LoaderCircle, MessageSquare, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'
@@ -9,10 +9,13 @@ import { AnnouncementRow, DueRow, LoanRow, NoteRow } from '@/components/student/
 import { Empty, Section } from '@/components/student/section'
 import { TodayTimeline } from '@/components/student/today-timeline'
 import { useNoteDownload } from '@/components/student/use-note-download'
-import { api, ApiError } from '@/lib/api'
+import { useRenewLoan } from '@/api/generated/library/library'
+import type { Dashboard } from '@/api/generated/model'
+import { useDashboard } from '@/api/generated/student/student'
+import { ApiError } from '@/lib/api'
 import { useMe } from '@/lib/auth'
 import { calendarDaysBetween, formatLongDate, greeting, shortDate, time, weekday } from '@/lib/format'
-import { dashboardKey, useDashboard, type Dashboard } from '@/lib/student'
+import { invalidateStudentData } from '@/lib/student'
 import { useNow } from '@/lib/use-now'
 
 const list = '[&>li+li]:border-t'
@@ -81,13 +84,14 @@ export default function Home() {
   const now = useNow()
   const qc = useQueryClient()
   const download = useNoteDownload()
-  const renew = useMutation({
-    mutationFn: (id: string) => api<{ id: string; due_at: string }>(`/library/loans/${id}/renew`, { method: 'POST' }),
-    onSuccess: (r) => {
-      toast(`Renewed. Due back ${shortDate(new Date(r.due_at))}.`)
-      qc.invalidateQueries({ queryKey: dashboardKey })
+  const renew = useRenewLoan({
+    mutation: {
+      onSuccess: (r) => {
+        toast(`Renewed. Due back ${shortDate(new Date(r.due_at))}.`)
+        void invalidateStudentData(qc)
+      },
+      onError: (e) => toast(e instanceof ApiError ? e.message : 'Could not renew. Try again.'),
     },
-    onError: (e) => toast(e instanceof ApiError ? e.message : 'Could not renew. Try again.'),
   })
 
   if (isPending) return <Loading />
@@ -111,7 +115,7 @@ export default function Home() {
       <DashboardView
         data={data}
         now={now}
-        onRenew={renew.mutate}
+        onRenew={(loanId) => renew.mutate({ loanId })}
         renewing={renew.isPending}
         onDownload={(n) => download.request(n)}
       />

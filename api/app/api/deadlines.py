@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import storage
 from app.api.me import term_info
+from app.api.types import AssessmentKind, SubmissionMode, SubmissionStatus
 from app.config import get_settings
 from app.db import get_db
 from app.models import Assessment, Student, Submission, SubmissionFile, UploadSession
@@ -31,16 +32,16 @@ DONE = ("submitted", "late", "marked", "returned")
 
 class DeadlineItem(BaseModel):
     id: uuid.UUID
-    kind: str
+    kind: AssessmentKind
     title: str
     module_code: str
     due_at: datetime
     week: int | None
     venue: str | None
-    submission_mode: str
+    submission_mode: SubmissionMode
     accepted_extensions: list[str] | None
     allow_late_until: datetime | None
-    status: str | None
+    status: SubmissionStatus | None
     submitted_at: datetime | None
     mark: float | None
     max_mark: float
@@ -125,7 +126,7 @@ class ReceiptFile(BaseModel):
 
 
 class SubmissionOut(BaseModel):
-    status: str
+    status: SubmissionStatus
     submitted_at: datetime | None
     note: str | None
     files: list[ReceiptFile]
@@ -140,13 +141,13 @@ class PendingUpload(BaseModel):
 
 class AssessmentOut(BaseModel):
     id: uuid.UUID
-    kind: str
+    kind: AssessmentKind
     title: str
     module_code: str
     due_at: datetime
     description: str | None
     lecturer: str | None
-    submission_mode: str
+    submission_mode: SubmissionMode
     accepted_extensions: list[str] | None
     max_file_mb: int
     allow_late_until: datetime | None

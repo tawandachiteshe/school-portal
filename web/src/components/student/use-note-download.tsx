@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useDataSaver } from '@/lib/data-saver'
 import { queueForWifi, shouldAsk, startDownload } from '@/lib/downloads'
+import { invalidateStudentData } from '@/lib/student'
 import { DownloadSheet, type PendingDownload } from './download-sheet'
 
 // Download a note, asking first when it's large and the phone is saving data.
@@ -14,7 +15,7 @@ export function useNoteDownload() {
   const go = (id: string) => {
     startDownload(id)
     // The API records the download; refresh "downloaded" / "new note" markers.
-    setTimeout(() => qc.invalidateQueries({ queryKey: ['student'] }), 1500)
+    setTimeout(() => void invalidateStudentData(qc), 1500)
   }
 
   const request = (note: Omit<PendingDownload, 'size_bytes'> & { size_bytes: number | null }, opts?: { ask?: boolean }) => {

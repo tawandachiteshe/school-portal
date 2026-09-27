@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import storage
 from app.api.me import term_info
+from app.api.types import AssessmentKind, ClassKind, SubmissionMode, SubmissionStatus
 from app.auth.deps import CurrentUser, current_user
 from app.config import get_settings
 from app.db import get_db
@@ -32,7 +33,7 @@ class Lecturer(BaseModel):
     email: str | None
 
 
-class NextClass(BaseModel):
+class ModuleNextClass(BaseModel):
     starts_at: datetime
     venue: str | None
 
@@ -41,7 +42,7 @@ class ModuleSummary(BaseModel):
     code: str
     name: str
     lecturer: str | None
-    next_class: NextClass | None
+    next_class: ModuleNextClass | None
     new_notes: int
 
 
@@ -52,7 +53,7 @@ class ModuleList(BaseModel):
 
 
 class WeekClass(BaseModel):
-    kind: str
+    kind: ClassKind
     starts_at: datetime
     ends_at: datetime
     venue: str | None
@@ -63,13 +64,13 @@ class WeekClass(BaseModel):
 
 class ModuleAssessment(BaseModel):
     id: uuid.UUID
-    kind: str
+    kind: AssessmentKind
     title: str
     weight: float
     due_at: datetime
     venue: str | None
-    submission_mode: str
-    status: str | None  # submission status, None if nothing handed in
+    submission_mode: SubmissionMode
+    status: SubmissionStatus | None  # None if nothing handed in
     submitted_at: datetime | None
     mark: float | None  # only once marks are released
     max_mark: float
@@ -156,7 +157,7 @@ async def list_modules(
                 code=o.module.code,
                 name=o.module.name,
                 lecturer=lead.short_name if lead else None,
-                next_class=NextClass(starts_at=nxt.starts_at, venue=nxt.venue) if nxt else None,
+                next_class=ModuleNextClass(starts_at=nxt.starts_at, venue=nxt.venue) if nxt else None,
                 new_notes=sum(1 for r in recent if r.offering_id == o.id and r.id not in downloaded),
             )
         )

@@ -1,0 +1,3510 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TCFL Portal API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Healthz",
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/dev-accounts": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Dev Accounts",
+        "operationId": "dev_accounts",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DevAccount"
+                  },
+                  "type": "array",
+                  "title": "Response Dev Accounts"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/dev-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Dev Login",
+        "operationId": "dev_login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevLoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "type": "object",
+                  "title": "Response Dev Login"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Me",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/settings": {
+      "get": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Get My Settings",
+        "operationId": "get_my_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Update My Settings",
+        "operationId": "update_my_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/dashboard": {
+      "get": {
+        "tags": [
+          "student"
+        ],
+        "summary": "Dashboard",
+        "operationId": "dashboard",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/announcements": {
+      "get": {
+        "tags": [
+          "student"
+        ],
+        "summary": "List Announcements",
+        "operationId": "list_announcements",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcements"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/announcements/{announcement_id}": {
+      "get": {
+        "tags": [
+          "student"
+        ],
+        "summary": "Announcement Detail",
+        "operationId": "announcement_detail",
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/library/loans/{loan_id}/renew": {
+      "post": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Renew Loan",
+        "operationId": "renew_loan",
+        "parameters": [
+          {
+            "name": "loan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Loan Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/modules": {
+      "get": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "List Modules",
+        "operationId": "list_modules",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/modules/{code}": {
+      "get": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Module Detail",
+        "operationId": "module_detail",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/materials/{material_id}/download": {
+      "get": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Download Material",
+        "operationId": "download_material",
+        "parameters": [
+          {
+            "name": "material_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Material Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/deadlines": {
+      "get": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Deadlines",
+        "operationId": "deadlines",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deadlines"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/assessments/{assessment_id}": {
+      "get": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Assessment Detail",
+        "operationId": "assessment_detail",
+        "parameters": [
+          {
+            "name": "assessment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Assessment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/assessments/{assessment_id}/uploads": {
+      "post": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Start Upload",
+        "operationId": "start_upload",
+        "parameters": [
+          {
+            "name": "assessment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Assessment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/uploads/{upload_id}": {
+      "get": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Upload Status",
+        "operationId": "upload_status",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Upload Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Upload Chunk",
+        "operationId": "upload_chunk",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Upload Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Cancel Upload",
+        "operationId": "cancel_upload",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Upload Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/uploads/{upload_id}/complete": {
+      "post": {
+        "tags": [
+          "deadlines"
+        ],
+        "summary": "Complete Upload",
+        "operationId": "complete_upload",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Upload Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/timetable": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Week Timetable",
+        "operationId": "week_timetable",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Any date in the week; defaults to this week",
+              "title": "Start"
+            },
+            "description": "Any date in the week; defaults to this week"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Week"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/timetable.ics": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Timetable Ics",
+        "description": "The rest of this term as a calendar file (\"Add this timetable to my phone calendar\").",
+        "operationId": "timetable_ics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/results": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Results",
+        "operationId": "results",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Results"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/results/{term_code}/slip.pdf": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Results Slip",
+        "operationId": "results_slip",
+        "parameters": [
+          {
+            "name": "term_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Term Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/results/remarks": {
+      "post": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Request Remark",
+        "operationId": "request_remark",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemarkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Request Remark"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/fees": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Fees",
+        "operationId": "fees",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fees"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/fees/statement.pdf": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Fee Statement",
+        "operationId": "fee_statement",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/card": {
+      "get": {
+        "tags": [
+          "records"
+        ],
+        "summary": "Student Card",
+        "operationId": "student_card",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Card"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnnouncementDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body_md": {
+            "type": "string",
+            "title": "Body Md"
+          },
+          "from_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Label"
+          },
+          "publish_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish At"
+          },
+          "is_pinned": {
+            "type": "boolean",
+            "title": "Is Pinned"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "contact_line": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Line"
+          },
+          "affects": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Affects"
+          },
+          "affects_you": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Affects You"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "body_md",
+          "from_label",
+          "publish_at",
+          "is_pinned",
+          "audience",
+          "contact_line",
+          "affects",
+          "affects_you"
+        ],
+        "title": "AnnouncementDetail"
+      },
+      "AnnouncementItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "from_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Label"
+          },
+          "publish_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish At"
+          },
+          "is_pinned": {
+            "type": "boolean",
+            "title": "Is Pinned"
+          },
+          "read": {
+            "type": "boolean",
+            "title": "Read"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "from_label",
+          "publish_at",
+          "is_pinned",
+          "read"
+        ],
+        "title": "AnnouncementItem"
+      },
+      "Announcements": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "unread",
+          "items"
+        ],
+        "title": "Announcements"
+      },
+      "AssessmentKind": {
+        "type": "string",
+        "enum": [
+          "test",
+          "assignment",
+          "practical",
+          "project",
+          "exam"
+        ],
+        "title": "AssessmentKind"
+      },
+      "AssessmentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "lecturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecturer"
+          },
+          "submission_mode": {
+            "$ref": "#/components/schemas/SubmissionMode"
+          },
+          "accepted_extensions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Extensions"
+          },
+          "max_file_mb": {
+            "type": "integer",
+            "title": "Max File Mb"
+          },
+          "allow_late_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Late Until"
+          },
+          "can_submit": {
+            "type": "boolean",
+            "title": "Can Submit"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "submission": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pending_upload": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PendingUpload"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "chunk_bytes": {
+            "type": "integer",
+            "title": "Chunk Bytes",
+            "default": 262144
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "module_code",
+          "due_at",
+          "description",
+          "lecturer",
+          "submission_mode",
+          "accepted_extensions",
+          "max_file_mb",
+          "allow_late_until",
+          "can_submit",
+          "reason",
+          "submission",
+          "pending_upload"
+        ],
+        "title": "AssessmentOut"
+      },
+      "Card": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "programme_name": {
+            "type": "string",
+            "title": "Programme Name"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date",
+            "title": "Valid Until"
+          },
+          "has_photo": {
+            "type": "boolean",
+            "title": "Has Photo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "student_number",
+          "barcode",
+          "programme_name",
+          "class_group",
+          "valid_until",
+          "has_photo"
+        ],
+        "title": "Card"
+      },
+      "ClassKind": {
+        "type": "string",
+        "enum": [
+          "lecture",
+          "tutorial",
+          "lab",
+          "consultation"
+        ],
+        "title": "ClassKind"
+      },
+      "CompleteIn": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "CompleteIn"
+      },
+      "Dashboard": {
+        "properties": {
+          "today": {
+            "items": {
+              "$ref": "#/components/schemas/TodayClass"
+            },
+            "type": "array",
+            "title": "Today"
+          },
+          "next_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardNextClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "due": {
+            "items": {
+              "$ref": "#/components/schemas/DueItem"
+            },
+            "type": "array",
+            "title": "Due"
+          },
+          "announcements": {
+            "$ref": "#/components/schemas/Announcements"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/NoteItem"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/LoanItem"
+            },
+            "type": "array",
+            "title": "Loans"
+          },
+          "results": {
+            "$ref": "#/components/schemas/ResultsStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "today",
+          "next_class",
+          "due",
+          "announcements",
+          "notes",
+          "loans",
+          "results"
+        ],
+        "title": "Dashboard"
+      },
+      "DashboardNextClass": {
+        "properties": {
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module_code",
+          "starts_at",
+          "venue"
+        ],
+        "title": "DashboardNextClass"
+      },
+      "Day": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Classes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "classes"
+        ],
+        "title": "Day"
+      },
+      "DeadlineItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "submission_mode": {
+            "$ref": "#/components/schemas/SubmissionMode"
+          },
+          "accepted_extensions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Extensions"
+          },
+          "allow_late_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Late Until"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark"
+          },
+          "max_mark": {
+            "type": "number",
+            "title": "Max Mark"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "module_code",
+          "due_at",
+          "week",
+          "venue",
+          "submission_mode",
+          "accepted_extensions",
+          "allow_late_until",
+          "status",
+          "submitted_at",
+          "mark",
+          "max_mark",
+          "feedback"
+        ],
+        "title": "DeadlineItem"
+      },
+      "Deadlines": {
+        "properties": {
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeadlineItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week",
+          "items"
+        ],
+        "title": "Deadlines"
+      },
+      "DevAccount": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "display_name",
+          "roles"
+        ],
+        "title": "DevAccount"
+      },
+      "DevLoginIn": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "title": "DevLoginIn"
+      },
+      "DueItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "submission_mode": {
+            "$ref": "#/components/schemas/SubmissionMode"
+          },
+          "submitted": {
+            "type": "boolean",
+            "title": "Submitted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "module_code",
+          "due_at",
+          "venue",
+          "submission_mode",
+          "submitted"
+        ],
+        "title": "DueItem"
+      },
+      "Fees": {
+        "properties": {
+          "term_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Name"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "balance": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Balance"
+          },
+          "next_payment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextPayment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "payment_reference": {
+            "type": "string",
+            "title": "Payment Reference"
+          },
+          "payment_options": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Options"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "term_name",
+          "currency",
+          "balance",
+          "next_payment",
+          "payment_reference",
+          "payment_options",
+          "lines"
+        ],
+        "title": "Fees"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Lecturer": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "consultation_hours": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consultation Hours"
+          },
+          "office": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Office"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "consultation_hours",
+          "office",
+          "email"
+        ],
+        "title": "Lecturer"
+      },
+      "Line": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount"
+          },
+          "occurred_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Occurred On"
+          },
+          "receipt_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "description",
+          "amount",
+          "occurred_on",
+          "receipt_ref"
+        ],
+        "title": "Line"
+      },
+      "LoanItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "renewals_left": {
+            "type": "integer",
+            "title": "Renewals Left"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "authors",
+          "due_at",
+          "renewals_left",
+          "overdue"
+        ],
+        "title": "LoanItem"
+      },
+      "LogoutOut": {
+        "properties": {
+          "redirect": {
+            "type": "string",
+            "title": "Redirect"
+          }
+        },
+        "type": "object",
+        "required": [
+          "redirect"
+        ],
+        "title": "LogoutOut"
+      },
+      "MeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "given_name": {
+            "type": "string",
+            "title": "Given Name"
+          },
+          "initials": {
+            "type": "string",
+            "title": "Initials"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "student": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudentInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "staff": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StaffInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "term": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TermInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "given_name",
+          "initials",
+          "roles",
+          "phone",
+          "student",
+          "staff",
+          "term"
+        ],
+        "title": "MeOut"
+      },
+      "ModuleAssessment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "submission_mode": {
+            "$ref": "#/components/schemas/SubmissionMode"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark"
+          },
+          "max_mark": {
+            "type": "number",
+            "title": "Max Mark"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "weight",
+          "due_at",
+          "venue",
+          "submission_mode",
+          "status",
+          "submitted_at",
+          "mark",
+          "max_mark"
+        ],
+        "title": "ModuleAssessment"
+      },
+      "ModuleDetail": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "term_name": {
+            "type": "string",
+            "title": "Term Name"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "lecturer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lecturer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coursework_weight": {
+            "type": "number",
+            "title": "Coursework Weight"
+          },
+          "exam_weight": {
+            "type": "number",
+            "title": "Exam Weight"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "week_classes": {
+            "items": {
+              "$ref": "#/components/schemas/WeekClass"
+            },
+            "type": "array",
+            "title": "Week Classes"
+          },
+          "assessments": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleAssessment"
+            },
+            "type": "array",
+            "title": "Assessments"
+          },
+          "exam_scheduled": {
+            "type": "boolean",
+            "title": "Exam Scheduled"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/Note"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "term_name",
+          "class_group",
+          "lecturer",
+          "coursework_weight",
+          "exam_weight",
+          "week",
+          "week_classes",
+          "assessments",
+          "exam_scheduled",
+          "notes"
+        ],
+        "title": "ModuleDetail"
+      },
+      "ModuleList": {
+        "properties": {
+          "term_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Name"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleSummary"
+            },
+            "type": "array",
+            "title": "Modules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "term_name",
+          "class_group",
+          "modules"
+        ],
+        "title": "ModuleList"
+      },
+      "ModuleNextClass": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "venue"
+        ],
+        "title": "ModuleNextClass"
+      },
+      "ModuleSummary": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "lecturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecturer"
+          },
+          "next_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModuleNextClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "new_notes": {
+            "type": "integer",
+            "title": "New Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "lecturer",
+          "next_class",
+          "new_notes"
+        ],
+        "title": "ModuleSummary"
+      },
+      "NextPayment": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount"
+          },
+          "due_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Due On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "amount",
+          "due_on"
+        ],
+        "title": "NextPayment"
+      },
+      "Note": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "downloaded": {
+            "type": "boolean",
+            "title": "Downloaded"
+          },
+          "external_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "week",
+          "topic",
+          "mime_type",
+          "size_bytes",
+          "published_at",
+          "downloaded",
+          "external_url"
+        ],
+        "title": "Note"
+      },
+      "NoteItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "module_code",
+          "week",
+          "mime_type",
+          "size_bytes",
+          "published_at"
+        ],
+        "title": "NoteItem"
+      },
+      "Notice": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "announcement_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Announcement Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "text",
+          "announcement_id"
+        ],
+        "title": "Notice"
+      },
+      "PendingUpload": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "received_bytes": {
+            "type": "integer",
+            "title": "Received Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "size_bytes",
+          "received_bytes"
+        ],
+        "title": "PendingUpload"
+      },
+      "ReceiptFile": {
+        "properties": {
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "uploaded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Uploaded At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "filename",
+          "size_bytes",
+          "sha256",
+          "uploaded_at"
+        ],
+        "title": "ReceiptFile"
+      },
+      "RemarkIn": {
+        "properties": {
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offering_id",
+          "reason"
+        ],
+        "title": "RemarkIn"
+      },
+      "RenewOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "renewals_left": {
+            "type": "integer",
+            "title": "Renewals Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "due_at",
+          "renewals_left"
+        ],
+        "title": "RenewOut"
+      },
+      "ResultRow": {
+        "properties": {
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "coursework_mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coursework Mark"
+          },
+          "exam_mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Mark"
+          },
+          "final_mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Mark"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "is_pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Pass"
+          },
+          "remarks": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remarks"
+          },
+          "remark_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remark Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offering_id",
+          "module_code",
+          "module_name",
+          "coursework_mark",
+          "exam_mark",
+          "final_mark",
+          "grade",
+          "is_pass",
+          "remarks",
+          "remark_status"
+        ],
+        "title": "ResultRow"
+      },
+      "Results": {
+        "properties": {
+          "current_term_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Term Name"
+          },
+          "current_published": {
+            "type": "boolean",
+            "title": "Current Published"
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/TermResults"
+            },
+            "type": "array",
+            "title": "Terms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_term_name",
+          "current_published",
+          "terms"
+        ],
+        "title": "Results"
+      },
+      "ResultsStatus": {
+        "properties": {
+          "term_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Name"
+          },
+          "published": {
+            "type": "boolean",
+            "title": "Published"
+          }
+        },
+        "type": "object",
+        "required": [
+          "term_name",
+          "published"
+        ],
+        "title": "ResultsStatus"
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "applicant",
+          "student",
+          "lecturer",
+          "admissions",
+          "registry",
+          "librarian",
+          "admin",
+          "student_affairs"
+        ],
+        "title": "Role"
+      },
+      "SettingsIn": {
+        "properties": {
+          "sms_reminders": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Reminders"
+          }
+        },
+        "type": "object",
+        "title": "SettingsIn"
+      },
+      "SettingsOut": {
+        "properties": {
+          "sms_reminders": {
+            "type": "boolean",
+            "title": "Sms Reminders"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sms_reminders"
+        ],
+        "title": "SettingsOut"
+      },
+      "Slot": {
+        "properties": {
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClassKind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "lecturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecturer"
+          },
+          "cancelled": {
+            "type": "boolean",
+            "title": "Cancelled"
+          },
+          "change_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Reason"
+          },
+          "assessment_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module_code",
+          "module_name",
+          "kind",
+          "starts_at",
+          "ends_at",
+          "venue",
+          "lecturer",
+          "cancelled",
+          "change_reason",
+          "assessment_title"
+        ],
+        "title": "Slot"
+      },
+      "StaffInfo": {
+        "properties": {
+          "staff_number": {
+            "type": "string",
+            "title": "Staff Number"
+          },
+          "short_name": {
+            "type": "string",
+            "title": "Short Name"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_number",
+          "short_name",
+          "position"
+        ],
+        "title": "StaffInfo"
+      },
+      "StudentInfo": {
+        "properties": {
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "programme_code": {
+            "type": "string",
+            "title": "Programme Code"
+          },
+          "programme_name": {
+            "type": "string",
+            "title": "Programme Name"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "year_of_study": {
+            "type": "integer",
+            "title": "Year Of Study"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_number",
+          "programme_code",
+          "programme_name",
+          "class_group",
+          "year_of_study"
+        ],
+        "title": "StudentInfo"
+      },
+      "SubmissionMode": {
+        "type": "string",
+        "enum": [
+          "online",
+          "physical",
+          "none"
+        ],
+        "title": "SubmissionMode"
+      },
+      "SubmissionOut": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptFile"
+            },
+            "type": "array",
+            "title": "Files"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "submitted_at",
+          "note",
+          "files"
+        ],
+        "title": "SubmissionOut"
+      },
+      "SubmissionStatus": {
+        "type": "string",
+        "enum": [
+          "submitted",
+          "late",
+          "marked",
+          "returned"
+        ],
+        "title": "SubmissionStatus"
+      },
+      "TermInfo": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "weeks": {
+            "type": "integer",
+            "title": "Weeks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "week",
+          "weeks"
+        ],
+        "title": "TermInfo"
+      },
+      "TermResults": {
+        "properties": {
+          "term_code": {
+            "type": "string",
+            "title": "Term Code"
+          },
+          "term_name": {
+            "type": "string",
+            "title": "Term Name"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ResultRow"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "remark_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remark Until"
+          },
+          "notice": {
+            "type": "string",
+            "title": "Notice"
+          }
+        },
+        "type": "object",
+        "required": [
+          "term_code",
+          "term_name",
+          "published_at",
+          "modules",
+          "remark_until",
+          "notice"
+        ],
+        "title": "TermResults"
+      },
+      "TodayClass": {
+        "properties": {
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClassKind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "lecturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecturer"
+          },
+          "cancelled": {
+            "type": "boolean",
+            "title": "Cancelled"
+          },
+          "change_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Reason"
+          },
+          "assessment_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module_code",
+          "module_name",
+          "kind",
+          "starts_at",
+          "ends_at",
+          "venue",
+          "lecturer",
+          "cancelled",
+          "change_reason",
+          "assessment_title"
+        ],
+        "title": "TodayClass"
+      },
+      "UploadIn": {
+        "properties": {
+          "filename": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Filename"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Size Bytes"
+          },
+          "mime_type": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Mime Type",
+            "default": "application/octet-stream"
+          }
+        },
+        "type": "object",
+        "required": [
+          "filename",
+          "size_bytes"
+        ],
+        "title": "UploadIn"
+      },
+      "UploadOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "received_bytes": {
+            "type": "integer",
+            "title": "Received Bytes"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "chunk_bytes": {
+            "type": "integer",
+            "title": "Chunk Bytes",
+            "default": 262144
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "received_bytes",
+          "size_bytes"
+        ],
+        "title": "UploadOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Week": {
+        "properties": {
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "term_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Name"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/Day"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/Notice"
+            },
+            "type": "array",
+            "title": "Notices"
+          },
+          "has_previous": {
+            "type": "boolean",
+            "title": "Has Previous"
+          },
+          "has_next": {
+            "type": "boolean",
+            "title": "Has Next"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week",
+          "starts_on",
+          "ends_on",
+          "term_name",
+          "class_group",
+          "days",
+          "notices",
+          "has_previous",
+          "has_next"
+        ],
+        "title": "Week"
+      },
+      "WeekClass": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ClassKind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "cancelled": {
+            "type": "boolean",
+            "title": "Cancelled"
+          },
+          "change_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Reason"
+          },
+          "assessment_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "starts_at",
+          "ends_at",
+          "venue",
+          "cancelled",
+          "change_reason",
+          "assessment_title"
+        ],
+        "title": "WeekClass"
+      }
+    }
+  }
+}

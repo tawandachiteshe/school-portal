@@ -6,30 +6,20 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { SubPage } from '@/components/shell/sub-page'
 import { AnnouncementRow } from '@/components/student/rows'
 import { Empty, TextLink } from '@/components/student/section'
-import { api, ApiError } from '@/lib/api'
+import {
+  announcementDetail,
+  getAnnouncementDetailQueryKey,
+  getDashboardQueryKey,
+  getListAnnouncementsQueryKey,
+  useListAnnouncements,
+} from '@/api/generated/student/student'
+import { ApiError } from '@/lib/api'
 import { formatLongDate, time } from '@/lib/format'
-import { dashboardKey, type Announcements as AnnouncementList } from '@/lib/student'
 import { useNow } from '@/lib/use-now'
-
-type Detail = {
-  id: string
-  title: string
-  body_md: string
-  from_label: string | null
-  publish_at: string
-  is_pinned: boolean
-  audience: string
-  contact_line: string | null
-  affects: string | null
-  affects_you: boolean | null
-}
 
 export function AnnouncementsList() {
   const now = useNow()
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['student', 'announcements'],
-    queryFn: () => api<AnnouncementList>('/student/announcements'),
-  })
+  const { data, isPending, isError } = useListAnnouncements()
   return (
     <SubPage title="Announcements" back="/" backLabel="Back to home">
       <main className="flex flex-col gap-2 px-4 py-6">
@@ -56,12 +46,12 @@ export function AnnouncementDetail() {
   const { id } = useParams()
   const qc = useQueryClient()
   const { data, isPending, error } = useQuery({
-    queryKey: ['student', 'announcements', id],
-    queryFn: async () => {
-      const d = await api<Detail>(`/student/announcements/${id}`)
+    queryKey: getAnnouncementDetailQueryKey(id!),
+    queryFn: async ({ signal }) => {
+      const d = await announcementDetail(id!, { signal })
       // Opening it marks it read: refresh the unread dots elsewhere.
-      qc.invalidateQueries({ queryKey: dashboardKey })
-      qc.invalidateQueries({ queryKey: ['student', 'announcements'], exact: true })
+      void qc.invalidateQueries({ queryKey: getDashboardQueryKey() })
+      void qc.invalidateQueries({ queryKey: getListAnnouncementsQueryKey() })
       return d
     },
     retry: (n, e) => !(e instanceof ApiError && e.status === 404) && n < 1,

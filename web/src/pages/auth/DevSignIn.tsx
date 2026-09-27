@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Wordmark } from '@/components/shell/wordmark'
-import { api, ApiError } from '@/lib/api'
-import { homeFor, meQueryKey, type Me } from '@/lib/auth'
-
-type DevAccount = { username: string; display_name: string; roles: string[] }
+import { devLogin, useDevAccounts } from '@/api/generated/auth/auth'
+import { me as fetchMe } from '@/api/generated/me/me'
+import { ApiError } from '@/lib/api'
+import { homeFor, meQueryKey } from '@/lib/auth'
 
 const ROLE_LABEL: Record<string, string> = {
   student: 'Student',
@@ -25,17 +25,13 @@ export default function DevSignIn() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [error, setError] = useState<string | null>(null)
-  const accounts = useQuery({
-    queryKey: ['dev-accounts'],
-    queryFn: () => api<DevAccount[]>('/auth/dev-accounts'),
-    retry: false,
-  })
+  const accounts = useDevAccounts({ query: { retry: false } })
 
   async function signIn(username: string) {
     setError(null)
     try {
-      await api('/auth/dev-login', { json: { username } })
-      const me = await api<Me>('/me')
+      await devLogin({ username })
+      const me = await fetchMe()
       qc.setQueryData(meQueryKey, me)
       const next = params.get('next')
       navigate(next?.startsWith('/') && !next.startsWith('//') ? next : homeFor(me), { replace: true })
