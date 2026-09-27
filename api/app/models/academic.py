@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, SmallInteger, Text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, SmallInteger, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -125,3 +125,19 @@ class OfferingLecturer(Base):
     )
 
     staff: Mapped["Staff"] = relationship(lazy="joined")  # noqa: F821
+
+
+class IntakePlace(Base):
+    """Places a programme has in an intake, set by Admissions (not known until they set it)."""
+
+    __tablename__ = "intake_places"
+
+    intake_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("intakes.id", ondelete="CASCADE"), primary_key=True
+    )
+    programme_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("programmes.id", ondelete="CASCADE"), primary_key=True
+    )
+    places: Mapped[int] = mapped_column(Integer)
+    updated_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

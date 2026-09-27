@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.api import (
     admissions,
+    admissions_places,
     announcements_staff,
     apply,
     apply_birth,
@@ -13,12 +14,14 @@ from app.api import (
     deadlines,
     internal,
     library,
+    library_catalogue,
     library_desk,
     me,
     modules,
     public,
     records,
     student,
+    students_staff,
     teaching,
 )
 from app.auth import reset as auth_reset
@@ -66,6 +69,9 @@ def create_app() -> FastAPI:
     app.include_router(apply_submit.staff_router)
     app.include_router(internal.router)
     app.include_router(public.router)
+    app.include_router(admissions_places.router)
+    app.include_router(library_catalogue.router)
+    app.include_router(students_staff.router)
     app.include_router(assistant.router)
     app.include_router(assistant.staff_router)
     return app

@@ -4692,6 +4692,457 @@
         }
       }
     },
+    "/staff/admissions/places": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Intake Places",
+        "operationId": "intake_places",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakePlaces"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/places/{programme_id}": {
+      "put": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Set Intake Places",
+        "operationId": "set_intake_places",
+        "parameters": [
+          {
+            "name": "programme_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Programme Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacesIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakePlaces"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/catalogue": {
+      "get": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Catalogue",
+        "description": "Title, author, subject, ISBN, call number or a copy's barcode; everything (A–Z) without a query.",
+        "operationId": "catalogue",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogueItem"
+                  },
+                  "title": "Response Catalogue"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Add Book",
+        "operationId": "add_book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueItem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/catalogue/{item_id}/copies": {
+      "post": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Add Copy",
+        "operationId": "add_copy",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueItem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/reading-lists": {
+      "get": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Reading Lists",
+        "operationId": "reading_lists",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleReadingList"
+                  },
+                  "type": "array",
+                  "title": "Response Reading Lists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/reading-lists/{offering_id}/books": {
+      "post": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Add To Reading List",
+        "operationId": "add_to_reading_list",
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Offering Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListedIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleReadingList"
+                  },
+                  "title": "Response Add To Reading List"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/reading-lists/{offering_id}/books/{item_id}": {
+      "delete": {
+        "tags": [
+          "library catalogue"
+        ],
+        "summary": "Remove From Reading List",
+        "operationId": "remove_from_reading_list",
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Offering Id"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleReadingList"
+                  },
+                  "title": "Response Remove From Reading List"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/students": {
+      "get": {
+        "tags": [
+          "students"
+        ],
+        "summary": "Find Students",
+        "description": "Student number (all or part), or any part of the name.",
+        "operationId": "find_students",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 60,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentRow"
+                  },
+                  "title": "Response Find Students"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/students/{number}": {
+      "get": {
+        "tags": [
+          "students"
+        ],
+        "summary": "Student Profile",
+        "operationId": "student_profile",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/assistant": {
       "get": {
         "tags": [
@@ -6449,6 +6900,106 @@
         ],
         "title": "Book"
       },
+      "BookIn": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 2,
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Authors"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2100.0,
+                "minimum": 1800.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "isbn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isbn"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Subjects"
+          },
+          "copies": {
+            "items": {
+              "$ref": "#/components/schemas/CopyIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Copies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "BookIn"
+      },
       "Borrower": {
         "properties": {
           "person_id": {
@@ -6573,6 +7124,117 @@
           "has_photo"
         ],
         "title": "Card"
+      },
+      "CatalogueItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "isbn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isbn"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Subjects"
+          },
+          "copies": {
+            "type": "integer",
+            "title": "Copies"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "on_loan": {
+            "type": "integer",
+            "title": "On Loan"
+          },
+          "reservations_waiting": {
+            "type": "integer",
+            "title": "Reservations Waiting"
+          },
+          "barcodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Barcodes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "authors",
+          "edition",
+          "year",
+          "isbn",
+          "call_number",
+          "subjects",
+          "copies",
+          "available",
+          "on_loan",
+          "reservations_waiting",
+          "barcodes"
+        ],
+        "title": "CatalogueItem"
       },
       "CatalogueResults": {
         "properties": {
@@ -6947,6 +7609,33 @@
           "verified"
         ],
         "title": "Contact"
+      },
+      "CopyIn": {
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 3,
+            "title": "Barcode"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          }
+        },
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "title": "CopyIn"
       },
       "Crop": {
         "properties": {
@@ -8456,6 +9145,47 @@
         ],
         "title": "IntakeInfo"
       },
+      "IntakePlaces": {
+        "properties": {
+          "intake": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intake"
+          },
+          "closes_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes At"
+          },
+          "programmes": {
+            "items": {
+              "$ref": "#/components/schemas/ProgrammePlaces"
+            },
+            "type": "array",
+            "title": "Programmes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intake",
+          "closes_at",
+          "programmes"
+        ],
+        "title": "IntakePlaces"
+      },
       "IssueIn": {
         "properties": {
           "person_id": {
@@ -8671,6 +9401,91 @@
           "sms_queued"
         ],
         "title": "LinkSent"
+      },
+      "ListedBook": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "is_core": {
+            "type": "boolean",
+            "title": "Is Core"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "copies": {
+            "type": "integer",
+            "title": "Copies"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "title",
+          "authors",
+          "is_core",
+          "note",
+          "copies",
+          "available"
+        ],
+        "title": "ListedBook"
+      },
+      "ListedIn": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "is_core": {
+            "type": "boolean",
+            "title": "Is Core",
+            "default": true
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id"
+        ],
+        "title": "ListedIn"
       },
       "LoanItem": {
         "properties": {
@@ -9542,6 +10357,50 @@
           "venue"
         ],
         "title": "ModuleNextClass"
+      },
+      "ModuleReadingList": {
+        "properties": {
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "books": {
+            "items": {
+              "$ref": "#/components/schemas/ListedBook"
+            },
+            "type": "array",
+            "title": "Books"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offering_id",
+          "module_code",
+          "module_name",
+          "class_group",
+          "books"
+        ],
+        "title": "ModuleReadingList"
       },
       "ModuleSummary": {
         "properties": {
@@ -10849,6 +11708,21 @@
         ],
         "title": "PhoneSession"
       },
+      "PlacesIn": {
+        "properties": {
+          "places": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Places"
+          }
+        },
+        "type": "object",
+        "required": [
+          "places"
+        ],
+        "title": "PlacesIn"
+      },
       "ProgrammeChoice": {
         "properties": {
           "id": {
@@ -10977,6 +11851,74 @@
           "years"
         ],
         "title": "ProgrammeOption"
+      },
+      "ProgrammePlaces": {
+        "properties": {
+          "programme_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Programme Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "places": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Places"
+          },
+          "offered": {
+            "type": "integer",
+            "title": "Offered"
+          },
+          "accepted": {
+            "type": "integer",
+            "title": "Accepted"
+          },
+          "declined": {
+            "type": "integer",
+            "title": "Declined"
+          },
+          "in_queue": {
+            "type": "integer",
+            "title": "In Queue"
+          },
+          "remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining"
+          }
+        },
+        "type": "object",
+        "required": [
+          "programme_id",
+          "code",
+          "name",
+          "places",
+          "offered",
+          "accepted",
+          "declined",
+          "in_queue",
+          "remaining"
+        ],
+        "title": "ProgrammePlaces"
       },
       "PublicHome": {
         "properties": {
@@ -13276,6 +14218,169 @@
           "year_of_study"
         ],
         "title": "StudentInfo"
+      },
+      "StudentLoan": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "due_at",
+          "overdue"
+        ],
+        "title": "StudentLoan"
+      },
+      "StudentProfile": {
+        "properties": {
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "year_of_study": {
+            "type": "integer",
+            "title": "Year Of Study"
+          },
+          "study_mode": {
+            "type": "string",
+            "title": "Study Mode"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "intake": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intake"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "fees_cleared": {
+            "type": "boolean",
+            "title": "Fees Cleared"
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/StudentLoan"
+            },
+            "type": "array",
+            "title": "Loans"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_number",
+          "name",
+          "programme",
+          "class_group",
+          "year_of_study",
+          "study_mode",
+          "status",
+          "intake",
+          "phone",
+          "email",
+          "fees_cleared",
+          "loans"
+        ],
+        "title": "StudentProfile"
+      },
+      "StudentRow": {
+        "properties": {
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_number",
+          "name",
+          "programme",
+          "class_group",
+          "status"
+        ],
+        "title": "StudentRow"
       },
       "StudentSearchResults": {
         "properties": {

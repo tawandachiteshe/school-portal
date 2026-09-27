@@ -4,6 +4,7 @@ from app.models.academic import (
     AcademicTerm,
     Department,
     Intake,
+    IntakePlace,
     Module,
     ModuleOffering,
     OfferingLecturer,
@@ -61,6 +62,7 @@ from app.models.teaching import (
 )
 
 __all__ = [
+    "IntakePlace",
     "AskQuestion",
     "ChatMessage",
     "ChatSession",

@@ -9,7 +9,6 @@ import SignIn from '@/pages/auth/SignIn'
 import Foundations from '@/pages/Foundations'
 import Landing from '@/pages/Landing'
 import NotFound from '@/pages/NotFound'
-import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
 import ApplyIndex from '@/pages/apply/ApplyIndex'
 import ApplyOffer from '@/pages/apply/Offer'
 import ApplyProgramme from '@/pages/apply/Programme'
@@ -22,11 +21,15 @@ import ApplyResults from '@/pages/apply/results/Results'
 import NationalId from '@/pages/apply/id/NationalId'
 import AccountsPayments from '@/pages/staff/accounts/Payments'
 import AskQuestions from '@/pages/staff/studentaffairs/AskQuestions'
+import AdmissionsPlaces from '@/pages/staff/admissions/Places'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
 import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
 import AnnouncementsStaff from '@/pages/staff/announcements/List'
+import LibraryCatalogue from '@/pages/staff/library/Catalogue'
 import LibraryDesk from '@/pages/staff/library/Desk'
+import LibraryReadingLists from '@/pages/staff/library/ReadingLists'
+import StaffStudents from '@/pages/staff/Students'
 import LibraryOverdue from '@/pages/staff/library/Overdue'
 import LibraryReservations from '@/pages/staff/library/Reservations'
 import ClassPage from '@/pages/staff/teaching/ClassPage'
@@ -139,7 +142,7 @@ export const router = createBrowserRouter([
       { path: 'accounts/payments', element: <AccountsPayments /> },
       { path: 'admissions', element: <AdmissionsQueue /> },
       { path: 'admissions/decided', element: <AdmissionsQueue decided /> },
-      { path: 'admissions/places', element: <StaffPlaceholder context="Admissions" title="Intake places" /> },
+      { path: 'admissions/places', element: <AdmissionsPlaces /> },
       { path: 'admissions/:reference', element: <AdmissionsReview /> },
       { path: 'teaching', element: <LecturerToday /> },
       { path: 'teaching/marking', element: <Marking /> },
@@ -148,13 +151,13 @@ export const router = createBrowserRouter([
       { path: 'library', element: <LibraryDesk /> },
       { path: 'library/overdue', element: <LibraryOverdue /> },
       { path: 'library/reservations', element: <LibraryReservations /> },
-      { path: 'library/catalogue', element: <StaffPlaceholder context="Library" title="Catalogue" /> },
-      { path: 'library/reading-lists', element: <StaffPlaceholder context="Library" title="Reading lists" /> },
+      { path: 'library/catalogue', element: <LibraryCatalogue /> },
+      { path: 'library/reading-lists', element: <LibraryReadingLists /> },
       { path: 'announcements', element: <AnnouncementsStaff /> },
       { path: 'announcements/new', element: <AnnouncementCompose /> },
       { path: 'announcements/:id', element: <AnnouncementCompose /> },
       { path: 'ask-questions', element: <AskQuestions /> },
-      { path: 'students', element: <StaffPlaceholder context="College" title="Find a student" /> },
+      { path: 'students', element: <StaffStudents /> },
     ],
   },
   { path: '*', element: <NotFound /> },
