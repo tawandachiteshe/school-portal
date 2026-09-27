@@ -129,6 +129,5 @@ async def test_week_lists_deadlines_and_module_has_weekly_slots():
         m = (await c.get("/student/modules/DCN201")).json()
     assert [(s["day_of_week"], s["starts_at"], s["venue"]) for s in m["weekly_slots"]] == [
         (1, "08:00", "Lecture Room B2"),
-        (3, "10:00", "Lab 3"),
         (4, "10:00", "Lab 3"),
     ]

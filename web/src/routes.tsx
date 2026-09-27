@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
         element: <StudentShell />,
         children: [
           { index: true, element: <Home />, handle: { desk: true } },
-          { path: '/modules', element: <Modules /> },
+          { path: '/modules', element: <Modules />, handle: { desk: true } },
           { path: '/deadlines', element: <Deadlines />, handle: { desk: true } },
           { path: '/library', element: <Library />, handle: { desk: true } },
         ],

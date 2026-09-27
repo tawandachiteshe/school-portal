@@ -38,7 +38,7 @@ async def test_module_detail():
     assert d["lecturer"]["consultation_hours"] == "Tuesdays 14:00–16:00"
     assert (d["coursework_weight"], d["exam_weight"]) == (50, 50)
     assert d["week"] in (6, 7)  # week 7 once this week's classes are over
-    assert len(d["week_classes"]) == 3  # Mon, Wed, Thu
+    assert len(d["week_classes"]) == 2  # Mon, Thu
     a1 = next(a for a in d["assessments"] if a["title"] == "Assignment 1: Signal types")
     assert (a1["mark"], a1["max_mark"], a1["status"]) == (16, 20, "marked")
     t1 = next(a for a in d["assessments"] if a["title"].startswith("Test 1"))

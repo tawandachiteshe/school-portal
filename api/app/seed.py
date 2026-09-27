@@ -323,20 +323,20 @@ class Seeder:
 
     # (module, ISO weekday, start, end, venue, kind). Thursday matches design/Main and Timetable.
     SLOTS = [
+        # design/DeskTimetable week grid; agrees with Modules ("MTH110 Next: Mon 10:00, Lecture Room B2")
+        # and DeskModule ("DCN201 · Mondays 08:00 Lecture Room B2, Thursdays 10:00 Lab 3").
         ("DCN201", 1, "08:00", "09:30", "LR-B2", "lecture"),
-        ("NET202", 1, "10:00", "11:30", "LAB-3", "lab"),
-        ("PRG101", 1, "14:30", "16:00", "BLOCK-C", "lecture"),
-        ("MTH110", 2, "08:00", "09:30", "LR-B2", "lecture"),
-        ("PRG101", 2, "10:00", "11:30", "LAB-3", "lab"),
-        ("NET202", 2, "12:00", "13:30", "LR-B2", "lecture"),
-        ("DCN201", 3, "10:00", "11:30", "LAB-3", "tutorial"),
-        ("MTH110", 3, "12:00", "13:30", "LR-B2", "tutorial"),
+        ("MTH110", 1, "10:00", "11:30", "LR-B2", "lecture"),
+        ("PRG101", 1, "14:00", "16:00", "BLOCK-C", "lab"),
+        ("NET202", 2, "08:00", "09:30", "LAB-3", "lecture"),
+        ("PRG101", 2, "10:00", "11:30", "BLOCK-C", "lecture"),
+        ("MTH110", 3, "08:00", "09:00", None, "tutorial"),
+        ("NET202", 3, "14:00", "16:00", "LAB-3", "lab"),
         ("MTH110", 4, "08:00", "09:30", "LR-B2", "lecture"),
         ("DCN201", 4, "10:00", "11:30", "LAB-3", "lecture"),
-        ("NET202", 4, "12:00", "13:30", "LAB-3", "lab"),
+        ("NET202", 4, "12:00", "13:30", "LAB-3", "lecture"),
         ("PRG101", 4, "14:30", "16:00", "BLOCK-C", "lecture"),
-        ("PRG101", 5, "08:00", "09:30", "BLOCK-C", "lab"),
-        ("NET202", 5, "10:00", "11:30", "LR-B2", "tutorial"),
+        ("PRG101", 5, "10:00", "11:00", "BLOCK-C", "tutorial"),
     ]
 
     def timetable(self, offerings, venues) -> None:
@@ -347,7 +347,7 @@ class Seeder:
                     day_of_week=dow,
                     starts_at=time.fromisoformat(a),
                     ends_at=time.fromisoformat(b),
-                    venue=venues[venue],
+                    venue=venues[venue] if venue else None,
                     kind=kind,
                 )
             )
@@ -495,10 +495,11 @@ class Seeder:
         )
 
     # (module, title, week, size, age). All PDFs: they're generated so downloads work.
+    # Ages give design/Main's three newest notes and design/Modules' "1 new note" on DCN201 and NET202 only.
     MATERIALS = [
         ("DCN201", "Amplitude and frequency modulation", 6, 1_200_000, timedelta(hours=2)),
         ("NET202", "IPv4 subnetting worked examples", 6, 3_400_000, timedelta(days=1)),
-        ("PRG101", "Arrays in C: lecture notes", 5, 640_000, timedelta(days=5)),
+        ("PRG101", "Arrays in C: lecture notes", 5, 640_000, timedelta(days=8)),
         ("DCN201", "Test 1 revision questions", 5, 310_000, timedelta(days=7)),
         ("DCN201", "Analogue and digital signals", 4, 4_800_000, timedelta(days=14)),
         ("DCN201", "Digital modulation: ASK, FSK and PSK", 5, 1_300_000, timedelta(days=10)),
@@ -509,7 +510,7 @@ class Seeder:
         ("DCN201", "Module outline and assessment plan", 1, 150_000, timedelta(days=37)),
         ("NET202", "Network topologies", 4, 1_100_000, timedelta(days=15)),
         ("PRG101", "Loops: while, do-while and for", 4, 520_000, timedelta(days=12)),
-        ("MTH110", "Differentiation: rules and examples", 5, 880_000, timedelta(days=6)),
+        ("MTH110", "Differentiation: rules and examples", 5, 880_000, timedelta(days=12)),
     ]
 
     def materials(self, offerings, lecturers) -> None:
