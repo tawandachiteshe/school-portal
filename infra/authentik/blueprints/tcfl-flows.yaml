@@ -8,6 +8,8 @@
 #   number is checked with an SMS code (design/VerifyPhone) when SIGNUP_VERIFY_PHONE is set. Codes go through Authentik's generic SMS
 #   provider to the portal (POST /api/internal/sms), which queues them like any other text.
 #
+# - Google (tcfl-source-*): "Continue with Google" when GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set.
+#
 # Password reset by SMS code (design/ForgotPassword) is done by the portal, not a flow.
 version: 1
 metadata:
@@ -94,6 +96,15 @@ entries:
       placeholder: "263773184521"
       order: 20
   - model: authentik_stages_prompt.prompt
+    id: prompt-email
+    identifiers: { name: tcfl-prompt-email }
+    attrs:
+      field_key: email
+      label: Email
+      type: email
+      required: false
+      order: 25
+  - model: authentik_stages_prompt.prompt
     id: prompt-password
     identifiers: { name: tcfl-prompt-password }
     attrs:
@@ -153,6 +164,7 @@ entries:
       fields:
         - !KeyOf prompt-name
         - !KeyOf prompt-username
+        - !KeyOf prompt-email
         - !KeyOf prompt-password
         - !KeyOf prompt-password-repeat
       validation_policies:
@@ -202,6 +214,67 @@ entries:
     identifiers: { target: !KeyOf verify-phone-binding, policy: !KeyOf verify-phone-on, order: 0 }
   - model: authentik_flows.flowstagebinding
     identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf login, order: 40 }
+
+  # --- Google sign-in (only when GOOGLE_CLIENT_ID is set) ------------------------------------------
+  # Google redirect URI: <portal origin>/auth/source/oauth/callback/google/
+  # Someone new becomes an applicant (name and email from Google, no mobile number yet). A Google
+  # account whose email matches an existing account signs in to that account.
+  # These flows run on Authentik's own page, so their login stage asks nothing ("remember me" would).
+  - model: authentik_stages_user_login.userloginstage
+    id: login-google
+    identifiers: { name: tcfl-login-google }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+    attrs:
+      session_duration: hours=8
+  - model: authentik_flows.flow
+    id: source-authentication-flow
+    identifiers: { slug: tcfl-source-authentication }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+    attrs:
+      name: TCFL sign-in with Google
+      title: Sign in
+      designation: authentication
+      authentication: require_unauthenticated
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf source-authentication-flow, stage: !KeyOf login-google, order: 10 }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+
+  - model: authentik_flows.flow
+    id: source-enrollment-flow
+    identifiers: { slug: tcfl-source-enrollment }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+    attrs:
+      name: TCFL sign-up with Google
+      title: Start an application
+      designation: enrollment
+      authentication: require_unauthenticated
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf source-enrollment-flow, stage: !KeyOf signup-write, order: 10 }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf source-enrollment-flow, stage: !KeyOf login-google, order: 20 }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+
+  - model: authentik_sources_oauth.oauthsource
+    id: google
+    identifiers: { slug: google }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+    attrs:
+      name: Google
+      provider_type: google
+      consumer_key: !Env [GOOGLE_CLIENT_ID, ""]
+      consumer_secret: !Env [GOOGLE_CLIENT_SECRET, ""]
+      authentication_flow: !KeyOf source-authentication-flow
+      enrollment_flow: !KeyOf source-enrollment-flow
+      user_matching_mode: email_link
+      pkce: S256
+
+  - model: authentik_stages_identification.identificationstage
+    identifiers: { name: tcfl-identification }
+    conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
+    attrs:
+      sources: [!KeyOf google]
+      show_source_labels: true
 
   # Authentik's own pages default to these flows too.
   - model: authentik_brands.brand

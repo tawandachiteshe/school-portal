@@ -34,7 +34,8 @@ import type {
   ResetDone,
   ResetFinishIn,
   ResetStartIn,
-  ResetStarted
+  ResetStarted,
+  SignInOptions
 } from '../model';
 
 import { apiFetch } from '../../fetcher';
@@ -337,6 +338,106 @@ export function useOidcCallback<TData = Awaited<ReturnType<typeof oidcCallback>>
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getOidcCallbackQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getSignInOptionsUrl = () => {
+
+
+
+
+  return `/auth/options`
+}
+
+/**
+ * @summary Sign In Options
+ */
+export const signInOptions = async ( options?: Parameters<typeof apiFetch>[1]): Promise<SignInOptions> => {
+
+  return apiFetch<SignInOptions>(getSignInOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSignInOptionsQueryKey = () => {
+    return [
+    `/auth/options`
+    ] as const;
+    }
+
+
+export const getSignInOptionsQueryOptions = <TData = Awaited<ReturnType<typeof signInOptions>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSignInOptionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof signInOptions>>> = ({ signal }) => signInOptions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SignInOptionsQueryResult = NonNullable<Awaited<ReturnType<typeof signInOptions>>>
+export type SignInOptionsQueryError = unknown
+
+
+export function useSignInOptions<TData = Awaited<ReturnType<typeof signInOptions>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof signInOptions>>,
+          TError,
+          Awaited<ReturnType<typeof signInOptions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSignInOptions<TData = Awaited<ReturnType<typeof signInOptions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof signInOptions>>,
+          TError,
+          Awaited<ReturnType<typeof signInOptions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSignInOptions<TData = Awaited<ReturnType<typeof signInOptions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Sign In Options
+ */
+
+export function useSignInOptions<TData = Awaited<ReturnType<typeof signInOptions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof signInOptions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSignInOptionsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -81,11 +81,19 @@ export function generalError(c: Challenge | null): string | undefined {
   return fieldError(c, 'non_field_errors')
 }
 
+const portalLogin = (next: string, shared = false) => {
+  const safe = next.startsWith('/') && !next.startsWith('//') ? next : '/'
+  return `/api/auth/login?next=${encodeURIComponent(safe)}${shared ? '&shared=1' : ''}`
+}
+
 // The flow finished and Authentik has a session: the portal turns it into its own (OIDC, BFF).
 export function finishSignIn(next: string, shared = false) {
-  const safe = next.startsWith('/') && !next.startsWith('//') ? next : '/'
-  window.location.assign(`/api/auth/login?next=${encodeURIComponent(safe)}${shared ? '&shared=1' : ''}`)
+  window.location.assign(portalLogin(next, shared))
 }
+
+// Authentik's Google source: Google, then Authentik's source flow (sign in, or sign up as an
+// applicant), then back through the portal's OIDC sign-in to `next`.
+export const googleSignInUrl = (next: string) => `/auth/source/oauth/login/google/?next=${encodeURIComponent(portalLogin(next))}`
 
 // Who is signed in to Authentik (a GET, so no CSRF token is needed). Authentik's CSRF cookie is
 // scoped to /auth/, so our screens can't answer a flow for an already signed-in session; they

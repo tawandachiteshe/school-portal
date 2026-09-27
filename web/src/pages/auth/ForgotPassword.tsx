@@ -1,19 +1,21 @@
-import { ArrowLeft, CircleCheck, Info } from 'lucide-react'
+import { CircleCheck, Info } from 'lucide-react'
 import { useId, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Wordmark } from '@/components/shell/wordmark'
 import { resetFinish, resetStart } from '@/api/generated/auth/auth'
 import { ApiError } from '@/lib/api'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { AUTH_DESKTOP, AuthHeading, AuthLayout } from './AuthLayout'
 
 const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 
 // design/ForgotPassword: text a code, then choose a new password (the second screen has no design).
 export default function ForgotPassword() {
   const navigate = useNavigate()
+  const desktop = useIsDesktop(AUTH_DESKTOP)
   const ids = { id: useId(), code: useId(), pw: useId(), pw2: useId() }
   const [stage, setStage] = useState<'ask' | 'code' | 'done'>('ask')
   const [identifier, setIdentifier] = useState('')
@@ -36,15 +38,38 @@ export default function ForgotPassword() {
     }
   }
 
+  const help = (
+    <>
+      <h2 className={desktop ? 'text-lg leading-6 font-semibold' : 'font-semibold'}>Changed your number, or lost your phone?</h2>
+      <p className="text-sm">Bring your National ID to ICT Services in Block C and they'll reset it for you.</p>
+      <p className="border-t pt-3 text-sm text-muted-foreground">Staff: use the reset link in your TCFL email, or ask ICT Services.</p>
+    </>
+  )
+
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[480px] flex-col bg-background">
-      <header className="flex h-14 shrink-0 items-center gap-1 border-b bg-card pr-4 pl-1">
-        <button type="button" aria-label="Back to sign in" onClick={() => navigate('/login')} className="inline-flex size-11 items-center justify-center">
-          <ArrowLeft className="size-5" strokeWidth={1.5} />
-        </button>
-        <Wordmark />
-      </header>
-      <main className="flex grow flex-col gap-6 px-4 py-6">
+    <AuthLayout
+      onBack={() => navigate('/login')}
+      action={
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/login">Sign in</Link>
+        </Button>
+      }
+      aside={help}
+      phoneExtra={
+        stage === 'ask' && (
+          <>
+            <Alert variant="info">
+              <Info strokeWidth={1.5} />
+              <p className="text-sm">
+                Changed your number, or lost your phone? Bring your National ID to ICT Services in Block C and they'll reset it
+                for you.
+              </p>
+            </Alert>
+            <p className="text-sm text-muted-foreground">Staff: use the reset link in your TCFL email, or ask ICT Services.</p>
+          </>
+        )
+      }
+    >
         {error && (
           <div role="alert" className="rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive">
             {error}
@@ -52,10 +77,11 @@ export default function ForgotPassword() {
         )}
         {stage === 'ask' && (
           <>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Reset your password</h1>
-              <p className="text-muted-foreground">We'll text a code to the mobile number on your account. Then you choose a new password.</p>
-            </div>
+            <AuthHeading
+              eyebrow="Signing in"
+              title="Reset your password"
+              lead="We'll text a code to the mobile number on your account. Then you choose a new password."
+            />
             <form
               className="flex flex-col gap-5"
               onSubmit={(e) => {
@@ -67,32 +93,35 @@ export default function ForgotPassword() {
               }}
             >
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor={ids.id}>Student number or mobile number</Label>
-                <Input id={ids.id} value={identifier} autoComplete="username" onChange={(e) => setIdentifier(e.target.value)} className="font-mono" />
+                <Label htmlFor={ids.id}>Student number, mobile number or email</Label>
+                <Input
+                  id={ids.id}
+                  value={identifier}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  className="font-mono"
+                />
               </div>
               <Button type="submit" block disabled={busy || identifier.trim().length < 3}>
                 Text me a code
               </Button>
             </form>
-            <Alert variant="info">
-              <Info strokeWidth={1.5} />
-              <p className="text-sm">
-                Changed your number, or lost your phone? Bring your National ID to ICT Services in Block C and they'll reset it
-                for you.
-              </p>
-            </Alert>
-            <p className="text-sm text-muted-foreground">Staff: use the reset link in your TCFL email, or ask ICT Services.</p>
           </>
         )}
         {stage === 'code' && (
           <>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Choose a new password</h1>
-              <p className="text-muted-foreground">
-                If <span className="font-mono text-foreground">{identifier}</span> is an account with a mobile number, we've
-                texted a code to it. It works for {minutes} minutes.
-              </p>
-            </div>
+            <AuthHeading
+              eyebrow="Signing in"
+              title="Choose a new password"
+              lead={
+                <>
+                  If <span className="font-mono text-foreground">{identifier}</span> is an account with a mobile number, we've texted a
+                  code to it. It works for {minutes} minutes.
+                </>
+              }
+            />
             <form
               className="flex flex-col gap-5"
               onSubmit={(e) => {
@@ -146,7 +175,6 @@ export default function ForgotPassword() {
             </Button>
           </>
         )}
-      </main>
-    </div>
+    </AuthLayout>
   )
 }

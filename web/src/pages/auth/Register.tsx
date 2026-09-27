@@ -9,6 +9,7 @@ import { answer, authentikUser, type Challenge, e164, fallbackUrl, fieldError, f
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { AUTH_DESKTOP, AuthHeading, AuthLayout, Checklist } from './AuthLayout'
+import { GoogleSignIn } from './GoogleSignIn'
 import { type AuthentikUser, SignedInAs } from './SignedInAs'
 
 const FLOW = 'tcfl-enrollment'
@@ -178,10 +179,10 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
 export default function Register() {
   const navigate = useNavigate()
   const desktop = useIsDesktop(AUTH_DESKTOP)
-  const ids = { name: useId(), mobile: useId(), pw: useId(), pw2: useId() }
+  const ids = { name: useId(), mobile: useId(), email: useId(), pw: useId(), pw2: useId() }
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [down, setDown] = useState<string | null>(null)
-  const [form, setForm] = useState({ name: '', mobile: '', password: '', repeat: '' })
+  const [form, setForm] = useState({ name: '', mobile: '', email: '', password: '', repeat: '' })
   const [busy, setBusy] = useState(false)
   const [local, setLocal] = useState<string | null>(null)
   const [already, setAlready] = useState<AuthentikUser | null>(null)
@@ -221,6 +222,7 @@ export default function Register() {
           component: 'ak-stage-prompt',
           name: form.name.trim(),
           username: phone.slice(1),
+          email: form.email.trim(),
           password: form.password,
           password_repeat: form.repeat,
         }),
@@ -288,48 +290,59 @@ export default function Register() {
           </Button>
         </div>
       ) : (
-        <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={ids.name}>Full name</Label>
-            <span className="text-sm text-muted-foreground">As it is on your National ID</span>
-            {err('name') && <span className="font-medium text-destructive">{err('name')}</span>}
-            <Input id={ids.name} value={form.name} autoComplete="name" onChange={set('name')} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={ids.mobile}>Mobile number</Label>
-            <span className="text-sm text-muted-foreground">You'll sign in with this number</span>
-            {err('username') && <span className="font-medium text-destructive">{err('username')}</span>}
-            <Input id={ids.mobile} value={form.mobile} inputMode="tel" autoComplete="tel" placeholder="077 318 4521" onChange={set('mobile')} className="font-mono" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={ids.pw}>Password</Label>
-            <span className="text-sm text-muted-foreground">At least 10 characters. A few words together is easy to remember.</span>
-            {err('password') && <span className="font-medium text-destructive">{err('password')}</span>}
-            <Input id={ids.pw} type="password" value={form.password} autoComplete="new-password" onChange={set('password')} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={ids.pw2}>Password again</Label>
-            <Input id={ids.pw2} type="password" value={form.repeat} autoComplete="new-password" onChange={set('repeat')} />
-          </div>
-          <div>
-            <Button
-              type="submit"
-              block={!desktop}
-              className={desktop ? 'min-w-40' : undefined}
-              disabled={busy || !challenge || !form.name || !form.mobile || !form.password}
-            >
-              Create account
-            </Button>
-          </div>
-          {!desktop && (
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link to="/login" className="text-primary underline underline-offset-2">
-                Sign in
-              </Link>
-            </p>
-          )}
-        </form>
+        <>
+          <GoogleSignIn next="/apply" first />
+          <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={ids.name}>Full name</Label>
+              <span className="text-sm text-muted-foreground">As it is on your National ID</span>
+              {err('name') && <span className="font-medium text-destructive">{err('name')}</span>}
+              <Input id={ids.name} value={form.name} autoComplete="name" onChange={set('name')} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={ids.mobile}>Mobile number</Label>
+              <span className="text-sm text-muted-foreground">You'll sign in with this number</span>
+              {err('username') && <span className="font-medium text-destructive">{err('username')}</span>}
+              <Input id={ids.mobile} value={form.mobile} inputMode="tel" autoComplete="tel" placeholder="077 318 4521" onChange={set('mobile')} className="font-mono" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={ids.email}>
+                Email <span className="font-normal text-muted-foreground">(optional)</span>
+              </Label>
+              <span className="text-sm text-muted-foreground">You can sign in with it too</span>
+              {err('email') && <span className="font-medium text-destructive">{err('email')}</span>}
+              <Input id={ids.email} type="email" value={form.email} autoComplete="email" spellCheck={false} onChange={set('email')} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={ids.pw}>Password</Label>
+              <span className="text-sm text-muted-foreground">At least 10 characters. A few words together is easy to remember.</span>
+              {err('password') && <span className="font-medium text-destructive">{err('password')}</span>}
+              <Input id={ids.pw} type="password" value={form.password} autoComplete="new-password" onChange={set('password')} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={ids.pw2}>Password again</Label>
+              <Input id={ids.pw2} type="password" value={form.repeat} autoComplete="new-password" onChange={set('repeat')} />
+            </div>
+            <div>
+              <Button
+                type="submit"
+                block={!desktop}
+                className={desktop ? 'min-w-40' : undefined}
+                disabled={busy || !challenge || !form.name || !form.mobile || !form.password}
+              >
+                Create account
+              </Button>
+            </div>
+            {!desktop && (
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{' '}
+                <Link to="/login" className="text-primary underline underline-offset-2">
+                  Sign in
+                </Link>
+              </p>
+            )}
+          </form>
+        </>
       )}
     </>,
   )

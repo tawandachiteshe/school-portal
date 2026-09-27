@@ -224,8 +224,8 @@ class FakeAuthentik:
         return None
 
     async def get(self, path, params=None):
-        u = self.users.get(params["username"])
-        return httpx.Response(200, json={"results": [u] if u else []})
+        found = [u for u in self.users.values() if all(u.get(k) == v for k, v in params.items())]
+        return httpx.Response(200, json={"results": found})
 
     async def post(self, path, json=None):
         pk = int(path.split("/")[2])
@@ -311,3 +311,29 @@ async def test_reset_codes_stop_after_five_wrong_tries(authentik):
             json={"identifier": "0779990003", "code": "123456", "password": "blue river mango"},
         )
     assert r.status_code == 422 and 43 not in authentik.passwords
+
+
+async def test_reset_by_email(authentik):
+    authentik.users["263779990004"] = {
+        "pk": 44,
+        "username": "263779990004",
+        "email": "nyasha.dube@gmail.com",
+        "is_active": True,
+        "attributes": {"phone_number": "+263779990004"},
+    }
+    async with client() as c:
+        await c.get("/healthz")
+        c.headers["X-CSRF-Token"] = c.cookies["portal_csrf"]
+        await c.post("/auth/reset/start", json={"identifier": "nyasha.dube@gmail.com"})
+        r = await c.post(
+            "/auth/reset/finish",
+            json={"identifier": "nyasha.dube@gmail.com", "code": "123456", "password": "blue river mango"},
+        )
+    assert r.json() == {"ok": True} and authentik.passwords[44] == "blue river mango"
+
+
+async def test_sign_in_options_follow_the_google_setting(monkeypatch):
+    async with client() as c:
+        assert (await c.get("/auth/options")).json() == {"google": False}
+        monkeypatch.setattr(get_settings(), "google_client_id", "x.apps.googleusercontent.com")
+        assert (await c.get("/auth/options")).json() == {"google": True}

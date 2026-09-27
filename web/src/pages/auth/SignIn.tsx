@@ -19,6 +19,7 @@ import {
 } from '@/lib/authentik-flow'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { AUTH_DESKTOP, AuthHeading, AuthLayout, Checklist } from './AuthLayout'
+import { GoogleSignIn } from './GoogleSignIn'
 import { type AuthentikUser, SignedInAs } from './SignedInAs'
 import { cn } from '@/lib/utils'
 
@@ -118,7 +119,7 @@ export default function SignIn() {
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={ids.id}>Student number, staff email or mobile number</Label>
+        <Label htmlFor={ids.id}>Student number, email or mobile number</Label>
         {uidError && <span className="font-medium text-destructive">{uidError}</span>}
         <Input
           id={ids.id}
@@ -209,6 +210,7 @@ export default function SignIn() {
     >
       <AuthHeading eyebrow="TelOne Centre for Learning" title="Sign in" lead="Students, applicants and staff all sign in here." />
       {signedIn || ((challenge || down) && form)}
+      {!already && (challenge || down) && <GoogleSignIn next={next} />}
       {devLink}
     </AuthLayout>
   )

@@ -96,7 +96,8 @@ Everything below is created by the blueprint in `infra/authentik/blueprints/tcfl
 | Flow | Purpose |
 |------|---------|
 | `tcfl-authentication` | Identification (username or email) and password on one screen → MFA validation for anyone with a device → login (8 h; 14 days with "remember me") |
-| `tcfl-enrollment` | Applicant sign-up: name, mobile number (becomes the username), password twice (10+ characters, zxcvbn score ≥ 2) → write the user into `portal-applicants` → **phone check by SMS code** (verify-only; only when `SIGNUP_VERIFY_PHONE` is set) → login |
+| `tcfl-enrollment` | Applicant sign-up: name, mobile number (becomes the username), email (optional), password twice (10+ characters, zxcvbn score ≥ 2) → write the user into `portal-applicants` → **phone check by SMS code** (verify-only; only when `SIGNUP_VERIFY_PHONE` is set) → login |
+| `tcfl-source-authentication`, `tcfl-source-enrollment` | Google sign-in and sign-up (only with `GOOGLE_CLIENT_ID`) |
 | Password reset | Done by the portal, not a flow (below) |
 | `tcfl-invitation` | For imported students and staff: set a password from an invitation link |
 
@@ -104,10 +105,20 @@ Both flows are in `infra/authentik/blueprints/tcfl-flows.yaml`.
 
 **Phone check on sign-up (`SIGNUP_VERIFY_PHONE`).** The SMS stage is bound to `tcfl-enrollment` with an expression policy, `tcfl-verify-phone-on`, which is true only when `SIGNUP_VERIFY_PHONE` is set in Authentik's environment. It is **off until an SMS provider is set up**: applicants go from the form straight into their application, and their number isn't checked. To turn it on, set `SIGNUP_VERIFY_PHONE=1` and restart the Authentik worker so the blueprint is applied again. The stage needs the user to exist, so the account is written before the number is checked. An abandoned sign-up leaves an applicant account whose number isn't verified.
 
+**Email.** Sign-up asks for an optional email address. People can sign in with it (the identification stage matches username or email), and the password reset page accepts it too. The reset code still goes to the account's mobile number by SMS.
+
+**Google.** "Continue with Google" shows on sign-in (below the form) and sign-up (above it) when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. The API reads `GOOGLE_CLIENT_ID` for `GET /api/auth/options` (`{google}`), and the blueprint only creates the Google objects when it is set.
+- The button links to `/auth/source/oauth/login/google/?next=/api/auth/login?next=…`. Authentik sends the browser to Google, then runs a source flow on its own page, then follows `next` into the portal's usual OIDC sign-in.
+- `tcfl-source-authentication` signs in a Google account already linked, or whose email matches an existing account (`user_matching_mode: email_link`; Google verifies emails).
+- `tcfl-source-enrollment` makes anyone else an applicant (`portal-applicants`), with their name and email from Google and no mobile number yet.
+- Both use their own login stage, `tcfl-login-google`, which asks nothing, because these flows run on Authentik's page.
+- In the Google Cloud console, create an OAuth client of type *Web application* with the redirect URI `<portal origin>/auth/source/oauth/callback/google/`.
+- Turning Google off later: clear the variables and delete the `google` source in Authentik (the blueprint skips its entries but doesn't remove them).
+
 **SMS.** Authentik's *generic* SMS provider posts `{From, To, Body}` with a bearer token (`SMS_WEBHOOK_SECRET`) to the portal at `POST /api/internal/sms` (`PORTAL_SMS_WEBHOOK_URL`). This covers the sign-up code. The text joins `sms_outbox`, which the SMS worker sends once `SMS_PROVIDER` is set. In development there is no provider, and the API logs `SMS to +263…: <code>` instead.
 
 **Password reset by SMS code (design/ForgotPassword).** Students and applicants have phones, not reliable email, so the portal does this itself:
-- `POST /api/auth/reset/start {identifier}` takes a student number or mobile number. It texts a 6-digit code (valid 10 minutes, at most 3 codes an hour) and always answers `{minutes: 10}`, so the page can't be used to find accounts.
+- `POST /api/auth/reset/start {identifier}` takes a student number, mobile number or email. It texts a 6-digit code (valid 10 minutes, at most 3 codes an hour) and always answers `{minutes: 10}`, so the page can't be used to find accounts.
 - `POST /api/auth/reset/finish {identifier, code, password}` checks the code (keyed hash, 5 tries, used once), then sets the password with the Authentik admin API (`AUTHENTIK_API_URL`, `AUTHENTIK_API_TOKEN`). Authentik's password policy errors are shown as they come.
 - Staff reset through ICT Services or their TCFL email, as the design says.
 

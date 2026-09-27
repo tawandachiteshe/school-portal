@@ -113,6 +113,17 @@ async def oidc_callback(
     return r
 
 
+class SignInOptions(BaseModel):
+    """Ways to sign in besides a password. google: Authentik has a Google source."""
+
+    google: bool
+
+
+@router.get("/options")
+async def sign_in_options() -> SignInOptions:
+    return SignInOptions(google=bool(get_settings().google_client_id))
+
+
 # --- development sign-in: pick a seeded account, no Authentik needed ------------------
 
 

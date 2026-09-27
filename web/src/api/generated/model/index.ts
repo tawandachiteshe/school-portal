@@ -190,6 +190,7 @@ export * from './settingsOut';
 export * from './shared';
 export * from './sharedNote';
 export * from './shortfall';
+export * from './signInOptions';
 export * from './sitting';
 export * from './sittingIn';
 export * from './sittingOut';

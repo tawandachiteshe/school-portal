@@ -173,6 +173,27 @@
         }
       }
     },
+    "/auth/options": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign In Options",
+        "operationId": "sign_in_options",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInOptions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/dev-accounts": {
       "get": {
         "tags": [
@@ -11837,6 +11858,20 @@
         ],
         "title": "Shortfall",
         "description": "One unmet requirement, in plain words (design/ReviewNotEligible)."
+      },
+      "SignInOptions": {
+        "properties": {
+          "google": {
+            "type": "boolean",
+            "title": "Google"
+          }
+        },
+        "type": "object",
+        "required": [
+          "google"
+        ],
+        "title": "SignInOptions",
+        "description": "Ways to sign in besides a password. google: Authentik has a Google source."
       },
       "Sitting": {
         "properties": {

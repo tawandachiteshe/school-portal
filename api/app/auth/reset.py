@@ -53,7 +53,7 @@ def _candidates(identifier: str) -> list[str]:
 
 
 async def _find(db: AsyncSession, identifier: str) -> tuple[str, str] | None:
-    """(Authentik username, phone) for a student number or mobile number, if it's an account with a phone."""
+    """(Authentik username, phone) for a student number, mobile number or email, if it has a phone."""
     names = _candidates(identifier)
     digits = re.sub(r"\D", "", identifier)
     phones = (
@@ -63,10 +63,14 @@ async def _find(db: AsyncSession, identifier: str) -> tuple[str, str] | None:
         if digits
         else []
     )
+    emails = [identifier.strip()] if "@" in identifier else []
     u = (
         (
             await db.execute(
-                select(User).where(or_(User.username.in_(names), User.phone.in_(phones)), User.is_active)
+                select(User).where(
+                    or_(User.username.in_(names), User.phone.in_(phones), User.email.in_(emails)),
+                    User.is_active,
+                )
             )
         )
         .scalars()
@@ -81,8 +85,9 @@ async def _find(db: AsyncSession, identifier: str) -> tuple[str, str] | None:
         return u.username, u.phone
     # Signed up but never signed in to the portal: ask Authentik.
     async with _authentik() as c:
-        for name in names:
-            r = await c.get("core/users/", params={"username": name})
+        lookups = [{"email": e} for e in emails] + [{"username": n} for n in names]
+        for params in lookups:
+            r = await c.get("core/users/", params=params)
             found = r.json().get("results", []) if r.status_code == 200 else []
             phone = found[0].get("attributes", {}).get("phone_number") if found else None
             if found and found[0].get("is_active") and phone:
