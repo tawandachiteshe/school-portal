@@ -36,6 +36,7 @@ class Hours(BaseModel):
 
 class LoanOut(BaseModel):
     id: uuid.UUID
+    barcode: str
     title: str
     authors: list[str]
     edition: str | None
@@ -158,6 +159,7 @@ async def _my_reservations(db: AsyncSession, person_id: uuid.UUID) -> list[Reser
 def _loan(loan: LibraryLoan) -> LoanOut:
     return LoanOut(
         id=loan.id,
+        barcode=loan.copy.barcode,
         title=loan.copy.item.title,
         authors=loan.copy.item.authors,
         edition=loan.copy.item.edition,

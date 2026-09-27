@@ -16,7 +16,10 @@ import { ApiError } from '@/lib/api'
 import { useMe } from '@/lib/auth'
 import { calendarDaysBetween, formatLongDate, greeting, shortDate, time, weekday } from '@/lib/format'
 import { invalidateStudentData } from '@/lib/student'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
+import HomeDesk from './HomeDesk'
+import { DeskFallback } from '@/components/shell/student-desktop'
 
 const list = '[&>li+li]:border-t'
 
@@ -84,6 +87,7 @@ export default function Home() {
   const now = useNow()
   const qc = useQueryClient()
   const download = useNoteDownload()
+  const desktop = useIsDesktop()
   const renew = useRenewLoan({
     mutation: {
       onSuccess: (r) => {
@@ -94,7 +98,14 @@ export default function Home() {
     },
   })
 
-  if (isPending) return <Loading />
+  if (isPending)
+    return desktop ? (
+      <DeskFallback>
+        <Loading />
+      </DeskFallback>
+    ) : (
+      <Loading />
+    )
   if (isError || !data)
     return (
       <main className="flex flex-col gap-8 px-4 pt-6 pb-8">
@@ -110,6 +121,19 @@ export default function Home() {
       </main>
     )
 
+  if (desktop)
+    return (
+      <>
+        <HomeDesk
+          data={data}
+          now={now}
+          onRenew={(loanId) => renew.mutate({ loanId })}
+          renewing={renew.isPending}
+          onDownload={(n) => download.request(n)}
+        />
+        {download.sheet}
+      </>
+    )
   return (
     <>
       <DashboardView

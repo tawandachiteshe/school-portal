@@ -6,6 +6,7 @@
  */
 import type { Day } from './day';
 import type { Notice } from './notice';
+import type { WeekDue } from './weekDue';
 
 export interface Week {
   week: number | null;
@@ -15,6 +16,7 @@ export interface Week {
   class_group: string | null;
   days: Day[];
   notices: Notice[];
+  due: WeekDue[];
   has_previous: boolean;
   has_next: boolean;
 }

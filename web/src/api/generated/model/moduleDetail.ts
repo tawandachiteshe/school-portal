@@ -8,6 +8,7 @@ import type { Lecturer } from './lecturer';
 import type { ModuleAssessment } from './moduleAssessment';
 import type { Note } from './note';
 import type { WeekClass } from './weekClass';
+import type { WeeklySlot } from './weeklySlot';
 
 export interface ModuleDetail {
   code: string;
@@ -18,6 +19,7 @@ export interface ModuleDetail {
   coursework_weight: number;
   exam_weight: number;
   week: number | null;
+  weekly_slots: WeeklySlot[];
   week_classes: WeekClass[];
   assessments: ModuleAssessment[];
   exam_scheduled: boolean;

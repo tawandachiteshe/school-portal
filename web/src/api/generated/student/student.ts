@@ -22,8 +22,10 @@ import type {
 import type {
   AnnouncementDetail,
   Announcements,
+  AppApiStudentSearchResults,
   Dashboard,
-  HTTPValidationError
+  HTTPValidationError,
+  SearchStudentParams
 } from '../model';
 
 import { apiFetch } from '../../fetcher';
@@ -337,6 +339,113 @@ export function useAnnouncementDetail<TData = Awaited<ReturnType<typeof announce
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAnnouncementDetailQueryOptions(announcementId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getSearchStudentUrl = (params: SearchStudentParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/student/search?${stringifiedParams}` : `/student/search`
+}
+
+/**
+ * @summary Search Student
+ */
+export const searchStudent = async (params: SearchStudentParams, options?: Parameters<typeof apiFetch>[1]): Promise<AppApiStudentSearchResults> => {
+
+  return apiFetch<AppApiStudentSearchResults>(getSearchStudentUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSearchStudentQueryKey = (params?: SearchStudentParams,) => {
+    return [
+    `/student/search`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getSearchStudentQueryOptions = <TData = Awaited<ReturnType<typeof searchStudent>>, TError = HTTPValidationError>(params: SearchStudentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchStudentQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchStudent>>> = ({ signal }) => searchStudent(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchStudentQueryResult = NonNullable<Awaited<ReturnType<typeof searchStudent>>>
+export type SearchStudentQueryError = HTTPValidationError
+
+
+export function useSearchStudent<TData = Awaited<ReturnType<typeof searchStudent>>, TError = HTTPValidationError>(
+ params: SearchStudentParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchStudent>>,
+          TError,
+          Awaited<ReturnType<typeof searchStudent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchStudent<TData = Awaited<ReturnType<typeof searchStudent>>, TError = HTTPValidationError>(
+ params: SearchStudentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchStudent>>,
+          TError,
+          Awaited<ReturnType<typeof searchStudent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchStudent<TData = Awaited<ReturnType<typeof searchStudent>>, TError = HTTPValidationError>(
+ params: SearchStudentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Search Student
+ */
+
+export function useSearchStudent<TData = Awaited<ReturnType<typeof searchStudent>>, TError = HTTPValidationError>(
+ params: SearchStudentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchStudent>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchStudentQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

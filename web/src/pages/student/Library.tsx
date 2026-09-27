@@ -10,14 +10,17 @@ import { SubPage } from '@/components/shell/sub-page'
 import { BookRow, ReservationStatus, reservationText } from '@/components/student/book-row'
 import { Empty } from '@/components/student/section'
 import { useLibraryHome, useReadingList, useRenewLoan, useSearchCatalogue } from '@/api/generated/library/library'
-import type { LoanOut } from '@/api/generated/model'
+import type { LibraryHome, LoanOut } from '@/api/generated/model'
 import { ApiError } from '@/lib/api'
 import { shortDate } from '@/lib/format'
+import { onDay } from '@/lib/records'
 import { invalidateStudentData } from '@/lib/student'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { DeskBar, DeskFallback } from '@/components/shell/student-desktop'
 
 const list = '[&>li+li]:border-t'
 
-function SearchBox({ initial = '' }: { initial?: string }) {
+function SearchBox({ initial = '', placeholder = 'Title, author or module code' }: { initial?: string; placeholder?: string }) {
   const navigate = useNavigate()
   const [q, setQ] = useState(initial)
   return (
@@ -38,7 +41,7 @@ function SearchBox({ initial = '' }: { initial?: string }) {
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Title, author or module code"
+        placeholder={placeholder}
         className="pl-10"
         enterKeyHint="search"
       />
@@ -93,8 +96,165 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
   )
 }
 
+function LibraryDesk({
+  h,
+  onRenew,
+  busy,
+}: {
+  h: LibraryHome
+  onRenew: (id: string) => void
+  busy: boolean
+}) {
+  const overdue = h.loans.filter((l) => l.overdue)
+  const th = 'py-2 pr-3 text-left text-sm font-medium text-muted-foreground'
+  return (
+    <>
+      <DeskBar left={`Library · ${h.location} · ${h.today ? `open today until ${h.today.closes}` : 'closed today'}`} />
+      <main className="flex flex-col gap-7 p-8">
+        <div className="flex items-end justify-between gap-6">
+          <h1 className="text-[28px] leading-9 font-semibold tracking-[-0.015em]">Library</h1>
+          <div className="w-[480px]">
+            <SearchBox placeholder="Search by title, author or module code" />
+          </div>
+        </div>
+        <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-12">
+          <div className="flex flex-col gap-7">
+            <section aria-labelledby="dl-loans">
+              <h2 id="dl-loans" className="pb-2 text-lg leading-6 font-semibold">
+                On loan · {h.loans.length}
+              </h2>
+              {h.loans.length ? (
+                <table className="w-full border-collapse text-[15px] leading-[22px]">
+                  <thead>
+                    <tr className="border-b">
+                      <th className={th}>Book</th>
+                      <th className={`${th} w-[150px]`}>Barcode</th>
+                      <th className={`${th} w-[200px]`}>Due</th>
+                      <th className={`${th} w-[130px]`}>
+                        <span className="sr-only">Action</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {h.loans.map((l) => (
+                      <tr key={l.id} className="border-b">
+                        <td className="py-2.5 pr-3">
+                          <div className="font-medium">{l.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {[l.authors[0], l.edition].filter(Boolean).join(' · ')}
+                          </div>
+                        </td>
+                        <td className="py-2.5 pr-3 font-mono text-sm">{l.barcode}</td>
+                        <td className="py-2.5 pr-3">
+                          {l.overdue ? (
+                            <span className="font-medium text-destructive">Overdue since {shortDate(new Date(l.due_at))}</span>
+                          ) : (
+                            <>
+                              {shortDate(new Date(l.due_at))}{' '}
+                              <span className="text-sm text-muted-foreground">
+                                · {l.renewals_left ? `${l.renewals_left} of ${l.renewals_max} renewals left` : 'no renewals left'}
+                              </span>
+                            </>
+                          )}
+                        </td>
+                        <td className="py-2.5 text-right text-sm">
+                          {l.overdue ? (
+                            <span className="text-muted-foreground">Return to the desk</span>
+                          ) : (
+                            l.renewals_left > 0 && (
+                              <Button variant="outline" size="sm" disabled={busy} onClick={() => onRenew(l.id)}>
+                                Renew
+                              </Button>
+                            )
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-muted-foreground">No books on loan. Show your student card at the desk in {h.location} to borrow.</p>
+              )}
+            </section>
+            {h.reading_lists.length > 0 && (
+              <section aria-labelledby="dl-lists">
+                <h2 id="dl-lists" className="pb-2 text-lg leading-6 font-semibold">
+                  Reading lists
+                </h2>
+                <table className="w-full border-collapse text-[15px] leading-[22px]">
+                  <thead>
+                    <tr className="border-b">
+                      <th className={`${th} w-[100px]`}>Module</th>
+                      <th className={th}>Books</th>
+                      <th className={`${th} w-[180px]`}>On the shelf</th>
+                      <th className={`${th} w-20`}>
+                        <span className="sr-only">Open</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {h.reading_lists.map((r) => (
+                      <tr key={r.module_code} className="border-b">
+                        <td className="py-2.5 pr-3 font-mono">{r.module_code}</td>
+                        <td className="py-2.5 pr-3">{r.books}</td>
+                        <td className={`py-2.5 pr-3 ${r.on_shelf === 0 ? 'text-muted-foreground' : ''}`}>
+                          {r.on_shelf === 0 ? 'None' : r.on_shelf}
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <Link to={`/library/lists/${r.module_code}`} className="text-sm text-primary underline underline-offset-3">
+                            View<span className="sr-only"> {r.module_code} reading list</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </section>
+            )}
+          </div>
+          <aside className="flex flex-col gap-4">
+            <h2 className="font-semibold">Reserved for you</h2>
+            {h.reservations.length ? (
+              h.reservations.map((r) => (
+                <div key={r.id} className="flex flex-col gap-2 rounded-md border bg-card p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-semibold">{r.title}</div>
+                      <div className="text-sm text-muted-foreground">{r.authors[0]}</div>
+                    </div>
+                    <ReservationStatus r={r} />
+                  </div>
+                  <p className="text-sm">
+                    {r.status === 'ready' && r.collect_by ? (
+                      <>
+                        Collect from the desk by <span className="font-semibold">{shortDate(onDay(r.collect_by))}</span>. Bring your
+                        student card.
+                      </>
+                    ) : (
+                      reservationText(r)
+                    )}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Nothing reserved. Search the catalogue to reserve a book that's out.</p>
+            )}
+            {overdue.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Overdue books can't be renewed online. Return {overdue.map((l) => l.title).join(' and ')} at the desk, or ask
+                there if you still need it.
+              </p>
+            )}
+          </aside>
+        </div>
+      </main>
+    </>
+  )
+}
+
 export default function Library() {
   const { data: h, isPending, isError } = useLibraryHome()
+  const desktop = useIsDesktop()
   const qc = useQueryClient()
   const renew = useRenewLoan({
     mutation: {
@@ -105,6 +265,14 @@ export default function Library() {
       onError: (e) => toast(e instanceof ApiError ? e.message : 'Could not renew. Try again.'),
     },
   })
+  if (desktop)
+    return h ? (
+      <LibraryDesk h={h} onRenew={(loanId) => renew.mutate({ loanId })} busy={renew.isPending} />
+    ) : (
+      <DeskFallback>
+        {isError ? <Empty>Couldn't load the library. Check your connection.</Empty> : <Skeleton className="mt-6 h-64" />}
+      </DeskFallback>
+    )
   return (
     <main className="flex grow flex-col gap-7 px-4 py-6">
       <div className="flex flex-col gap-1">

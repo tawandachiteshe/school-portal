@@ -10,7 +10,10 @@ import { ApiError } from '@/lib/api'
 import { calendarDaysBetween, isUrgent, relativeDue, shortDate, shortDateTime, time } from '@/lib/format'
 import type { ModuleAssessment, ModuleDetail as Detail, Note as ModuleNote, WeekClass } from '@/api/generated/model'
 import { useModuleDetail } from '@/api/generated/modules/modules'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
+import { DeskFallback } from '@/components/shell/student-desktop'
+import ModuleDesk from './ModuleDesk'
 import { cn } from '@/lib/utils'
 
 const KIND: Record<string, string> = { lecture: 'Lecture', tutorial: 'Tutorial', lab: 'Lab', consultation: 'Consultation' }
@@ -28,7 +31,7 @@ function H2({ id, children, aside }: { id: string; children: React.ReactNode; as
   )
 }
 
-function WeekClasses({ classes, week, now }: { classes: WeekClass[]; week: number | null; now: Date }) {
+export function WeekClasses({ classes, week, now }: { classes: WeekClass[]; week: number | null; now: Date }) {
   const current = classes.findIndex((c) => !c.cancelled && new Date(c.ends_at) > now)
   return (
     <section aria-labelledby="h-week" className="flex flex-col">
@@ -113,7 +116,7 @@ function AssessmentRow({ a, now }: { a: ModuleAssessment; now: Date }) {
   )
 }
 
-function Assessments({ m, now }: { m: Detail; now: Date }) {
+export function Assessments({ m, now }: { m: Detail; now: Date }) {
   return (
     <section aria-labelledby="h-ass" className="flex flex-col">
       <H2
@@ -187,6 +190,23 @@ export default function ModuleDetail() {
   const now = useNow()
   const download = useNoteDownload()
   const get = (n: ModuleNote) => download.request({ ...n }, { ask: !n.downloaded })
+  const desktop = useIsDesktop()
+
+  if (desktop)
+    return m ? (
+      <>
+        <ModuleDesk m={m} tab={tab} setTab={setTab} now={now} onDownload={get} />
+        {download.sheet}
+      </>
+    ) : (
+      <DeskFallback>
+        {error ? (
+          <Empty>{error instanceof ApiError ? error.message : "Couldn't load this module."}</Empty>
+        ) : (
+          <Skeleton className="mt-6 h-64" />
+        )}
+      </DeskFallback>
+    )
 
   return (
     <SubPage title={code.toUpperCase()} mono back="/modules" backLabel="Back to modules" bottomNav>

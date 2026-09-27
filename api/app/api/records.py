@@ -1,7 +1,7 @@
 """Student records: timetable (+ calendar feed), results (+ slip, re-marks), fees (+ statement), card."""
 
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -11,18 +11,20 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.me import term_info
-from app.api.types import ClassKind
+from app.api.types import AssessmentKind, ClassKind
 from app.auth.deps import CurrentUser, current_user
 from app.config import get_settings
 from app.db import get_db
 from app.models import (
     AcademicTerm,
+    Assessment,
     FeeDueDate,
     FeeTransaction,
     ModuleOffering,
     ModuleResult,
     RemarkRequest,
     Student,
+    Submission,
 )
 from app.pdf import make_pdf
 from app.services import clock, timetable
@@ -59,6 +61,15 @@ class Notice(BaseModel):
     announcement_id: uuid.UUID
 
 
+class WeekDue(BaseModel):
+    id: uuid.UUID
+    kind: AssessmentKind
+    title: str
+    module_code: str
+    due_at: datetime
+    submitted: bool
+
+
 class Week(BaseModel):
     week: int | None
     starts_on: date
@@ -67,6 +78,7 @@ class Week(BaseModel):
     class_group: str | None
     days: list[Day]
     notices: list[Notice]
+    due: list[WeekDue]  # assignments and tests due this week (desktop week grid)
     has_previous: bool
     has_next: bool
 
@@ -123,6 +135,37 @@ async def week_timetable(
             )
             notices.append(Notice(date=a.affects_on, text=f"{a.title}. {tail}", announcement_id=a.id))
 
+    week_start = clock.at(monday, time(0, 0))
+    week_end = week_start + timedelta(days=7)
+    assessments = (
+        (
+            await db.execute(
+                select(Assessment)
+                .where(
+                    Assessment.offering_id.in_([o.id for o in offerings]),
+                    Assessment.published_at.is_not(None),
+                    Assessment.due_at >= week_start,
+                    Assessment.due_at < week_end,
+                )
+                .order_by(Assessment.due_at)
+            )
+        )
+        .unique()
+        .scalars()
+        .all()
+    )
+    done = set(
+        (
+            await db.execute(
+                select(Submission.assessment_id).where(
+                    Submission.student_id == student.id,
+                    Submission.assessment_id.in_([a.id for a in assessments]),
+                    Submission.status != "draft",
+                )
+            )
+        ).scalars()
+    )
+
     return Week(
         week=term_info(term, max(monday, term.starts_on)).week if term and monday <= term.ends_on else None,
         starts_on=monday,
@@ -131,6 +174,17 @@ async def week_timetable(
         class_group=student.class_group,
         days=out_days,
         notices=notices,
+        due=[
+            WeekDue(
+                id=a.id,
+                kind=a.kind,
+                title=a.title,
+                module_code=a.offering.module.code,
+                due_at=a.due_at,
+                submitted=a.id in done,
+            )
+            for a in assessments
+        ],
         has_previous=bool(term and monday > term.starts_on),
         has_next=bool(term and days[-1] < term.ends_on),
     )

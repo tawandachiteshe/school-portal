@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
 import { watchWifiQueue } from '@/lib/downloads'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { DeskFallback, DesktopStudentShell, useHasDeskLayout } from './student-desktop'
 import { invalidateStudentData } from '@/lib/student'
 import { dismissUpload, resumeSavedUploads } from '@/lib/uploads'
 import { useQueryClient } from '@tanstack/react-query'
@@ -91,10 +93,21 @@ export function StudentRoot() {
       ),
     [],
   )
-  return <Outlet />
+  return useIsDesktop() ? <DesktopStudentShell /> : <Outlet />
 }
 
 export function StudentShell({ avatar = true }: { avatar?: boolean }) {
+  const desktop = useIsDesktop()
+  const hasDesk = useHasDeskLayout()
+  // On a computer the sidebar replaces the top bar and bottom nav.
+  if (desktop)
+    return hasDesk ? (
+      <Outlet />
+    ) : (
+      <DeskFallback>
+        <Outlet />
+      </DeskFallback>
+    )
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <StudentTopBar avatar={avatar} />

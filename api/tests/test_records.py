@@ -119,3 +119,16 @@ def test_ics_escaping():
     from app.api.records import _ics_escape
 
     assert _ics_escape("Lab 3; Block C, room 2") == "Lab 3\; Block C\\, room 2"
+
+
+async def test_week_lists_deadlines_and_module_has_weekly_slots():
+    async with signed_in(TARIRO) as c:
+        today = clock.today()
+        w = (await c.get("/student/timetable", params={"start": today.isoformat()})).json()
+        assert all(w["starts_on"] <= d["due_at"][:10] for d in w["due"])
+        m = (await c.get("/student/modules/DCN201")).json()
+    assert [(s["day_of_week"], s["starts_at"], s["venue"]) for s in m["weekly_slots"]] == [
+        (1, "08:00", "Lecture Room B2"),
+        (3, "10:00", "Lab 3"),
+        (4, "10:00", "Lab 3"),
+    ]

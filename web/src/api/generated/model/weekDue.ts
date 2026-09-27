@@ -4,15 +4,13 @@
  * TCFL Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { AssessmentKind } from './assessmentKind';
 
-export interface LoanOut {
+export interface WeekDue {
   id: string;
-  barcode: string;
+  kind: AssessmentKind;
   title: string;
-  authors: string[];
-  edition: string | null;
+  module_code: string;
   due_at: string;
-  renewals_left: number;
-  renewals_max: number;
-  overdue: boolean;
+  submitted: boolean;
 }

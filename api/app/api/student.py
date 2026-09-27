@@ -3,9 +3,9 @@
 import uuid
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -347,4 +347,100 @@ async def announcement_detail(
         contact_line=a.contact_line,
         affects=affects,
         affects_you=affects_you,
+    )
+
+
+# --- search (desktop top bar: "Search modules, notes, announcements") -------------------------
+
+
+class ModuleHit(BaseModel):
+    code: str
+    name: str
+
+
+class NoteHit(BaseModel):
+    id: uuid.UUID
+    title: str
+    module_code: str
+    week: int | None
+    mime_type: str | None
+    size_bytes: int | None
+
+
+class AnnouncementHit(BaseModel):
+    id: uuid.UUID
+    title: str
+    from_label: str | None
+    publish_at: datetime
+
+
+class SearchResults(BaseModel):
+    query: str
+    modules: list[ModuleHit]
+    notes: list[NoteHit]
+    announcements: list[AnnouncementHit]
+
+
+@router.get("/search")
+async def search_student(
+    q: str = Query(min_length=2, max_length=100),
+    cu: CurrentUser = Depends(current_user),
+    student: Student = Depends(current_student),
+    db: AsyncSession = Depends(get_db),
+) -> SearchResults:
+    term = q.strip().lower()
+    now = clock.now()
+    offerings = await current_offerings(db, student)
+    modules = [
+        ModuleHit(code=o.module.code, name=o.module.name)
+        for o in offerings
+        if term in o.module.code.lower() or term in o.module.name.lower()
+    ]
+    notes = (
+        (
+            await db.execute(
+                select(CourseMaterial)
+                .where(
+                    CourseMaterial.offering_id.in_([o.id for o in offerings]),
+                    CourseMaterial.published_at.is_not(None),
+                    CourseMaterial.published_at <= now,
+                    or_(
+                        CourseMaterial.title.ilike(f"%{term}%"),
+                        CourseMaterial.topic.ilike(f"%{term}%"),
+                        CourseMaterial.offering_id.in_(
+                            [o.id for o in offerings if o.module.code.lower() == term]
+                        ),
+                    ),
+                )
+                .order_by(CourseMaterial.published_at.desc())
+                .limit(20)
+            )
+        )
+        .unique()
+        .scalars()
+        .all()
+    )
+    anns = [
+        a
+        for a in await ann.visible(db, cu.user.id)
+        if term in a.title.lower() or term in a.body_md.lower() or term in (a.from_label or "").lower()
+    ][:10]
+    return SearchResults(
+        query=q.strip(),
+        modules=modules,
+        notes=[
+            NoteHit(
+                id=n.id,
+                title=n.title,
+                module_code=n.offering.module.code,
+                week=n.week,
+                mime_type=n.mime_type,
+                size_bytes=n.size_bytes,
+            )
+            for n in notes
+        ],
+        announcements=[
+            AnnouncementHit(id=a.id, title=a.title, from_label=a.from_label, publish_at=a.publish_at)
+            for a in anns
+        ],
     )

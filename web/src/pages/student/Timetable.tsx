@@ -8,7 +8,10 @@ import { calendarDaysBetween, time, weekday } from '@/lib/format'
 import type { Slot } from '@/api/generated/model'
 import { useWeekTimetable } from '@/api/generated/records/records'
 import { onDay } from '@/lib/records'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
+import { DeskFallback } from '@/components/shell/student-desktop'
+import TimetableDesk from './TimetableDesk'
 import { cn } from '@/lib/utils'
 
 const monthDay = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'Africa/Harare' })
@@ -65,6 +68,7 @@ export default function Timetable() {
   const [picked, setPicked] = useState<string | null>(null)
   const { data: w, isPending, isError } = useWeekTimetable(start ? { start } : undefined)
   const now = useNow()
+  const desktop = useIsDesktop()
 
   const days = w?.days ?? []
   const todayIdx = days.findIndex((d) => calendarDaysBetween(now, onDay(d.date)) === 0)
@@ -76,8 +80,17 @@ export default function Timetable() {
   const go = (n: number) => {
     if (!w) return
     setPicked(null)
-    setStart(addDays(w.starts_on, n * 7))
+    setStart(n === 0 ? null : addDays(w.starts_on, n * 7))
   }
+
+  if (desktop)
+    return w ? (
+      <TimetableDesk w={w} now={now} onWeek={go} />
+    ) : (
+      <DeskFallback>
+        {isError ? <Empty>Couldn't load the timetable. Check your connection.</Empty> : <Skeleton className="mt-6 h-96" />}
+      </DeskFallback>
+    )
 
   return (
     <SubPage title={<span className="font-semibold">Timetable</span>} back="/modules" backLabel="Back">

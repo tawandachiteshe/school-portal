@@ -104,3 +104,13 @@ async def test_cannot_renew_someone_elses_loan():
         loan_id = (await c.get("/student/dashboard")).json()["loans"][0]["id"]
     async with signed_in("fchikore") as c:
         assert (await c.post(f"/library/loans/{loan_id}/renew")).status_code == 403
+
+
+async def test_search_finds_modules_notes_and_announcements():
+    async with signed_in(TARIRO) as c:
+        r = (await c.get("/student/search", params={"q": "modulation"})).json()
+        assert "Amplitude and frequency modulation" in [n["title"] for n in r["notes"]]
+        r = (await c.get("/student/search", params={"q": "networks"})).json()
+        assert [m["code"] for m in r["modules"]] == ["NET202"]
+        r = (await c.get("/student/search", params={"q": "lab 3"})).json()
+        assert any(a["title"].startswith("Lab 3 closed") for a in r["announcements"])

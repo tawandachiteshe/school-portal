@@ -17,7 +17,15 @@ from app.api.types import AssessmentKind, ClassKind, SubmissionMode, SubmissionS
 from app.auth.deps import CurrentUser, current_user
 from app.config import get_settings
 from app.db import get_db
-from app.models import Assessment, CourseMaterial, MaterialDownload, ModuleOffering, Student, Submission
+from app.models import (
+    Assessment,
+    CourseMaterial,
+    MaterialDownload,
+    ModuleOffering,
+    Student,
+    Submission,
+    TimetableSlot,
+)
 from app.services import clock, timetable
 from app.services.students import current_offerings, current_student
 
@@ -88,6 +96,14 @@ class Note(BaseModel):
     external_url: str | None
 
 
+class WeeklySlot(BaseModel):
+    day_of_week: int  # ISO, 1 = Monday
+    starts_at: str  # "08:00"
+    ends_at: str
+    kind: ClassKind
+    venue: str | None
+
+
 class ModuleDetail(BaseModel):
     code: str
     name: str
@@ -97,6 +113,7 @@ class ModuleDetail(BaseModel):
     coursework_weight: float
     exam_weight: float
     week: int | None
+    weekly_slots: list[WeeklySlot]  # "Mondays 08:00 Lecture Room B2, Thursdays 10:00 Lab 3"
     week_classes: list[WeekClass]
     assessments: list[ModuleAssessment]
     exam_scheduled: bool
@@ -253,6 +270,21 @@ async def module_detail(
         coursework_weight=cw,
         exam_weight=100 - cw,
         week=term_info(o.term, max(week_start, now.date())).week,
+        weekly_slots=[
+            WeeklySlot(
+                day_of_week=sl.day_of_week,
+                starts_at=sl.starts_at.strftime("%H:%M"),
+                ends_at=sl.ends_at.strftime("%H:%M"),
+                kind=sl.kind,
+                venue=sl.venue.name if sl.venue else None,
+            )
+            for sl in sorted(
+                (await db.execute(select(TimetableSlot).where(TimetableSlot.offering_id == o.id)))
+                .unique()
+                .scalars(),
+                key=lambda sl: (sl.day_of_week, sl.starts_at),
+            )
+        ],
         week_classes=[
             WeekClass(
                 kind=c.kind,

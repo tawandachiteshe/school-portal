@@ -287,6 +287,50 @@
         }
       }
     },
+    "/student/search": {
+      "get": {
+        "tags": [
+          "student"
+        ],
+        "summary": "Search Student",
+        "operationId": "search_student",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__student__SearchResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/library/home": {
       "get": {
         "tags": [
@@ -376,7 +420,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchResults"
+                  "$ref": "#/components/schemas/app__api__library__SearchResults"
                 }
               }
             }
@@ -1247,6 +1291,43 @@
           "affects_you"
         ],
         "title": "AnnouncementDetail"
+      },
+      "AnnouncementHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "from_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Label"
+          },
+          "publish_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "from_label",
+          "publish_at"
+        ],
+        "title": "AnnouncementHit"
       },
       "AnnouncementItem": {
         "properties": {
@@ -2326,6 +2407,10 @@
             "format": "uuid",
             "title": "Id"
           },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
           "title": {
             "type": "string",
             "title": "Title"
@@ -2369,6 +2454,7 @@
         "type": "object",
         "required": [
           "id",
+          "barcode",
           "title",
           "authors",
           "edition",
@@ -2611,6 +2697,13 @@
             ],
             "title": "Week"
           },
+          "weekly_slots": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklySlot"
+            },
+            "type": "array",
+            "title": "Weekly Slots"
+          },
           "week_classes": {
             "items": {
               "$ref": "#/components/schemas/WeekClass"
@@ -2647,12 +2740,31 @@
           "coursework_weight",
           "exam_weight",
           "week",
+          "weekly_slots",
           "week_classes",
           "assessments",
           "exam_scheduled",
           "notes"
         ],
         "title": "ModuleDetail"
+      },
+      "ModuleHit": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "ModuleHit"
       },
       "ModuleList": {
         "properties": {
@@ -2880,6 +2992,66 @@
           "external_url"
         ],
         "title": "Note"
+      },
+      "NoteHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "module_code",
+          "week",
+          "mime_type",
+          "size_bytes"
+        ],
+        "title": "NoteHit"
       },
       "NoteItem": {
         "properties": {
@@ -3372,27 +3544,6 @@
           "student_affairs"
         ],
         "title": "Role"
-      },
-      "SearchResults": {
-        "properties": {
-          "query": {
-            "type": "string",
-            "title": "Query"
-          },
-          "books": {
-            "items": {
-              "$ref": "#/components/schemas/Book"
-            },
-            "type": "array",
-            "title": "Books"
-          }
-        },
-        "type": "object",
-        "required": [
-          "query",
-          "books"
-        ],
-        "title": "SearchResults"
       },
       "SettingsIn": {
         "properties": {
@@ -3979,6 +4130,13 @@
             "type": "array",
             "title": "Notices"
           },
+          "due": {
+            "items": {
+              "$ref": "#/components/schemas/WeekDue"
+            },
+            "type": "array",
+            "title": "Due"
+          },
           "has_previous": {
             "type": "boolean",
             "title": "Has Previous"
@@ -3997,6 +4155,7 @@
           "class_group",
           "days",
           "notices",
+          "due",
           "has_previous",
           "has_next"
         ],
@@ -4066,6 +4225,142 @@
           "assessment_title"
         ],
         "title": "WeekClass"
+      },
+      "WeekDue": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "submitted": {
+            "type": "boolean",
+            "title": "Submitted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "module_code",
+          "due_at",
+          "submitted"
+        ],
+        "title": "WeekDue"
+      },
+      "WeeklySlot": {
+        "properties": {
+          "day_of_week": {
+            "type": "integer",
+            "title": "Day Of Week"
+          },
+          "starts_at": {
+            "type": "string",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "title": "Ends At"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClassKind"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day_of_week",
+          "starts_at",
+          "ends_at",
+          "kind",
+          "venue"
+        ],
+        "title": "WeeklySlot"
+      },
+      "app__api__library__SearchResults": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "books": {
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            },
+            "type": "array",
+            "title": "Books"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "books"
+        ],
+        "title": "SearchResults"
+      },
+      "app__api__student__SearchResults": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleHit"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/NoteHit"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "announcements": {
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementHit"
+            },
+            "type": "array",
+            "title": "Announcements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "modules",
+          "notes",
+          "announcements"
+        ],
+        "title": "SearchResults"
       }
     }
   }

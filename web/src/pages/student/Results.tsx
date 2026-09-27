@@ -10,12 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { SubPage } from '@/components/shell/sub-page'
 import { Empty } from '@/components/student/section'
-import type { TermResults } from '@/api/generated/model'
+import type { Results as ResultsData, TermResults } from '@/api/generated/model'
 import { getResultsQueryKey, useRequestRemark, useResults } from '@/api/generated/records/records'
 import { ApiError } from '@/lib/api'
 import { formatLongDate } from '@/lib/format'
 import { onDay } from '@/lib/records'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
+import { ClassContext, DeskBar } from '@/components/shell/student-desktop'
 
 const longYear = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
@@ -26,8 +28,17 @@ const longYear = new Intl.DateTimeFormat('en-GB', {
 })
 const n = (x: number | null) => (x === null ? '–' : `${x}`)
 
-function RemarkSheet({ term, open, onOpenChange }: { term: TermResults; open: boolean; onOpenChange: (o: boolean) => void }) {
+export function RemarkSheet({
+  term,
+  open,
+  onOpenChange,
+}: {
+  term: TermResults
+  open: boolean
+  onOpenChange: (o: boolean) => void
+}) {
   const qc = useQueryClient()
+  const desktop = useIsDesktop()
   const reasonId = useId()
   const choices = term.modules.filter((m) => !m.remark_status)
   const [offering, setOffering] = useState<string | null>(null)
@@ -46,8 +57,12 @@ function RemarkSheet({ term, open, onOpenChange }: { term: TermResults; open: bo
   const error = remark.error instanceof ApiError ? remark.error.message : remark.error ? 'Could not send. Try again.' : null
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" showCloseButton={false} className="gap-4 rounded-t-xl px-4 pt-2 pb-6">
-        <span aria-hidden className="h-1 w-10 self-center rounded-full bg-border-strong" />
+      <SheetContent
+        side={desktop ? 'right' : 'bottom'}
+        showCloseButton={desktop}
+        className={desktop ? 'w-[480px] gap-4 p-6 sm:max-w-[480px]' : 'gap-4 rounded-t-xl px-4 pt-2 pb-6'}
+      >
+        {!desktop && <span aria-hidden className="h-1 w-10 self-center rounded-full bg-border-strong" />}
         <SheetHeader className="p-0">
           <SheetTitle className="text-lg leading-6 font-semibold">Ask for a re-mark</SheetTitle>
           <SheetDescription>
@@ -192,9 +207,131 @@ function Term({ t }: { t: TermResults }) {
   )
 }
 
+function ResultsDesk({ data }: { data: ResultsData }) {
+  const [code, setCode] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const t = data.terms.find((x) => x.term_code === code) ?? data.terms[0]
+  const failed = t?.modules.filter((m) => m.is_pass === false) ?? []
+  const canRemark = t?.remark_until != null && onDay(t.remark_until) >= new Date(new Date().toDateString())
+  return (
+    <>
+      <DeskBar
+        left={<ClassContext />}
+        right={
+          data.terms.length > 0 && (
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Semester</span>
+              <select
+                className="h-9 w-[180px] rounded-sm border border-input bg-card px-2 text-sm"
+                value={t?.term_code}
+                onChange={(e) => setCode(e.target.value)}
+              >
+                {data.terms.map((x) => (
+                  <option key={x.term_code} value={x.term_code}>
+                    {x.term_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )
+        }
+      />
+      <main className="flex max-w-[960px] flex-col gap-6 p-8">
+        {!t ? (
+          <div className="flex flex-col gap-1">
+            <h1 className="text-[28px] leading-9 font-semibold tracking-[-0.015em]">
+              Results{data.current_term_name ? ` · ${data.current_term_name}` : ''}
+            </h1>
+            <p className="text-muted-foreground">Not yet published. Your results appear here as soon as they are.</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-end justify-between gap-6">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-[28px] leading-9 font-semibold tracking-[-0.015em]">Results · {t.term_name}</h1>
+                {t.published_at && (
+                  <p className="text-muted-foreground">Published {longYear.format(new Date(t.published_at)).replace(',', '')}</p>
+                )}
+              </div>
+              <Button variant="outline" asChild>
+                <a href={`/api/student/results/${t.term_code}/slip.pdf`}>
+                  <Download strokeWidth={1.5} />
+                  Results slip (PDF)
+                </a>
+              </Button>
+            </div>
+            {failed.length === 0 ? (
+              <Alert variant="success">
+                <CircleCheck strokeWidth={1.5} />
+                <p>
+                  You passed all {t.modules.length} {t.modules.length === 1 ? 'module' : 'modules'}.
+                </p>
+              </Alert>
+            ) : (
+              <Alert variant="destructive">
+                <CircleAlert strokeWidth={1.5} />
+                <p>You didn't pass {failed.map((m) => m.module_code).join(', ')}. Ask Student Affairs what happens next.</p>
+              </Alert>
+            )}
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left text-sm text-muted-foreground">
+                  <th className="w-[100px] py-2 pr-3 font-medium">Code</th>
+                  <th className="py-2 pr-3 font-medium">Module</th>
+                  <th className="w-[120px] py-2 pr-3 text-right font-medium">Coursework</th>
+                  <th className="w-[90px] py-2 pr-3 text-right font-medium">Exam</th>
+                  <th className="w-[90px] py-2 pr-3 text-right font-medium">Final</th>
+                  <th className="w-[140px] py-2 font-medium">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {t.modules.map((m) => (
+                  <tr key={m.offering_id} className="border-b">
+                    <td className="py-2.5 pr-3 font-mono">{m.module_code}</td>
+                    <td className="py-2.5 pr-3">{m.module_name}</td>
+                    <td className="py-2.5 pr-3 text-right font-mono">{n(m.coursework_mark)}</td>
+                    <td className="py-2.5 pr-3 text-right font-mono">{n(m.exam_mark)}</td>
+                    <td className="py-2.5 pr-3 text-right font-mono font-semibold">
+                      {m.final_mark === null ? '–' : `${m.final_mark}%`}
+                    </td>
+                    <td className="py-2.5">
+                      {m.is_pass !== null && (
+                        <span className={m.is_pass ? 'font-medium text-success' : 'font-medium text-destructive'}>
+                          {m.is_pass ? 'Pass' : 'Fail'}
+                        </span>
+                      )}
+                      {m.remark_status && <span className="text-sm text-muted-foreground"> · re-mark asked</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-sm text-muted-foreground">
+              {t.notice}
+              {canRemark && t.remark_until && (
+                <>
+                  {' '}
+                  Think a mark is wrong?{' '}
+                  <button type="button" onClick={() => setOpen(true)} className="text-primary underline underline-offset-3">
+                    Ask for a re-mark
+                  </button>{' '}
+                  by {formatLongDate(onDay(t.remark_until))}.
+                </>
+              )}
+            </p>
+            <RemarkSheet term={t} open={open} onOpenChange={setOpen} />
+          </>
+        )}
+      </main>
+    </>
+  )
+}
+
 export default function Results() {
   const { data, isPending, isError } = useResults()
+  const desktop = useIsDesktop()
   const latest = data?.terms[0]
+  if (desktop && data) return <ResultsDesk data={data} />
   return (
     <SubPage title={<span className="font-semibold">Results</span>} back="/more" backLabel="Back">
       <main className="flex grow flex-col gap-6 px-4 py-6">

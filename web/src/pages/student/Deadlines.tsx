@@ -8,10 +8,12 @@ import { Empty } from '@/components/student/section'
 import { useDeadlines } from '@/api/generated/deadlines/deadlines'
 import type { DeadlineItem } from '@/api/generated/model'
 import { acceptedText } from '@/lib/deadlines'
-import { isUrgent, relativeDue, shortDateTime } from '@/lib/format'
+import { isUrgent, relativeDue, shortDate, shortDateTime } from '@/lib/format'
 import { KIND_LABEL } from '@/lib/student'
 import { useUpload } from '@/lib/uploads'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
+import { ClassContext, DeskBar } from '@/components/shell/student-desktop'
 import { cn } from '@/lib/utils'
 
 const SHOW = ['upcoming', 'submitted', 'marked'] as const
@@ -134,38 +136,156 @@ function Group({ id, title, children }: { id: string; title: string; children: R
   )
 }
 
-function Upcoming({ items, week, now }: { items: DeadlineItem[]; week: number | null; now: Date }) {
+type Group = { id: string; title: string; items: DeadlineItem[] }
+
+// "This week · Week 6", "Next week · Week 7", "Later this semester" (design/Deadlines)
+function upcomingGroups(items: DeadlineItem[], week: number | null, now: Date): Group[] {
   const open = items.filter(
     (i) => new Date(i.due_at) > now || (i.status === null && i.allow_late_until && new Date(i.allow_late_until) > now),
   )
-  if (!open.length) return <Empty>Nothing coming up. New tests and assignments appear here once lecturers add them.</Empty>
-  const thisWeek = open.filter((i) => week === null || (i.week ?? 0) <= week)
-  const nextWeek = week === null ? [] : open.filter((i) => i.week === week + 1)
-  const later = week === null ? [] : open.filter((i) => (i.week ?? 0) > week + 1 || i.week === null)
+  if (week === null) return open.length ? [{ id: 'h-this', title: 'Coming up', items: open }] : []
+  return [
+    { id: 'h-this', title: `This week · Week ${week}`, items: open.filter((i) => (i.week ?? 0) <= week) },
+    { id: 'h-next', title: `Next week · Week ${week + 1}`, items: open.filter((i) => i.week === week + 1) },
+    { id: 'h-later', title: 'Later this semester', items: open.filter((i) => (i.week ?? 0) > week + 1 || i.week === null) },
+  ].filter((g) => g.items.length)
+}
+
+function Upcoming({ items, week, now }: { items: DeadlineItem[]; week: number | null; now: Date }) {
+  const groups = upcomingGroups(items, week, now)
+  if (!groups.length) return <Empty>Nothing coming up. New tests and assignments appear here once lecturers add them.</Empty>
   return (
     <div className="flex flex-col gap-6">
-      {thisWeek.length > 0 && (
-        <Group id="h-this" title={week ? `This week · Week ${week}` : 'Coming up'}>
-          {thisWeek.map((i) => (
+      {groups.map((g) => (
+        <Group key={g.id} id={g.id} title={g.title}>
+          {g.items.map((i) => (
             <UpcomingRow key={i.id} item={i} now={now} />
           ))}
         </Group>
-      )}
-      {nextWeek.length > 0 && (
-        <Group id="h-next" title={`Next week · Week ${week! + 1}`}>
-          {nextWeek.map((i) => (
-            <UpcomingRow key={i.id} item={i} now={now} />
-          ))}
-        </Group>
-      )}
-      {later.length > 0 && (
-        <Group id="h-later" title="Later this semester">
-          {later.map((i) => (
-            <UpcomingRow key={i.id} item={i} now={now} />
-          ))}
-        </Group>
-      )}
+      ))}
     </div>
+  )
+}
+
+const th = 'py-2 pr-3 text-left text-sm font-medium text-muted-foreground'
+
+function DeskRow({ i, now }: { i: DeadlineItem; now: Date }) {
+  const due = new Date(i.due_at)
+  const done = i.status !== null
+  return (
+    <tr className={cn('border-b', done && 'text-muted-foreground')}>
+      <td className="py-2 pr-3">
+        <Badge>{KIND_LABEL[i.kind]}</Badge>
+      </td>
+      <td className="py-2 pr-3 font-mono text-sm">{i.module_code}</td>
+      <td className={cn('py-2 pr-3', !done && 'font-medium')}>{i.title}</td>
+      <td className="py-2 pr-3">{shortDateTime(due)}</td>
+      <td className="py-2 pr-3 text-sm">
+        {!done && isUrgent(due, now, false) ? (
+          <Badge variant="urgent">{relativeDue(due, now)}</Badge>
+        ) : (
+          <span className="text-muted-foreground">{due > now ? relativeDue(due, now) : 'Late window'}</span>
+        )}
+      </td>
+      <td className="py-2 text-right text-sm">
+        {done ? (
+          <span className="inline-flex items-center gap-1">
+            <Check className="size-4 text-success" strokeWidth={1.5} aria-hidden />
+            Submitted{i.submitted_at && ` ${shortDate(new Date(i.submitted_at))}`}
+          </span>
+        ) : i.submission_mode === 'online' && due.getTime() - now.getTime() < 7 * 86_400_000 ? (
+          <Button size="sm" asChild>
+            <Link to={`/deadlines/${i.id}/submit`}>Submit work</Link>
+          </Button>
+        ) : (
+          i.submission_mode !== 'online' && <span className="text-muted-foreground">{i.venue}</span>
+        )}
+      </td>
+    </tr>
+  )
+}
+
+function DeskTables({ show, items, week, now }: { show: Show; items: DeadlineItem[]; week: number | null; now: Date }) {
+  if (show === 'upcoming') {
+    const groups = upcomingGroups(items, week, now)
+    if (!groups.length) return <Empty>Nothing coming up.</Empty>
+    return (
+      <table className="w-full border-collapse text-[15px] leading-[22px]">
+        <thead>
+          <tr className="border-b">
+            <th className={cn(th, 'w-[110px]')}>Type</th>
+            <th className={cn(th, 'w-[90px]')}>Module</th>
+            <th className={th}>Title</th>
+            <th className={cn(th, 'w-[180px]')}>Due</th>
+            <th className={cn(th, 'w-[130px]')}>When</th>
+            <th className={cn(th, 'w-[170px]')}>
+              <span className="sr-only">Action or place</span>
+            </th>
+          </tr>
+        </thead>
+        {groups.map((g) => (
+          <tbody key={g.id}>
+            <tr>
+              <td colSpan={6} className="bg-muted px-3 py-1.5 text-xs leading-4 font-semibold tracking-[0.06em] text-muted-foreground uppercase">
+                {g.title}
+              </td>
+            </tr>
+            {g.items.map((i) => (
+              <DeskRow key={i.id} i={i} now={now} />
+            ))}
+          </tbody>
+        ))}
+      </table>
+    )
+  }
+  const rows =
+    show === 'submitted'
+      ? items.filter((i) => (i.status === 'submitted' || i.status === 'late') && i.mark === null)
+      : items.filter((i) => i.mark !== null)
+  if (!rows.length) return <Empty>{show === 'submitted' ? 'Nothing waiting for marks.' : 'No marks released yet.'}</Empty>
+  return (
+    <table className="w-full border-collapse text-[15px] leading-[22px]">
+      <thead>
+        <tr className="border-b">
+          <th className={cn(th, 'w-[110px]')}>Type</th>
+          <th className={cn(th, 'w-[90px]')}>Module</th>
+          <th className={th}>Title</th>
+          <th className={cn(th, 'w-[180px]')}>{show === 'submitted' ? 'Submitted' : 'Due'}</th>
+          <th className={cn(th, show === 'marked' ? 'w-[90px] text-right' : 'w-[150px]')}>
+            {show === 'submitted' ? 'Status' : 'Mark'}
+          </th>
+          {show === 'marked' && <th className={cn(th, 'pl-6')}>Feedback</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((i) => (
+          <tr key={i.id} className="border-b align-top">
+            <td className="py-2 pr-3">
+              <Badge>{KIND_LABEL[i.kind]}</Badge>
+            </td>
+            <td className="py-2 pr-3 font-mono text-sm">{i.module_code}</td>
+            <td className="py-2 pr-3 font-medium">
+              {show === 'submitted' ? <Link to={`/deadlines/${i.id}/submit`}>{i.title}</Link> : i.title}
+            </td>
+            <td className="py-2 pr-3">
+              {show === 'submitted' && i.submitted_at ? shortDateTime(new Date(i.submitted_at)) : shortDateTime(new Date(i.due_at))}
+            </td>
+            {show === 'submitted' ? (
+              <td className="py-2 text-sm">
+                {i.status === 'late' ? <Badge variant="destructive">Late</Badge> : <span className="text-muted-foreground">Awaiting marks</span>}
+              </td>
+            ) : (
+              <>
+                <td className="py-2 text-right font-mono font-semibold">
+                  {i.mark}/{i.max_mark}
+                </td>
+                <td className="py-2 pl-6 text-sm">{i.feedback}</td>
+              </>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
@@ -178,12 +298,36 @@ export default function Deadlines() {
     .filter((i) => (i.status === 'submitted' || i.status === 'late') && i.mark === null)
     .sort((a, b) => (b.submitted_at ?? '').localeCompare(a.submitted_at ?? ''))
   const marked = data?.items.filter((i) => i.mark !== null).sort((a, b) => b.due_at.localeCompare(a.due_at))
+  const desktop = useIsDesktop()
+  const setShow = (v: string) => setParams(v === 'upcoming' ? {} : { show: v }, { replace: true })
+
+  if (desktop)
+    return (
+      <>
+        <DeskBar left={<ClassContext />} />
+        <main className="flex flex-col gap-4 px-8 py-6">
+          <Tabs value={show} onValueChange={setShow} className="gap-4">
+            <div className="flex items-end justify-between">
+              <h1 className="text-[28px] leading-9 font-semibold tracking-[-0.015em]">Deadlines</h1>
+              <TabsList variant="segmented" aria-label="Filter deadlines" className="w-[340px]">
+                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger value="submitted">Submitted</TabsTrigger>
+                <TabsTrigger value="marked">Marked</TabsTrigger>
+              </TabsList>
+            </div>
+            {isPending && <Skeleton className="h-64" />}
+            {isError && <Empty>Couldn't load your deadlines. Check your connection.</Empty>}
+            {data && <DeskTables show={show} items={data.items} week={data.week} now={now} />}
+          </Tabs>
+        </main>
+      </>
+    )
 
   return (
     <main className="flex grow flex-col gap-6 px-4 py-6">
       <Tabs
         value={show}
-        onValueChange={(v) => setParams(v === 'upcoming' ? {} : { show: v }, { replace: true })}
+        onValueChange={setShow}
         className="gap-6"
       >
         <div className="flex flex-col gap-4">

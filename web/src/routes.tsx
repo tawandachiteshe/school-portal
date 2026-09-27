@@ -17,6 +17,7 @@ import Results from '@/pages/student/Results'
 import Fees from '@/pages/student/Fees'
 import StudentCard from '@/pages/student/StudentCard'
 import Library, { LibrarySearch, ReadingListPage } from '@/pages/student/Library'
+import Search from '@/pages/student/Search'
 import { AnnouncementDetail, AnnouncementsList } from '@/pages/student/Announcements'
 
 // Route map follows docs/design-handoff.md. Screens are added as they are built.
@@ -33,10 +34,10 @@ export const router = createBrowserRouter([
       {
         element: <StudentShell />,
         children: [
-          { index: true, element: <Home /> },
+          { index: true, element: <Home />, handle: { desk: true } },
           { path: '/modules', element: <Modules /> },
-          { path: '/deadlines', element: <Deadlines /> },
-          { path: '/library', element: <Library /> },
+          { path: '/deadlines', element: <Deadlines />, handle: { desk: true } },
+          { path: '/library', element: <Library />, handle: { desk: true } },
         ],
       },
       { path: '/modules/:code', element: <ModuleDetail /> },
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
       { path: '/fees', element: <Fees /> },
       { path: '/card', element: <StudentCard /> },
       { path: '/library/search', element: <LibrarySearch /> },
+      { path: '/search', element: <Search /> },
       { path: '/library/lists/:code', element: <ReadingListPage /> },
       { element: <StudentShell avatar={false} />, children: [{ path: '/more', element: <More /> }] },
       { path: '/announcements', element: <AnnouncementsList /> },
