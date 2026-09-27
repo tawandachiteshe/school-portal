@@ -71,6 +71,7 @@ for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns
 
 ## Commands
 
+- `make` lists the shortcuts (`make setup`, `make dev`, `make check`, `make gen-api`, `make reset`, `make prod-env DOMAIN=…`); the commands they run are below.
 - Web (in `web/`): `bun install`, `bun run dev` (http://localhost:5173, proxies `/api` and `/auth`), `bun run build`,
   `bun run test` (Vitest), `bun run lint` (oxlint), `bun run gen:api` (exports the FastAPI spec to `web/openapi.json`,
   then Orval generates typed TanStack Query hooks into `src/api/generated/`; never hand-write API types or hooks,

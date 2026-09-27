@@ -36,6 +36,8 @@ open http://localhost:5173/auth/  # Authentik (admin at /auth/if/admin/)
 open http://localhost:8000/docs   # API docs
 ```
 
+Everyday commands are in the `Makefile`: `make` lists them. First run on this machine: `make setup`, then `make dev`.
+
 Sample data (the people and modules in the designs): `docker compose exec api python -m app.seed`.
 In development `/login` offers a sign-in as any seeded account (`DEV_LOGIN=true`, never in production).
 
