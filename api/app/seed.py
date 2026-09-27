@@ -438,9 +438,20 @@ class Seeder:
         "Ngoni",
     ]
 
+    # Classmates who are also test personas (docs: TCFL Portal test personas) can sign in: Thandeka is
+    # Tariro's classmate, to check one student never sees another's records.
+    PERSONA_CLASSMATES = {"TCFL/2027/0147": "+263772100147"}
+
     def person_user(self, number: str, surname: str, first: str) -> Person:
-        # Classmates have portal records but no dev sign-in (no username).
-        u = User(idp_subject=f"seed:{number}", display_name=f"{first} {surname}", email_verified=True)
+        # Other classmates have portal records but no sign-in (no username).
+        phone = self.PERSONA_CLASSMATES.get(number)
+        u = User(
+            idp_subject=f"seed:{number}",
+            username=number if phone else None,
+            display_name=f"{first} {surname}",
+            email_verified=True,
+            phone=phone,
+        )
         u.roles = [UserRole(role="student", idp_group=GROUPS["student"])]
         p = Person(surname=surname, first_names=first, user=u)
         self.db.add_all([u, p])

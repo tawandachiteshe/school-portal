@@ -188,6 +188,7 @@ APPLICANTS = [
         MEETS,
         flags=[("ID_PHOTO_QUALITY", "medium", "ID photo blurred")],
         dob=date(2006, 7, 7),
+        phone="+263772100880",
     ),
     # Needs checking: signals that stop a decision until someone looks.
     Applicant(
@@ -228,6 +229,7 @@ APPLICANTS = [
         status="more_info",
         decision="Please upload a clearer photo of page 2 of your results slip. The grades are cut off.",
         dob=date(2006, 2, 2),
+        phone="+263772100801",
     ),
     Applicant(
         "APP-27-08741",
@@ -240,6 +242,22 @@ APPLICANTS = [
         MEETS,
         status="accepted",
         dob=date(2006, 4, 4),
+        phone="+263772100741",
+    ),
+    # Paid the fee in cash at the Accounts Office; the application waits for Accounts to confirm it
+    # (staff/accounts/Payments) before it reaches the review queue.
+    Applicant(
+        "APP-27-08894",
+        "Tatenda",
+        "Mukanya",
+        "63-2311478 63",
+        "DSE",
+        0,
+        "11:15",
+        MEETS,
+        status="awaiting_fee",
+        phone="+263772100894",
+        dob=date(2006, 11, 11),
     ),
     Applicant(
         "APP-27-08756",
@@ -253,6 +271,7 @@ APPLICANTS = [
         status="rejected",
         decision="The Diploma in Telecommunications Engineering needs Physical Science at C or better.",
         dob=date(2006, 9, 9),
+        phone="+263772100756",
     ),
 ]
 
@@ -396,7 +415,13 @@ class AdmissionsSeed:
         return d
 
     def person_for(self, a: Applicant, number: str, reg: str, origin: str, valid: bool) -> Person:
-        u = User(idp_subject=f"seed:applicant:{a.ref}", display_name=f"{a.first} {a.surname}", phone=a.phone)
+        # Personas (docs: TCFL Portal test personas) have a phone, which is their sign-in username.
+        u = User(
+            idp_subject=f"seed:applicant:{a.ref}",
+            username=a.phone[1:] if a.phone else None,
+            display_name=f"{a.first} {a.surname}",
+            phone=a.phone,
+        )
         u.roles = [UserRole(role="applicant", idp_group="portal-applicants")]
         p = Person(surname=a.surname, first_names=a.first, user=u, date_of_birth=a.dob)
         self.identity(p, number, reg, origin, valid)
@@ -428,8 +453,8 @@ class AdmissionsSeed:
             person=person,
             intake_id=self.intake.id,
             programme_id=self.programmes[a.programme].id,
-            status=a.status,
-            submitted_at=submitted,
+            status="draft" if a.status == "awaiting_fee" else a.status,
+            submitted_at=None if a.status == "awaiting_fee" else submitted,
             created_at=started,
             consent_processing_at=started,
             assigned_to=self.officer.id if a.owner else None,
@@ -537,21 +562,32 @@ class AdmissionsSeed:
         )
         # Paid by EcoCash just before submitting (design/Submitted "receipt EC-8841027" for Tariro).
         app.declared_at = submitted - timedelta(minutes=2)
-        self.db.add(
-            ApplicationPayment(
-                application_id=app.id,
-                method="ecocash",
-                status="paid",
-                amount=Decimal(get_settings().application_fee_usd),
-                phone=person.user.phone if person.user and person.user.phone else "+263770000001",
-                provider="dev",
-                receipt="EC-8841027"
-                if a.ref == "APP-27-08813"
-                else f"EC-{8840000 + len(a.ref) * 97 + int(a.ref[-3:]):07d}",
-                paid_at=submitted,
-                created_at=submitted - timedelta(minutes=1),
+        if a.status == "awaiting_fee":
+            self.db.add(
+                ApplicationPayment(
+                    application_id=app.id,
+                    method="cash",
+                    status="awaiting_confirmation",
+                    amount=Decimal(get_settings().application_fee_usd),
+                    created_at=submitted,
+                )
             )
-        )
+        else:
+            self.db.add(
+                ApplicationPayment(
+                    application_id=app.id,
+                    method="ecocash",
+                    status="paid",
+                    amount=Decimal(get_settings().application_fee_usd),
+                    phone=person.user.phone if person.user and person.user.phone else "+263770000001",
+                    provider="dev",
+                    receipt="EC-8841027"
+                    if a.ref == "APP-27-08813"
+                    else f"EC-{8840000 + len(a.ref) * 97 + int(a.ref[-3:]):07d}",
+                    paid_at=submitted,
+                    created_at=submitted - timedelta(minutes=1),
+                )
+            )
         for code, severity, text in a.flags:
             self.db.add(
                 ApplicationFlag(
@@ -574,13 +610,14 @@ class AdmissionsSeed:
                 created_at=slip_read,
                 via="phone",
             )
-            ev(
-                kind="status",
-                from_status="draft",
-                to_status="submitted",
-                created_at=submitted,
-                actor_id=person.user_id,
-            )
+            if a.status != "awaiting_fee":
+                ev(
+                    kind="status",
+                    from_status="draft",
+                    to_status="submitted",
+                    created_at=submitted,
+                    actor_id=person.user_id,
+                )
             if a.owner:
                 ev(
                     kind="assigned",
