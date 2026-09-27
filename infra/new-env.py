@@ -2,6 +2,10 @@
 """Fill .env.production.example for a domain, with a fresh random value for every secret.
 
     python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production
+    python3 infra/new-env.py --demo https://tcfl.example.com > .env.production   # pitch site
+
+--demo: sample data allowed (DEMO=true), student portal shown, and an Authentik admin token made on
+first start (AUTHENTIK_BOOTSTRAP_TOKEN), which the API uses to create the sample accounts' sign-ins.
 
 Prints to stdout; keep the result out of git and paste it into Dokploy's Environment tab.
 """
@@ -11,9 +15,12 @@ import secrets
 import sys
 from pathlib import Path
 
-if len(sys.argv) != 2 or not sys.argv[1].startswith("https://"):
-    sys.exit("usage: new-env.py https://portal.example.ac.zw")
-origin = sys.argv[1].rstrip("/")
+args = sys.argv[1:]
+demo = "--demo" in args
+args = [a for a in args if a != "--demo"]
+if len(args) != 1 or not args[0].startswith("https://"):
+    sys.exit("usage: new-env.py [--demo] https://portal.example.ac.zw")
+origin = args[0].rstrip("/")
 text = (Path(__file__).resolve().parent.parent / ".env.production.example").read_text()
 text = text.replace("https://portal.tcfl.ac.zw", origin)
 
@@ -34,12 +41,25 @@ values = {
     "AUTHENTIK_BOOTSTRAP_PASSWORD": token(18),
     "SMS_WEBHOOK_SECRET": token(32),
 }
+# A pitch site's settings replace the template's, whatever it says.
+demo_values = {}
+if demo:
+    api_token = token(48)
+    demo_values = {
+        "DEMO": "true",
+        "STUDENT_PORTAL_OPEN": "true",
+        "AUTHENTIK_BOOTSTRAP_TOKEN": api_token,
+        "AUTHENTIK_API_TOKEN": api_token,
+    }
+
 out = []
 for line in text.splitlines():
     key = line.split("=", 1)[0]
-    if key in values and line.endswith("=change-me"):
+    if key in demo_values:
+        line = f"{key}={demo_values[key]}"
+    elif key in values and line.endswith("=change-me"):
         line = f"{key}={values[key]}"
-    if key == "DATABASE_URL":
+    elif key == "DATABASE_URL":
         line = line.replace("change-me", db_password)
     out.append(line)
 print("\n".join(out))

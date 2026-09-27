@@ -157,6 +157,12 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 10. **Try it** before announcing: apply as a test applicant on a phone, pay by cash, confirm the payment as Accounts, review and decide as Admissions. Then delete the test applicant in Authentik.
 11. **Updates:** push to `main` and click **Deploy** (or turn on auto-deploy). Settings that only Authentik reads (for example `SIGNUP_VERIFY_PHONE`, `GOOGLE_CLIENT_ID`, `AUTHENTIK_EMAIL__HOST`) need the Authentik services restarted too, so the blueprints pick them up.
 
+**A pitch or training site** (sample data, not real applicants):
+- Environment: `python3 infra/new-env.py --demo https://tcfl.example.com > .env.production`. It sets `DEMO=true` (allows the sample data on a production server), `STUDENT_PORTAL_OPEN=true`, and an Authentik admin token made on first start (`AUTHENTIK_BOOTSTRAP_TOKEN`, also used as `AUTHENTIK_API_TOKEN`).
+- Domains: the three routes of step 5 on the app's host. Authentik can have a second host of its own for the admin console, for example `id.example.com` → `authentik-server`, port 9000, path `/`, strip off. It's still served under `/auth/`: the admin is at `https://id.example.com/auth/if/admin/`. The app keeps using `/auth` on its own host, which the portal's sign-in screens need.
+- After deploying, in the `api` terminal: `python -m app.seed`, then `python -m app.authentik_dev` (every persona's password is `tcfl-dev-2027`; [11-test-personas.md](11-test-personas.md)). Run both again to reset the site after a demo.
+- The one-click sign-in page (`/login/dev`) stays off: it's never on in production.
+
 **Opening the student portal later:** import students, staff and modules (not built yet, [12](12-status-and-gaps.md)), set `STUDENT_PORTAL_OPEN=true`, and add staff to `portal-lecturers`, `portal-librarians` and `portal-student-affairs`.
 
 `VITE_*` variables (if any are added) are baked in at **build** time, so redeploy after changing them.

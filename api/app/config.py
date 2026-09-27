@@ -101,6 +101,9 @@ class Settings(BaseSettings):
     # First release is applications only (docs/12): until students are imported, the landing page
     # doesn't advertise the student portal.
     student_portal_open: bool = True
+    # A pitch or training site: allows the sample data and its sign-ins on a production server
+    # (app.seed, app.authentik_dev). Never on a site with real applicants: seeding wipes everything.
+    demo: bool = False
     assistant_enabled: bool = True
     assistant_model: str = "claude-sonnet-5"
     assistant_max_tokens: int = 1200  # per answer

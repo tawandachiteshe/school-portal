@@ -1136,8 +1136,8 @@ class Seeder:
 
 
 async def main() -> None:
-    if get_settings().is_prod:
-        sys.exit("Refusing to seed a production database.")
+    if get_settings().is_prod and not get_settings().demo:
+        sys.exit("Refusing to seed a production database (DEMO=true allows it on a pitch site).")
     async with get_sessionmaker()() as db:
         await db.execute(text(f"TRUNCATE {', '.join(TABLES)} RESTART IDENTITY CASCADE"))
         await Seeder(db, date.today(), results_published="--results-published" in sys.argv).run()

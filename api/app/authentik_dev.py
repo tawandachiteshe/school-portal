@@ -44,8 +44,8 @@ def group_pks(c: httpx.Client) -> dict[str, str]:
 
 async def main() -> None:
     s = get_settings()
-    if s.is_prod:
-        sys.exit("Refusing to create development accounts in production.")
+    if s.is_prod and not s.demo:
+        sys.exit("Refusing to create sample accounts in production (DEMO=true allows it on a pitch site).")
     c = api()
     groups = group_pks(c)
     missing = sorted(set(ROLE_GROUP.values()) - set(groups))
