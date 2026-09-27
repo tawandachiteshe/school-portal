@@ -12,7 +12,7 @@ import { useNoteDownload } from '@/components/student/use-note-download'
 import { useRenewLoan } from '@/api/generated/library/library'
 import type { Dashboard } from '@/api/generated/model'
 import { useDashboard } from '@/api/generated/student/student'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useMe } from '@/lib/auth'
 import { calendarDaysBetween, formatLongDate, greeting, shortDate, time, weekday } from '@/lib/format'
 import { invalidateStudentData } from '@/lib/student'
@@ -95,7 +95,7 @@ export default function Home() {
         toast(`Renewed. Due back ${shortDate(new Date(r.due_at))}.`)
         void invalidateStudentData(qc)
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : 'Could not renew. Try again.'),
+      onError: (e) => toast(errorMessage(e, 'Could not renew. Try again.')),
     },
   })
 

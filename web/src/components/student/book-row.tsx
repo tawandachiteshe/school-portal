@@ -4,10 +4,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useCancelReservation, useReserveBook } from '@/api/generated/library/library'
 import type { Book, ReservationOut } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
-import { shortDate } from '@/lib/format'
-import { onDay } from '@/lib/records'
+import { errorMessage } from '@/lib/api'
 import { invalidateStudentData } from '@/lib/student'
+import { reservationText, shelfText } from './book-text'
 
 const ordinal = (n: number) => `${n}${['th', 'st', 'nd', 'rd'][n % 100 > 10 && n % 100 < 14 ? 0 : n % 10] ?? 'th'}`
 
@@ -16,21 +15,10 @@ export function ReservationStatus({ r }: { r: ReservationOut }) {
   return <Badge>{r.position ? `${ordinal(r.position)} in the queue` : 'Reserved'}</Badge>
 }
 
-export function reservationText(r: ReservationOut) {
-  return r.status === 'ready' && r.collect_by
-    ? `Collect from the desk by ${shortDate(onDay(r.collect_by))}`
-    : 'Waiting for a copy to come back'
-}
-
-export function shelfText(b: Book) {
-  if (b.copies === 0) return b.e_resource_url ? 'Online only' : 'Not available to borrow'
-  return b.available > 0 ? `${b.available} on the shelf` : 'All copies on loan'
-}
-
 // Reserve / Cancel / status for one book; used by the phone row and the desktop table.
 export function BookActions({ b, compact = false }: { b: Book; compact?: boolean }) {
   const qc = useQueryClient()
-  const onError = (e: unknown) => toast(e instanceof ApiError ? e.message : 'Something went wrong. Try again.')
+  const onError = (e: unknown) => toast(errorMessage(e, 'Something went wrong. Try again.'))
   const reserve = useReserveBook({
     mutation: {
       onSuccess: () => {

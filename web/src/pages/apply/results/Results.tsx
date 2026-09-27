@@ -19,17 +19,17 @@ import {
   saveResults,
   useApplicationResults,
 } from '@/api/generated/apply-results/apply-results'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { applyHome, STEP_PATH } from '../common'
 import { LINK_KEY, LinkGone, LinkPanel } from '../id/NationalId'
-import { PagesCheck, Reading, type ResultsApi, ResultsFlow, useDrafts, usePageUpload } from './ResultsFlow'
-import { problem, scannedText, SittingTable, toBody } from './ResultsTable'
+import { type ResultsApi, useDrafts, usePageUpload } from './hooks'
+import { PagesCheck, Reading, ResultsFlow } from './ResultsFlow'
+import { problem, scannedText, toBody } from './drafts'
+import { SittingTable } from './ResultsTable'
 
 const h1 = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
 const fileUrl = (id: string) => `/api${getMyDocumentFileUrl(id)}`
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
-
 function useResultsApi(): ResultsApi {
   const qc = useQueryClient()
   const { data } = useApplicationResults({
@@ -84,7 +84,7 @@ function Desktop({ app }: { app: MyApplication }) {
         }
         void qc.invalidateQueries({ queryKey: getCurrentHandoffQueryKey() })
       },
-      onError: (e) => toast(errText(e, "Couldn't create a link. Try again.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't create a link. Try again.")),
     },
   })
   const phone = () => start.mutate({ data: { start_step: 'results' } })
@@ -205,7 +205,7 @@ function Desktop({ app }: { app: MyApplication }) {
       reset()
       navigate(STEP_PATH.review)
     } catch (e) {
-      setError(errText(e, "Couldn't save. Try again."))
+      setError(errorMessage(e, "Couldn't save. Try again."))
     } finally {
       setSaving(false)
     }

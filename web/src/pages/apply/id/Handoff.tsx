@@ -17,7 +17,7 @@ import {
   usePhoneState,
   useReportMismatch,
 } from '@/api/generated/apply-id/apply-id'
-import { ApiError } from '@/lib/api'
+import { ApiError, errorMessage } from '@/lib/api'
 import {
   getPhoneDocumentFileUrl,
   getPhoneResultsQueryKey,
@@ -97,7 +97,7 @@ export function HandoffLanding() {
   const claim = useClaimHandoff({
     mutation: {
       onSuccess: () => navigate(`/h/${code}/${PHONE_PATH[data?.start_step ?? ''] ?? 'id'}`, { replace: true }),
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't connect. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't connect. Try again.")),
     },
   })
   const mismatch = useReportMismatch({ mutation: { onSuccess: () => navigate(`/h/${code}/mismatch`, { replace: true }) } })
@@ -107,7 +107,7 @@ export function HandoffLanding() {
     return (
       <PhoneFrame linked={false}>
         {h1("This link doesn't work")}
-        <p>{error instanceof ApiError ? error.message : 'Check the link, or create a new one on your computer.'}</p>
+        <p>{errorMessage(error, 'Check the link, or create a new one on your computer.')}</p>
       </PhoneFrame>
     )
   if (data.state === 'yours') return <Navigate to={`/h/${code}/${PHONE_PATH[data.start_step] ?? 'id'}`} replace />

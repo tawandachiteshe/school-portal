@@ -19,14 +19,13 @@ import {
   uploadProof,
   useSubmitState,
 } from '@/api/generated/apply-submit/apply-submit'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useSignOut } from '@/lib/auth'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, dayTimeText, STEP_PATH } from './common'
 
 const LABEL: Record<PayMethod, string> = { ecocash: 'EcoCash', onemoney: 'OneMoney', bank: 'Bank transfer', cash: 'Cash at the Accounts Office' }
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 const h1Class = (desktop: boolean) =>
   desktop ? 'text-[28px] leading-9 font-semibold tracking-[-0.015em]' : 'text-2xl leading-8 font-semibold tracking-[-0.01em]'
 
@@ -81,7 +80,7 @@ export function Submit() {
       put(await declare({ agree: true }))
       navigate('/apply/pay')
     } catch (e) {
-      setError(errText(e, "Couldn't save. Try again."))
+      setError(errorMessage(e, "Couldn't save. Try again."))
     } finally {
       setBusy(false)
     }
@@ -407,7 +406,7 @@ export function Pay() {
     try {
       put(await f())
     } catch (e) {
-      setError(errText(e, "Couldn't start the payment. Try again."))
+      setError(errorMessage(e, "Couldn't start the payment. Try again."))
     } finally {
       setBusy(false)
     }

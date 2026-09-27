@@ -29,7 +29,7 @@ import {
   useDeleteAnnouncement,
   useGetStaffAnnouncement,
 } from '@/api/generated/staff-announcements/staff-announcements'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { shortDateTime, time } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1 } from '../teaching/staff-ui'
@@ -257,7 +257,7 @@ function ComposeForm({
       )
       if (action !== 'draft') navigate('/staff/announcements')
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Couldn't save. Try again.")
+      setError(errorMessage(e, "Couldn't save. Try again."))
     }
   }
 

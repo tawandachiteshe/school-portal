@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
 import { getIntakePlacesQueryKey, useIntakePlaces, useSetIntakePlaces } from '@/api/generated/admissions/admissions'
 import type { ProgrammePlaces } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
@@ -25,7 +25,7 @@ function PlacesCell({ p }: { p: ProgrammePlaces }) {
         setEditing(false)
         toast(`${p.name}: ${value} places.`)
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't save. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't save. Try again.")),
     },
   })
   const n = Number(value)

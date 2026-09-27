@@ -14,7 +14,7 @@ import {
   useSendToStudentAffairs,
 } from '@/api/generated/assistant/assistant'
 import type { AnswerOut, AnswerSource, AskHandoffOut } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { askStream } from '@/lib/ask-stream'
 import { shortDate } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
@@ -182,7 +182,7 @@ function Handoff({ question, sessionId }: { question: string; sessionId: string 
             )}
           </p>
         )}
-        {send.error && <p className="font-medium text-destructive">{send.error instanceof ApiError ? send.error.message : 'Couldn’t send it. Try again.'}</p>}
+        {send.error && <p className="font-medium text-destructive">{errorMessage(send.error, 'Couldn’t send it. Try again.')}</p>}
         <Button
           block
           disabled={send.isPending || text.trim().length < 3}
@@ -363,7 +363,7 @@ export default function Ask() {
       )
     } catch (err) {
       if (ctrl.signal.aborted) update(i, { status: undefined, error: 'Stopped.' })
-      else update(i, { status: undefined, error: err instanceof ApiError ? err.message : "Ask TCFL couldn't answer just now. Try again in a minute." })
+      else update(i, { status: undefined, error: errorMessage(err, "Ask TCFL couldn't answer just now. Try again in a minute.") })
     } finally {
       setBusy(false)
       abort.current = null

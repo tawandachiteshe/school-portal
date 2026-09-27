@@ -12,7 +12,7 @@ import { SubPage } from '@/components/shell/sub-page'
 import { Empty } from '@/components/student/section'
 import type { Results as ResultsData, TermResults } from '@/api/generated/model'
 import { getResultsQueryKey, useRequestRemark, useResults } from '@/api/generated/records/records'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate } from '@/lib/format'
 import { onDay } from '@/lib/records'
 import { useIsDesktop } from '@/lib/use-desktop'
@@ -54,7 +54,7 @@ export function RemarkSheet({
       },
     },
   })
-  const error = remark.error instanceof ApiError ? remark.error.message : remark.error ? 'Could not send. Try again.' : null
+  const error = remark.error ? errorMessage(remark.error, 'Could not send. Try again.') : null
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent

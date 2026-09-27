@@ -25,7 +25,7 @@ import {
   useReview,
   useSendMessage,
 } from '@/api/generated/admissions/admissions'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
@@ -68,8 +68,6 @@ const fileUrl = (id: string) => `/api${getDocumentFileUrl(id)}`
 const words = (s?: string | null) => (s ?? '').toUpperCase().split(/[^A-Z]+/).filter(Boolean).sort().join(' ')
 const birthMatches = (i: ReviewData['identity']) =>
   words(i.birth_name) === words(i.name_on_id) && (!i.date_of_birth || i.birth_date_of_birth === i.date_of_birth)
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
-
 function useRefresh(reference: string) {
   const qc = useQueryClient()
   return (r: ReviewData) => {
@@ -167,7 +165,7 @@ function TextDialog({ open, onOpenChange, ...p }: { open: boolean; onOpenChange:
 function Results({ r, s, first }: { r: ReviewData; s: Sitting; first: boolean }) {
   const refresh = useRefresh(r.reference)
   const verify = useMarkZimsecVerified({
-    mutation: { onSuccess: refresh, onError: (e) => toast(errText(e, "Couldn't save. Try again.")) },
+    mutation: { onSuccess: refresh, onError: (e) => toast(errorMessage(e, "Couldn't save. Try again.")) },
   })
   const id = `zs-${s.id}`
   const unclear = s.rows.filter((x) => x.read === 'unclear_confirmed').length
@@ -256,7 +254,7 @@ function Results({ r, s, first }: { r: ReviewData; s: Sitting; first: boolean })
 function ReviewView({ r }: { r: ReviewData }) {
   const refresh = useRefresh(r.reference)
   const ids = { el: useId(), id: useId(), ct: useId(), act: useId(), note: useId() }
-  const onError = (e: unknown) => toast(errText(e, "Couldn't save. Try again."))
+  const onError = (e: unknown) => toast(errorMessage(e, "Couldn't save. Try again."))
   const [dialog, setDialog] = useState<Decision | 'sms' | null>(null)
   const [resolving, setResolving] = useState<number | null>(null)
   const [note, setNote] = useState('')
@@ -724,7 +722,7 @@ export default function Review() {
   if (error || !data)
     return (
       <p className="p-8 text-muted-foreground">
-        {errText(error, "Couldn't open this application.")}{' '}
+        {errorMessage(error, "Couldn't open this application.")}{' '}
         <Link to="/staff/admissions" className="text-primary underline">
           Back to applications
         </Link>

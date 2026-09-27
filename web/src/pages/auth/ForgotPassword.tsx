@@ -6,11 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { resetFinish, resetStart } from '@/api/generated/auth/auth'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { AUTH_DESKTOP, AuthHeading, AuthLayout } from './AuthLayout'
-
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 
 // design/ForgotPassword: text a code, then choose a new password (the second screen has no design).
 export default function ForgotPassword() {
@@ -32,7 +30,7 @@ export default function ForgotPassword() {
     try {
       await f()
     } catch (e) {
-      setError(errText(e, "Couldn't do that just now. Try again."))
+      setError(errorMessage(e, "Couldn't do that just now. Try again."))
     } finally {
       setBusy(false)
     }

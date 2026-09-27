@@ -3,43 +3,16 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import type { ResultsState, SittingIn, SittingOut } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import type { SittingOut } from '@/api/generated/model'
+import { errorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import { asFile, assessImage, compressImage } from '../id/compress'
-import { IdCamera, type PhotoQuality } from '../id/IdCamera'
-import { checkable, type Draft, problem, SittingTable, toBody, toDraft } from './ResultsTable'
+import { IdCamera } from '../id/IdCamera'
+import { problem, toBody } from './drafts'
+import { type ResultsApi, useDrafts, usePageUpload } from './hooks'
+import { SittingTable } from './ResultsTable'
 
-export type ResultsApi = {
-  state: ResultsState | undefined
-  addPage: (file: File, scan: string | undefined, quality: string | null) => Promise<unknown>
-  removePage: (documentId: string) => Promise<unknown>
-  read: (scan: string) => Promise<unknown>
-  save: (body: { sittings: SittingIn[] }) => Promise<unknown>
-  fileUrl: (documentId: string) => string
-}
 
 const QUALITY = { clear: 'Clear', blurry: 'Blurry', dark: 'Too dark' } as const
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
-
-// Photos → upload one page at a time, with a quality label.
-export function usePageUpload(api: ResultsApi) {
-  const [busy, setBusy] = useState(false)
-  async function send(photo: Blob, scan: string | undefined, quality: PhotoQuality | null) {
-    setBusy(true)
-    try {
-      const q = quality ?? (await assessImage(photo))
-      await api.addPage(asFile(await compressImage(photo), 'zimsec-slip.jpg'), scan, q)
-      return true
-    } catch (e) {
-      toast(errText(e, "Couldn't send the photo. Check your signal and try again."))
-      return false
-    } finally {
-      setBusy(false)
-    }
-  }
-  return { send, busy }
-}
 
 // design/ZimsecPages
 export function PagesCheck({ scan, api, onAddPage, onRetake }: { scan: SittingOut; api: ResultsApi; onAddPage: () => void; onRetake: (n: number) => void }) {
@@ -79,7 +52,7 @@ export function PagesCheck({ scan, api, onAddPage, onRetake }: { scan: SittingOu
                   void api
                     .removePage(p.document_id)
                     .then(() => onRetake(p.number))
-                    .catch((e) => toast(errText(e, "Couldn't remove the page.")))
+                    .catch((e) => toast(errorMessage(e, "Couldn't remove the page.")))
                 }
               >
                 Retake
@@ -111,7 +84,7 @@ export function PagesCheck({ scan, api, onAddPage, onRetake }: { scan: SittingOu
             setReading(true)
             void api
               .read(scan.key)
-              .catch((e) => toast(errText(e, "Couldn't start reading. Try again.")))
+              .catch((e) => toast(errorMessage(e, "Couldn't start reading. Try again.")))
               .finally(() => setReading(false))
           }}
         >
@@ -133,45 +106,6 @@ export function Reading({ label = 'Reading your results…' }: { label?: string 
   )
 }
 
-const blank = (key: string): Draft => ({
-  key,
-  status: 'read',
-  level: 'O',
-  session: 'NOVEMBER',
-  year: '',
-  centre: '',
-  candidate: '',
-  name: null,
-  rows: [],
-  pages: [],
-  read_at: null,
-  editing: true,
-})
-
-// Edits are kept per sitting until saved; the server's copy fills in the rest.
-export function useDrafts(state: ResultsState | undefined) {
-  const [edits, setEdits] = useState<Record<string, Draft>>({})
-  const [removed, setRemoved] = useState<Set<string>>(new Set())
-  const [typed, setTyped] = useState<string[]>([]) // sittings typed in by hand, not read from a photo
-  const drafts = state
-    ? [
-        ...checkable(state)
-          .filter((s) => !removed.has(s.key))
-          .map((s) => (edits[s.key] && edits[s.key].status === s.status ? edits[s.key] : toDraft(s))),
-        ...typed.filter((k) => !removed.has(k)).map((k) => edits[k] ?? blank(k)),
-      ]
-    : []
-  const addBlank = () => setTyped((t) => [...t, `typed-${t.length + 1}`])
-  const set = (key: string, p: Partial<Draft>) =>
-    setEdits((e) => ({ ...e, [key]: { ...(e[key] ?? drafts.find((d) => d.key === key)!), ...p } }))
-  const remove = (key: string) => setRemoved((r) => new Set(r).add(key))
-  const reset = () => {
-    setEdits({})
-    setRemoved(new Set())
-    setTyped([])
-  }
-  return { drafts, set, remove, reset, addBlank }
-}
 
 type Camera = { scan?: string; page: number }
 
@@ -266,7 +200,7 @@ export function ResultsFlow({
       reset()
       onSaved()
     } catch (e) {
-      setError(errText(e, "Couldn't save. Check your signal and try again."))
+      setError(errorMessage(e, "Couldn't save. Check your signal and try again."))
     } finally {
       setSaving(false)
     }

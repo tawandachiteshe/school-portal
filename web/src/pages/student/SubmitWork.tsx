@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { SubPage } from '@/components/shell/sub-page'
 import { Empty } from '@/components/student/section'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useAssessmentDetail } from '@/api/generated/deadlines/deadlines'
 import type { AssessmentOut as AssessmentDetail } from '@/api/generated/model'
 import { acceptedText } from '@/lib/deadlines'
@@ -156,7 +156,7 @@ export default function SubmitWork() {
               <Skeleton className="h-24" />
             </>
           ) : (
-            <Empty>{error instanceof ApiError ? error.message : "Couldn't load this assessment."}</Empty>
+            <Empty>{errorMessage(error, "Couldn't load this assessment.")}</Empty>
           )}
         </main>
       </SubPage>
@@ -187,7 +187,7 @@ export default function SubmitWork() {
       setFile(null)
       setReplacing(false)
     } catch (e) {
-      setProblem(e instanceof ApiError ? e.message : "Couldn't start the upload. Check your connection and try again.")
+      setProblem(errorMessage(e, "Couldn't start the upload. Check your connection and try again."))
     } finally {
       setStarting(false)
     }

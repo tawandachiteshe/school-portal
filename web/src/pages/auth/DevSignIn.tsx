@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Wordmark } from '@/components/shell/wordmark'
 import { devLogin, useDevAccounts } from '@/api/generated/auth/auth'
 import { me as fetchMe } from '@/api/generated/me/me'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { homeFor, meQueryKey } from '@/lib/auth'
 
 const ROLE_LABEL: Record<string, string> = {
@@ -37,7 +37,7 @@ export default function DevSignIn() {
       const next = params.get('next')
       navigate(next?.startsWith('/') && !next.startsWith('//') ? next : homeFor(me), { replace: true })
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Could not sign in. Is the API running?')
+      setError(errorMessage(e, 'Could not sign in. Is the API running?'))
     }
   }
 

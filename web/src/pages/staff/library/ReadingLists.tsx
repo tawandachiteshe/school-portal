@@ -16,7 +16,7 @@ import {
   useRemoveFromReadingList,
 } from '@/api/generated/library-catalogue/library-catalogue'
 import type { ModuleReadingList } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
@@ -40,7 +40,7 @@ function AddToList({ list, onClose }: { list: ModuleReadingList | null; onClose:
         setNote('')
         onClose()
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't add it. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't add it. Try again.")),
     },
   })
   const listed = new Set(list?.books.map((b) => b.item_id))

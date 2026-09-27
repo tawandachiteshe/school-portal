@@ -15,7 +15,7 @@ import {
   usePaymentsToConfirm,
   useRejectPayment,
 } from '@/api/generated/accounts/accounts'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate, shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
@@ -36,7 +36,7 @@ export default function Payments() {
     setText('')
     toast(msg)
   }
-  const onError = (e: unknown) => toast(e instanceof ApiError ? e.message : "Couldn't save. Try again.")
+  const onError = (e: unknown) => toast(errorMessage(e, "Couldn't save. Try again."))
   const confirm = useConfirmPayment({ mutation: { onSuccess: (r) => done(r, 'Payment confirmed. The application has been sent to Admissions.'), onError } })
   const reject = useRejectPayment({ mutation: { onSuccess: (r) => done(r, 'The applicant has been told the payment wasn’t found.'), onError } })
   const rows = data ?? []

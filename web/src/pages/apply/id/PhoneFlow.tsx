@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { ConfirmIdIn, NationalIdState } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { asFile, compressImage } from './compress'
 import { IdCamera } from './IdCamera'
 import { IdCheck } from './IdCheck'
@@ -47,7 +47,7 @@ export function PhoneFlow({
       await upload(asFile(await compressImage(blob)))
       setStage('check')
     } catch (e) {
-      toast(e instanceof ApiError ? e.message : "Couldn't send the photo. Check your signal and try again.")
+      toast(errorMessage(e, "Couldn't send the photo. Check your signal and try again."))
       setStage('camera')
     }
   }

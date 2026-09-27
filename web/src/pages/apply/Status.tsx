@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ApplyShell } from '@/components/shell/apply-shell'
 import type { MyApplication } from '@/api/generated/model'
 import { getMyApplicationQueryKey, useMyApplication, useWithdraw } from '@/api/generated/apply/apply'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, dateOnly, dayText, dayTimeText } from './common'
@@ -131,7 +131,7 @@ export default function Status() {
         void qc.invalidateQueries({ queryKey: getMyApplicationQueryKey() })
         toast('Application withdrawn.')
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't withdraw. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't withdraw. Try again.")),
     },
   })
   if (isPending) return <Skeleton className="m-4 h-96" />

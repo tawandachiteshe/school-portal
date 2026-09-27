@@ -11,6 +11,11 @@ export class ApiError extends Error {
   }
 }
 
+// The API's own words when it gave a reason (HTTPException detail), otherwise the page's fallback.
+export function errorMessage(e: unknown, fallback: string): string {
+  return e instanceof ApiError ? e.message : fallback
+}
+
 export function readCookie(name: string): string | undefined {
   return document.cookie
     .split('; ')

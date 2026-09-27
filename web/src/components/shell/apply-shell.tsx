@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
 
 // The designs have five steps; Birth certificate was added after them.
-export const STEPS = ['Programme', 'National ID', 'Birth certificate', 'ZIMSEC results', 'Review', 'Submit'] as const
+const STEPS = ['Programme', 'National ID', 'Birth certificate', 'ZIMSEC results', 'Review', 'Submit'] as const
 
 // Mobile: "Step 1 of 6 · Programme / Next: National ID" over one 4px segment per step (design/ProgrammeMobile).
 function MobileSteps({ step }: { step: number }) {

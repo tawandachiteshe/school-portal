@@ -6,7 +6,7 @@ import { SubPage } from '@/components/shell/sub-page'
 import { NoteRow } from '@/components/student/rows'
 import { Empty } from '@/components/student/section'
 import { useNoteDownload } from '@/components/student/use-note-download'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { calendarDaysBetween, isUrgent, relativeDue, shortDate, shortDateTime, time } from '@/lib/format'
 import type { ModuleAssessment, ModuleDetail as Detail, Note as ModuleNote, WeekClass } from '@/api/generated/model'
 import { useModuleDetail } from '@/api/generated/modules/modules'
@@ -201,7 +201,7 @@ export default function ModuleDetail() {
     ) : (
       <DeskFallback>
         {error ? (
-          <Empty>{error instanceof ApiError ? error.message : "Couldn't load this module."}</Empty>
+          <Empty>{errorMessage(error, "Couldn't load this module.")}</Empty>
         ) : (
           <Skeleton className="mt-6 h-64" />
         )}
@@ -218,7 +218,7 @@ export default function ModuleDetail() {
             <Skeleton className="mt-4 h-40" />
           </div>
         )}
-        {error && <Empty>{error instanceof ApiError ? error.message : "Couldn't load this module."}</Empty>}
+        {error && <Empty>{errorMessage(error, "Couldn't load this module.")}</Empty>}
         {m && (
           <>
             <div className="flex flex-col gap-1">

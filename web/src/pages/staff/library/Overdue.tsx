@@ -14,7 +14,7 @@ import {
   useOverdue,
   useRemind,
 } from '@/api/generated/library-desk/library-desk'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate, shortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
@@ -46,7 +46,7 @@ export default function Overdue() {
         void qc.invalidateQueries({ queryKey: getOverdueQueryKey() })
         void qc.invalidateQueries({ queryKey: getDeskTodayQueryKey() })
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't send reminders. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't send reminders. Try again.")),
     },
   })
 

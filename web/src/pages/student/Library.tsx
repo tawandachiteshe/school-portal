@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SubPage } from '@/components/shell/sub-page'
-import { BookRow, BookTable, ReservationStatus, reservationText } from '@/components/student/book-row'
+import { BookRow, BookTable, ReservationStatus } from '@/components/student/book-row'
+import { reservationText } from '@/components/student/book-text'
 import { Empty } from '@/components/student/section'
 import { useLibraryHome, useReadingList, useRenewLoan, useSearchCatalogue } from '@/api/generated/library/library'
 import type { LibraryHome, LoanOut } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { shortDate } from '@/lib/format'
 import { onDay } from '@/lib/records'
 import { invalidateStudentData } from '@/lib/student'
@@ -262,7 +263,7 @@ export default function Library() {
         toast(`Renewed. Due back ${shortDate(new Date(r.due_at))}.`)
         void invalidateStudentData(qc)
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : 'Could not renew. Try again.'),
+      onError: (e) => toast(errorMessage(e, 'Could not renew. Try again.')),
     },
   })
   if (desktop)
@@ -411,7 +412,7 @@ export function ReadingListPage() {
         crumbs={[{ to: '/library', label: 'Library' }, { label: <span className="font-mono">{code.toUpperCase()}</span> }]}
       >
         {isPending && <Skeleton className="h-32" />}
-        {error && <Empty>{error instanceof ApiError ? error.message : "Couldn't load this reading list."}</Empty>}
+        {error && <Empty>{errorMessage(error, "Couldn't load this reading list.")}</Empty>}
         {data && (
           <>
             <div className="flex flex-col gap-1">
@@ -427,7 +428,7 @@ export function ReadingListPage() {
     <SubPage title={code.toUpperCase()} mono back="/library" backLabel="Back to library">
       <main className="flex grow flex-col gap-4 px-4 py-6">
         {isPending && <Skeleton className="h-32" />}
-        {error && <Empty>{error instanceof ApiError ? error.message : "Couldn't load this reading list."}</Empty>}
+        {error && <Empty>{errorMessage(error, "Couldn't load this reading list.")}</Empty>}
         {data && (
           <>
             <div className="flex flex-col gap-1">

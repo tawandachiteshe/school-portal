@@ -12,7 +12,7 @@ import {
   useMyApplication,
   useProgrammes,
 } from '@/api/generated/apply/apply'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, STEP_PATH } from './common'
@@ -131,7 +131,7 @@ export default function Programme() {
         qc.setQueryData(getMyApplicationQueryKey(), a)
         navigate(STEP_PATH.national_id)
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't save. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't save. Try again.")),
     },
   })
   if (app && app.status !== 'draft') return <Navigate to={applyHome(app)} replace />

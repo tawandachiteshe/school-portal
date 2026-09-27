@@ -14,7 +14,7 @@ import {
   useMarkRestPresent,
   useOpenRegister,
 } from '@/api/generated/teaching/teaching'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate, time } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -74,7 +74,7 @@ function RegisterView({ reg, slotId, date }: { reg: RegisterData; slotId: string
         void qc.invalidateQueries({ queryKey: key })
         navigate('/staff/teaching')
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't finish. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't finish. Try again.")),
     },
   })
 
@@ -182,7 +182,7 @@ export default function Register() {
   if (error || !data)
     return (
       <p className="mx-auto max-w-[480px] p-4 text-muted-foreground">
-        {error instanceof ApiError ? error.message : "Couldn't open the register."}{' '}
+        {errorMessage(error, "Couldn't open the register.")}{' '}
         <Link to="/staff/teaching" className="text-primary underline">
           Back to today
         </Link>

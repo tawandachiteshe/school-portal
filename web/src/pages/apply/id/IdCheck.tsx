@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { ConfirmIdIn, NationalIdState } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { decodeId, formatId } from '@/lib/national-id'
 import { cn } from '@/lib/utils'
 
@@ -81,7 +81,7 @@ export function IdCheck({
     try {
       await onSave({ id_number: formatId(d), surname, first_names: first, date_of_birth: date })
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Couldn't save. Check your signal and try again.")
+      setError(errorMessage(e, "Couldn't save. Check your signal and try again."))
       requestAnimationFrame(() => errRef.current?.focus())
     } finally {
       setSaving(false)

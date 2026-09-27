@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
 import type { InboxQuestion } from '@/api/generated/model'
 import { getAskQuestionsInboxQueryKey, useAskQuestionsInbox, useReplyToQuestion } from '@/api/generated/assistant/assistant'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
@@ -29,7 +29,7 @@ export default function AskQuestions() {
         setText('')
         toast('Reply sent. The student gets an SMS and sees it in Ask TCFL.')
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't send it. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't send it. Try again.")),
     },
   })
   const rows = data ?? []

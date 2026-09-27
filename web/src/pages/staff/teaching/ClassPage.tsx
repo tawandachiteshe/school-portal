@@ -14,7 +14,7 @@ import { StaffTopBar } from '@/components/shell/staff-shell'
 import { FilterBar, FilterSearch, FilterSelect } from '@/components/staff/filter-bar'
 import type { ClassPage as ClassData } from '@/api/generated/model'
 import { getClassPageQueryKey, getOverviewQueryKey, useClassPage, useUploadNotes } from '@/api/generated/teaching/teaching'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { fileKind, fileSize, shortDate, shortDateTime } from '@/lib/format'
 import { KIND_LABEL } from '@/lib/student'
 import { useMe } from '@/lib/auth'
@@ -58,7 +58,7 @@ function UploadDialog({ c, open, onOpenChange }: { c: ClassData; open: boolean; 
   })
   const students = c.other_classes.filter((x) => share.has(x.offering_id)).reduce((n, x) => n + x.students, 0)
   const weeks = me?.term?.weeks ?? 16
-  const error = upload.error instanceof ApiError ? upload.error.message : upload.error ? "Couldn't upload. Try again." : null
+  const error = upload.error ? errorMessage(upload.error, "Couldn't upload. Try again.") : null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -214,7 +214,7 @@ export default function ClassPage() {
   const { data: c, isPending, error } = useClassPage(id)
   if (isPending) return <Skeleton className="m-8 h-96" />
   if (error || !c)
-    return <p className="p-8 text-muted-foreground">{error instanceof ApiError ? error.message : "Couldn't load this class."}</p>
+    return <p className="p-8 text-muted-foreground">{errorMessage(error, "Couldn't load this class.")}</p>
 
   const now = new Date()
   const q = query[tab]

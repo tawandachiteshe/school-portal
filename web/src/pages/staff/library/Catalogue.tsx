@@ -10,14 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
 import { useAddBook, useAddCopy, useCatalogue } from '@/api/generated/library-catalogue/library-catalogue'
 import type { CatalogueItem } from '@/api/generated/model'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
 // No design: the books the library has (docs/05 §5.9 "librarians manage the catalogue in the
 // portal"). Search, add a book with its copies, add a copy to a book.
-const errText = (e: unknown) => (e instanceof ApiError ? e.message : "Couldn't save. Try again.")
-
 function Field({ label, hint, children, id }: { label: string; hint?: string; children: React.ReactNode; id: string }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -100,7 +98,7 @@ function AddBook({ open, onClose }: { open: boolean; onClose: () => void }) {
           <Field id={`${id}-l`} label="Where they're shelved">
             <Input id={`${id}-l`} value={f.location} onChange={set('location')} placeholder="Shelf 4" />
           </Field>
-          {add.error && <p className="font-medium text-destructive">{errText(add.error)}</p>}
+          {add.error && <p className="font-medium text-destructive">{errorMessage(add.error, "Couldn't save. Try again.")}</p>}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
@@ -148,7 +146,7 @@ function AddCopy({ book, onClose }: { book: CatalogueItem | null; onClose: () =>
             <Field id={`${id}-l`} label="Where it's shelved">
               <Input id={`${id}-l`} value={location} onChange={(e) => setLocation(e.target.value)} />
             </Field>
-            {add.error && <p className="font-medium text-destructive">{errText(add.error)}</p>}
+            {add.error && <p className="font-medium text-destructive">{errorMessage(add.error, "Couldn't save. Try again.")}</p>}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel

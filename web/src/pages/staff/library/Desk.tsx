@@ -21,12 +21,11 @@ import {
   useIssueBook,
   useReturnBook,
 } from '@/api/generated/library-desk/library-desk'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { formatLongDate, shortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 const dueDate = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'long', timeZone: 'Africa/Harare' })
 
 function useRefreshDesk() {
@@ -48,7 +47,7 @@ function BorrowerPanel({ b, onChanged }: { b: Borrower; onChanged: () => void })
         toast(`Renewed. Due back ${shortDate(new Date(r.due_at))}.`)
         onChanged()
       },
-      onError: (e) => toast(errText(e, "Couldn't renew.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't renew.")),
     },
   })
   const ret = useReturnBook({
@@ -58,7 +57,7 @@ function BorrowerPanel({ b, onChanged }: { b: Borrower; onChanged: () => void })
         refresh()
         onChanged()
       },
-      onError: (e) => toast(errText(e, "Couldn't return.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't return.")),
     },
   })
   const overdue = b.loans.filter((l) => l.days_late > 0)
@@ -159,7 +158,7 @@ function IssueCard({ b, onIssued }: { b: Borrower; onIssued: () => void }) {
         onIssued()
         inputRef.current?.focus()
       },
-      onError: (e) => setProblem(errText(e, "Couldn't issue this book.")),
+      onError: (e) => setProblem(errorMessage(e, "Couldn't issue this book.")),
     },
   })
 
@@ -170,7 +169,7 @@ function IssueCard({ b, onIssued }: { b: Borrower; onIssued: () => void }) {
     try {
       setCopy(await findCopy(code.trim()))
     } catch (e) {
-      setProblem(errText(e, "Couldn't find that book."))
+      setProblem(errorMessage(e, "Couldn't find that book."))
     }
   }
 
@@ -305,7 +304,7 @@ function IssueMode() {
       setB(await findBorrower(n.trim()))
     } catch (e) {
       setB(null)
-      setProblem(errText(e, "Couldn't find that card."))
+      setProblem(errorMessage(e, "Couldn't find that card."))
     }
   }
   const reload = () => b && void lookUp(b.number)
@@ -366,7 +365,7 @@ function ReturnMode() {
         refresh()
         inputRef.current?.focus()
       },
-      onError: (e) => setProblem(errText(e, "Couldn't return this book.")),
+      onError: (e) => setProblem(errorMessage(e, "Couldn't return this book.")),
     },
   })
   return (

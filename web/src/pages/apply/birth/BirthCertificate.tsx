@@ -19,7 +19,7 @@ import {
 } from '@/api/generated/apply-birth-certificate/apply-birth-certificate'
 import { getCurrentHandoffQueryKey, useCurrentHandoff, useStartHandoff } from '@/api/generated/apply-id/apply-id'
 import { getMyDocumentFileUrl } from '@/api/generated/apply-results/apply-results'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { applyHome, STEP_PATH } from '../common'
 import { asFile, compressImage } from '../id/compress'
@@ -29,7 +29,6 @@ import { Reading } from '../results/ResultsFlow'
 
 const h1Desk = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
 const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 const pad = (n: number) => String(n).padStart(2, '0')
 const myFile = (id: string) => `/api${getMyDocumentFileUrl(id)}`
 
@@ -66,7 +65,7 @@ export function BirthCheck({ s, fileUrl, onSave, onRetake }: { s: BirthCertifica
     try {
       await onSave({ name, date_of_birth: date })
     } catch (e) {
-      setError(errText(e, "Couldn't save. Check your signal and try again."))
+      setError(errorMessage(e, "Couldn't save. Check your signal and try again."))
       requestAnimationFrame(() => errRef.current?.focus())
     } finally {
       setSaving(false)
@@ -178,7 +177,7 @@ export function BirthFlow({ api, frame, onBack, onDone }: { api: BirthApi; frame
             await api.upload(asFile(await compressImage(b), 'birth-certificate.jpg'))
             setAgain(false)
           } catch (e) {
-            toast(errText(e, "Couldn't send the photo. Check your signal and try again."))
+            toast(errorMessage(e, "Couldn't send the photo. Check your signal and try again."))
           } finally {
             setSending(false)
           }
@@ -237,7 +236,7 @@ function Desktop({ app }: { app: MyApplication }) {
         }
         void qc.invalidateQueries({ queryKey: getCurrentHandoffQueryKey() })
       },
-      onError: (e) => toast(errText(e, "Couldn't create a link. Try again.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't create a link. Try again.")),
     },
   })
   const phone = () => start.mutate({ data: { start_step: 'birth_certificate' } })
@@ -258,7 +257,7 @@ function Desktop({ app }: { app: MyApplication }) {
           await api.upload(asFile(await compressImage(f), f.name))
           setAgain(false)
         } catch (err) {
-          toast(errText(err, "Couldn't upload the file. Try again."))
+          toast(errorMessage(err, "Couldn't upload the file. Try again."))
         }
       }}
     />

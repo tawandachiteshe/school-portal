@@ -18,7 +18,7 @@ import {
   usePublishMarks,
   useSaveMarks,
 } from '@/api/generated/teaching/teaching'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { shortDate, time } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from './staff-ui'
@@ -78,7 +78,7 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
         qc.setQueryData(getGetMarksQueryKey(sheet.assessment_id), s)
         refresh()
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't save. Your marks are kept on this page; try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't save. Your marks are kept on this page; try again.")),
     },
   })
   const publish = usePublishMarks({
@@ -89,7 +89,7 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
         setConfirm(false)
         toast('Marks published. Students can see them now.')
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't publish. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't publish. Try again.")),
     },
   })
 
@@ -409,6 +409,6 @@ export default function Marks() {
   const { data, isPending, error } = useGetMarks(id, { query: { staleTime: Infinity } })
   if (isPending) return <Skeleton className="m-8 h-96" />
   if (error || !data)
-    return <p className="p-8 text-muted-foreground">{error instanceof ApiError ? error.message : "Couldn't load marks."}</p>
+    return <p className="p-8 text-muted-foreground">{errorMessage(error, "Couldn't load marks.")}</p>
   return <MarksTable key={data.assessment_id} sheet={data} />
 }

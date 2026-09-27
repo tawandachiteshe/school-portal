@@ -13,7 +13,7 @@ import {
   getListAnnouncementsQueryKey,
   useListAnnouncements,
 } from '@/api/generated/student/student'
-import { ApiError } from '@/lib/api'
+import { ApiError, errorMessage } from '@/lib/api'
 import { formatLongDate, postedAt, time } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { useIsDesktop } from '@/lib/use-desktop'
@@ -167,7 +167,7 @@ export function AnnouncementDetail() {
             <Skeleton className="h-24" />
           </div>
         )}
-        {error && <Empty>{error instanceof ApiError ? error.message : "Couldn't load this announcement."}</Empty>}
+        {error && <Empty>{errorMessage(error, "Couldn't load this announcement.")}</Empty>}
         {data && (
           <>
             <article className="flex flex-col gap-4">

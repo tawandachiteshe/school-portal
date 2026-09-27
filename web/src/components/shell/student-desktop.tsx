@@ -12,7 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import { Link, NavLink, Outlet, useMatches, useNavigate } from 'react-router'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 import { Input } from '@/components/ui/input'
 import { useDeadlines } from '@/api/generated/deadlines/deadlines'
 import { useDashboard } from '@/api/generated/student/student'
@@ -159,12 +159,6 @@ export function DeskFallback({ bar, children }: { bar?: ReactNode; children: Rea
       <div className="flex w-full max-w-[720px] grow flex-col px-4">{children}</div>
     </>
   )
-}
-
-// True when the current route has its own desktop layout (route handle { desk: true }).
-export function useHasDeskLayout() {
-  const matches = useMatches()
-  return matches.some((m) => (m.handle as { desk?: boolean } | undefined)?.desk)
 }
 
 // A desktop page with a breadcrumb bar: "Library / Search".

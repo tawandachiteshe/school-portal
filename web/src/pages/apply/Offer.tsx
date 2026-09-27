@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } f
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApplyShell } from '@/components/shell/apply-shell'
 import { getMyApplicationQueryKey, getOfferLetterUrl, useAnswerOffer, useMyApplication } from '@/api/generated/apply/apply'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, dateOnly, dayText, longDayText } from './common'
@@ -30,7 +30,7 @@ export default function Offer() {
         setConfirmDecline(false)
         toast(v.data.answer === 'accept' ? "You've accepted your place." : "You've declined the offer.")
       },
-      onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't save. Try again."),
+      onError: (e) => toast(errorMessage(e, "Couldn't save. Try again.")),
     },
   })
   if (isPending) return <Skeleton className="m-4 h-96" />

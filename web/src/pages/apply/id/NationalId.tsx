@@ -21,7 +21,7 @@ import {
   useSendHandoffLink,
   useStartHandoff,
 } from '@/api/generated/apply-id/apply-id'
-import { ApiError } from '@/lib/api'
+import { errorMessage } from '@/lib/api'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, STEP_PATH } from '../common'
@@ -33,7 +33,6 @@ const hm = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit'
 const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const title = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
 const h1 = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
-const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 export const LINK_KEY = 'tcfl-handoff' // the link is shown once: keep it for this tab only
 
 function registration(s: NationalIdState) {
@@ -205,7 +204,7 @@ export function LinkPanel({
   const sms = useSendHandoffLink({
     mutation: {
       onSuccess: () => toast(`Link queued to ${app.phone_masked}. It arrives when the SMS service sends it.`),
-      onError: (e) => toast(errText(e, "Couldn't send the SMS.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't send the SMS.")),
     },
   })
   return (
@@ -464,7 +463,7 @@ function Desktop({ app }: { app: MyApplication }) {
         }
         void refresh()
       },
-      onError: (e) => toast(errText(e, "Couldn't create a link. Try again.")),
+      onError: (e) => toast(errorMessage(e, "Couldn't create a link. Try again.")),
     },
   })
   const [uploading, setUploading] = useState(false)
@@ -475,7 +474,7 @@ function Desktop({ app }: { app: MyApplication }) {
       await refresh()
       setView('upload')
     } catch (e) {
-      toast(errText(e, "Couldn't upload the file. Try again."))
+      toast(errorMessage(e, "Couldn't upload the file. Try again."))
     } finally {
       setUploading(false)
     }
