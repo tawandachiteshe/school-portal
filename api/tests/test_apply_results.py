@@ -49,6 +49,36 @@ def test_parse_rows_and_header():
     assert got["Shona"] == ("3159", None, "€")
 
 
+def test_parse_certificate_layout():
+    """ZIMSEC certificates: centre/candidate after the name, grades as "C (c)", marks after them,
+    summary lines, and subjects missing from the reference table."""
+    words = [
+        _w("7", 200, 60, 0.1), _w("A", 240, 60, 0.1), _w("R", 280, 60, 0.1),
+        _w("S", 320, 60, 0.1), _w("E", 360, 60, 0.1),
+        _w("AT", 500, 520), _w("ORDINARY", 560, 520), _w("LEVEL", 760, 520),
+        _w("the", 80, 580), _w("candidate", 140, 580), _w("named", 340, 580), _w("below", 460, 580),
+        _w("MOYO", 200, 670), _w("TARIRO", 300, 670), _w("010655/3177", 1060, 670),
+        _w("EXAMINATION", 500, 720), _w("OF", 740, 720), _w("NOVEMBER", 800, 720), _w("2019", 1000, 720),
+        _w("MATHEMATICS", 290, 900), _w("C(c)", 1120, 900, 0.7), _w("=", 1180, 900),
+        _w('"', 260, 930), _w("ENGLISH", 290, 930), _w("LANGUAGE", 430, 930),
+        _w("B", 1120, 930), _w("(b)", 1150, 930), _w("I", 1200, 930),
+        _w("INTEGRATED", 290, 960), _w("SCIENCE", 500, 960), _w("C", 1120, 960), _w("(c)", 1150, 960),
+        _w("NUMBER", 290, 990), _w("OF", 420, 990), _w("SUBJECTS", 470, 990), _w("RECORDED", 640, 990),
+        _w(":", 900, 990), _w("TWO", 1120, 990),
+    ]  # fmt: skip
+    r = parse(words, SUBJECTS, 2246, 3264)
+    assert (r.level, r.session, r.year) == ("O", "NOVEMBER", 2019)
+    assert (r.centre_number, r.candidate_number, r.candidate_name) == ("010655", "3177", "MOYO TARIRO")
+    got = {s.name: (s.code, s.grade) for s in r.subjects}
+    assert got == {
+        "Mathematics": ("4004", "C"),
+        "English Language": ("1122", "B"),
+        "Integrated Science": (None, "C"),
+    }
+    unlisted = next(s for s in r.subjects if s.code is None)
+    assert unlisted.confidence <= 0.6  # shown as "Check this grade"
+
+
 @pytest.fixture(autouse=True)
 def fakes(monkeypatch):
     blobs: dict[str, bytes] = {}

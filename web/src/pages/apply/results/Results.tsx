@@ -56,7 +56,7 @@ function Desktop({ app }: { app: MyApplication }) {
   const api = useResultsApi()
   const st = api.state
   const { send, busy } = usePageUpload(api)
-  const { drafts, set, remove, reset } = useDrafts(st)
+  const { drafts, set, remove, reset, addBlank } = useDrafts(st)
   const files = useRef<HTMLInputElement>(null)
   const addTo = useRef<string | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
@@ -155,7 +155,8 @@ function Desktop({ app }: { app: MyApplication }) {
         </div>
         {st.sittings.some((s) => s.status === 'failed') && (
           <p role="alert" className="max-w-[720px] font-medium text-destructive">
-            We couldn't read the grades from those photos. Try again with a clearer photo or scan.
+            We couldn't find the subjects and grades on that page. Check it's your result slip or certificate and try again,
+            or type your results in.
           </p>
         )}
         <div className="grid max-w-[1040px] grid-cols-2 gap-6">
@@ -179,11 +180,14 @@ function Desktop({ app }: { app: MyApplication }) {
               <h2 className="text-lg leading-6 font-semibold">Upload scans from this computer</h2>
               <p className="text-muted-foreground">One file per page. JPG, PNG or PDF, up to 5 MB each.</p>
             </div>
-            <div className="mt-auto">
+            <div className="mt-auto flex flex-wrap items-center gap-4">
               <Button variant="outline" onClick={() => choose()}>
                 <Upload strokeWidth={1.5} />
                 Choose files
               </Button>
+              <button type="button" onClick={addBlank} className="text-primary hover:underline">
+                Type my results in
+              </button>
             </div>
           </section>
         </div>

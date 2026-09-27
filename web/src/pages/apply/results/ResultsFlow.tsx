@@ -133,23 +133,44 @@ export function Reading({ label = 'Reading your results…' }: { label?: string 
   )
 }
 
+const blank = (key: string): Draft => ({
+  key,
+  status: 'read',
+  level: 'O',
+  session: 'NOVEMBER',
+  year: '',
+  centre: '',
+  candidate: '',
+  name: null,
+  rows: [],
+  pages: [],
+  read_at: null,
+  editing: true,
+})
+
 // Edits are kept per sitting until saved; the server's copy fills in the rest.
 export function useDrafts(state: ResultsState | undefined) {
   const [edits, setEdits] = useState<Record<string, Draft>>({})
   const [removed, setRemoved] = useState<Set<string>>(new Set())
+  const [typed, setTyped] = useState<string[]>([]) // sittings typed in by hand, not read from a photo
   const drafts = state
-    ? checkable(state)
-        .filter((s) => !removed.has(s.key))
-        .map((s) => (edits[s.key] && edits[s.key].status === s.status ? edits[s.key] : toDraft(s)))
+    ? [
+        ...checkable(state)
+          .filter((s) => !removed.has(s.key))
+          .map((s) => (edits[s.key] && edits[s.key].status === s.status ? edits[s.key] : toDraft(s))),
+        ...typed.filter((k) => !removed.has(k)).map((k) => edits[k] ?? blank(k)),
+      ]
     : []
+  const addBlank = () => setTyped((t) => [...t, `typed-${t.length + 1}`])
   const set = (key: string, p: Partial<Draft>) =>
     setEdits((e) => ({ ...e, [key]: { ...(e[key] ?? drafts.find((d) => d.key === key)!), ...p } }))
   const remove = (key: string) => setRemoved((r) => new Set(r).add(key))
   const reset = () => {
     setEdits({})
     setRemoved(new Set())
+    setTyped([])
   }
-  return { drafts, set, remove, reset }
+  return { drafts, set, remove, reset, addBlank }
 }
 
 type Camera = { scan?: string; page: number }
@@ -170,7 +191,7 @@ export function ResultsFlow({
 }) {
   const [camera, setCamera] = useState<Camera | null>(null)
   const { send, busy } = usePageUpload(api)
-  const { drafts, set, remove, reset } = useDrafts(api.state)
+  const { drafts, set, remove, reset, addBlank } = useDrafts(api.state)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const st = api.state
@@ -215,14 +236,20 @@ export function ResultsFlow({
         {failed && (
           <Alert variant="urgent">
             <TriangleAlert strokeWidth={1.5} />
-            <p>We couldn't read the grades from those photos. Take them again in good light, flat and sharp.</p>
+            <p>
+              We couldn't find the subjects and grades on that page. Check it's your result slip or certificate and try again,
+              or type your results in.
+            </p>
           </Alert>
         )}
         <div className="mt-auto flex flex-col gap-3">
           <Button block onClick={() => setCamera({ page: 1 })}>
             Photograph my result slip
           </Button>
-          <Button block variant="outline" onClick={onBack}>
+          <Button block variant="outline" onClick={addBlank}>
+            Type my results in
+          </Button>
+          <Button block variant="ghost" onClick={onBack}>
             Back
           </Button>
         </div>
