@@ -16,6 +16,8 @@ export function keptOffline(q: Pick<Query, 'queryKey' | 'state'>): boolean {
   const k = q.queryKey[0]
   return (
     q.state.status === 'success' &&
+    // "Nobody signed in" is never kept: after signing in, a saved null would send them back to /login.
+    q.state.data != null &&
     typeof k === 'string' &&
     (k === '/me' || (k.startsWith('/student/') && !k.startsWith('/student/search')) || k === '/library/home')
   )

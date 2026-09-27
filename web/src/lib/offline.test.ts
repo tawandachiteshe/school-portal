@@ -2,8 +2,8 @@ import { QueryClient } from '@tanstack/react-query'
 import { claimOfflineData, keptOffline } from './offline'
 import { markSignedIn, sessionEnded } from './session'
 
-const q = (key: string, status: 'success' | 'error' = 'success') =>
-  ({ queryKey: [key], state: { status } }) as unknown as Parameters<typeof keptOffline>[0]
+const q = (key: string, status: 'success' | 'error' = 'success', data: unknown = {}) =>
+  ({ queryKey: [key], state: { status, data } }) as unknown as Parameters<typeof keptOffline>[0]
 
 describe('what a phone keeps offline', () => {
   it('keeps the student’s own pages and who they are', () => {
@@ -16,6 +16,7 @@ describe('what a phone keeps offline', () => {
     expect(keptOffline(q('/assistant'))).toBe(false)
     expect(keptOffline(q('/student/search'))).toBe(false)
     expect(keptOffline(q('/student/dashboard', 'error'))).toBe(false)
+    expect(keptOffline(q('/me', 'success', null))).toBe(false) // signed out: never kept
   })
   it('drops the last person’s data when someone else signs in on the phone', () => {
     const qc = new QueryClient()
