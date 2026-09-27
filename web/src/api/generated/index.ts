@@ -13,6 +13,7 @@ export * from './library-desk/library-desk';
 export * from './me/me';
 export * from './modules/modules';
 export * from './ops/ops';
+export * from './public/public';
 export * from './records/records';
 export * from './staff-announcements/staff-announcements';
 export * from './student/student';

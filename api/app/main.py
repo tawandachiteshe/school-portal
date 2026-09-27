@@ -15,6 +15,7 @@ from app.api import (
     library_desk,
     me,
     modules,
+    public,
     records,
     student,
     teaching,
@@ -63,6 +64,7 @@ def create_app() -> FastAPI:
     app.include_router(apply_submit.router)
     app.include_router(apply_submit.staff_router)
     app.include_router(internal.router)
+    app.include_router(public.router)
     return app
 
 

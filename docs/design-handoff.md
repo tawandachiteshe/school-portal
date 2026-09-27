@@ -28,6 +28,7 @@ Every screen below is a file in `design/`. Suggested routes are a starting point
 ### Sign in (Authentik-driven)
 | File | Screen | Route | Authentik |
 |---|---|---|---|
+| Landing / LandingPhone | Public home page for anyone signed out: intake, how applying works, programmes, dates, help. Facts from `GET /api/public/home`; unknown dates and contacts are left off | `/` (signed out) | none |
 | SignIn | Sign in (phone) | `/login` | authentication flow: Identification → Password |
 | StaffSignIn | Sign in (desktop, shared-computer checkbox) | `/login` | same flow |
 | (no design) | Create applicant account: name, mobile number, password twice, in the style of SignIn. `design/Register.dc.html` is the lecturer's attendance register, not sign-up | `/register` | enrollment flow: Prompt stage |

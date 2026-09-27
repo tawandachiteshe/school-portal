@@ -7,6 +7,7 @@ import ForgotPassword from '@/pages/auth/ForgotPassword'
 import SignUp from '@/pages/auth/Register'
 import SignIn from '@/pages/auth/SignIn'
 import Foundations from '@/pages/Foundations'
+import Landing from '@/pages/Landing'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
 import ApplyIndex from '@/pages/apply/ApplyIndex'
@@ -55,7 +56,7 @@ export const router = createBrowserRouter([
   { path: '/foundations', element: <Foundations /> },
   {
     element: (
-      <RequireAuth roles={['student']}>
+      <RequireAuth roles={['student']} landing={<Landing />}>
         <StudentRoot />
       </RequireAuth>
     ),

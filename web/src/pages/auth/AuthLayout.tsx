@@ -1,4 +1,5 @@
 import { ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router'
 import { Wordmark } from '@/components/shell/wordmark'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
@@ -35,7 +36,9 @@ export function AuthLayout({
       <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-background">
         <header className={cn('flex h-14 shrink-0 items-center gap-1 px-4', onBack && 'border-b bg-card')}>
           {back}
-          <Wordmark />
+          <Link to="/" aria-label="TCFL Portal, home">
+            <Wordmark />
+          </Link>
         </header>
         <main className="flex grow flex-col gap-6 px-4 py-6">
           {children}
@@ -49,7 +52,9 @@ export function AuthLayout({
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="h-16 shrink-0 border-b bg-card">
         <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between gap-6 px-8 lg:px-20">
-          <Wordmark />
+          <Link to="/" aria-label="TCFL Portal, home">
+            <Wordmark />
+          </Link>
           {action}
         </div>
       </header>

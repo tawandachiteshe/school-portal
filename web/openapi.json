@@ -4670,6 +4670,27 @@
           }
         }
       }
+    },
+    "/public/home": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Public Home",
+        "operationId": "public_home",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicHome"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -7745,6 +7766,36 @@
         ],
         "title": "InfoRequest"
       },
+      "IntakeInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "open": {
+            "type": "boolean",
+            "title": "Open"
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opens At"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closes At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "open",
+          "opens_at",
+          "closes_at"
+        ],
+        "title": "IntakeInfo"
+      },
       "IssueIn": {
         "properties": {
           "person_id": {
@@ -10198,6 +10249,46 @@
         ],
         "title": "ProgrammeIn"
       },
+      "ProgrammeInfo": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "award": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Award"
+          },
+          "length": {
+            "type": "string",
+            "title": "Length"
+          },
+          "entry": {
+            "type": "string",
+            "title": "Entry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "award",
+          "length",
+          "entry"
+        ],
+        "title": "ProgrammeInfo"
+      },
       "ProgrammeOption": {
         "properties": {
           "id": {
@@ -10226,6 +10317,79 @@
           "years"
         ],
         "title": "ProgrammeOption"
+      },
+      "PublicHome": {
+        "properties": {
+          "intake": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntakeInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "programmes": {
+            "items": {
+              "$ref": "#/components/schemas/ProgrammeInfo"
+            },
+            "type": "array",
+            "title": "Programmes"
+          },
+          "application_fee": {
+            "type": "string",
+            "title": "Application Fee"
+          },
+          "decision_working_days": {
+            "type": "integer",
+            "title": "Decision Working Days"
+          },
+          "registration_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration At"
+          },
+          "classes_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classes Start"
+          },
+          "registration_place": {
+            "type": "string",
+            "title": "Registration Place"
+          },
+          "admissions_contact": {
+            "type": "string",
+            "title": "Admissions Contact"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intake",
+          "programmes",
+          "application_fee",
+          "decision_working_days",
+          "registration_at",
+          "classes_start",
+          "registration_place",
+          "admissions_contact"
+        ],
+        "title": "PublicHome"
       },
       "PublishAction": {
         "type": "string",
