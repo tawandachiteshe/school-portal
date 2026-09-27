@@ -42,6 +42,7 @@ class MeOut(BaseModel):
     initials: str
     roles: list[Role]
     phone: str | None
+    email: str | None
     student: StudentInfo | None
     staff: StaffInfo | None
     term: TermInfo | None
@@ -79,6 +80,7 @@ async def me(cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends
         initials=person.initials if person else name[:2].upper(),
         roles=sorted(cu.roles),
         phone=user.phone,
+        email=user.email,
         student=student,
         staff=staff,
         term=term_info(term, date.today()) if term else None,

@@ -49,7 +49,10 @@ export const router = createBrowserRouter([
       { path: '/library/search', element: <LibrarySearch /> },
       { path: '/search', element: <Search /> },
       { path: '/library/lists/:code', element: <ReadingListPage /> },
-      { element: <StudentShell avatar={false} />, children: [{ path: '/more', element: <More /> }] },
+      {
+        element: <StudentShell avatar={false} />,
+        children: [{ path: '/more', element: <More />, handle: { desk: true } }],
+      },
       { path: '/announcements', element: <AnnouncementsList /> },
       { path: '/announcements/:id', element: <AnnouncementDetail /> },
     ],

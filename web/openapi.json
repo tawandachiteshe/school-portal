@@ -2514,6 +2514,17 @@
             ],
             "title": "Phone"
           },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
           "student": {
             "anyOf": [
               {
@@ -2553,6 +2564,7 @@
           "initials",
           "roles",
           "phone",
+          "email",
           "student",
           "staff",
           "term"

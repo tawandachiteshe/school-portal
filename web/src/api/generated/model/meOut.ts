@@ -16,6 +16,7 @@ export interface MeOut {
   initials: string;
   roles: Role[];
   phone: string | null;
+  email: string | null;
   student: StudentInfo | null;
   staff: StaffInfo | null;
   term: TermInfo | null;
