@@ -29,7 +29,7 @@ from app.models import (
     Person,
     User,
 )
-from app.services import clock, eligibility
+from app.services import clock, eligibility, phones
 
 router = APIRouter(prefix="/staff/admissions", tags=["admissions"])
 officer = require_role("admissions", "admin")
@@ -447,11 +447,6 @@ def _norm_name(s: str | None) -> list[str]:
     return sorted(re.sub(r"[^A-Z ]", "", (s or "").upper()).split())
 
 
-def _mask_phone(e164: str) -> str:
-    """+263773184521 → '+263 77 ••• 4521'"""
-    return f"{e164[:4]} {e164[4:6]} ••• {e164[-4:]}"
-
-
 FIELD_LABELS = {
     "national_id": "ID number",
     "surname": "surname",
@@ -636,7 +631,7 @@ async def _review(db: AsyncSession, cu: CurrentUser, a: Application) -> Review:
             for f in sorted(_open_flags(a), key=lambda f: f.id)
         ],
         contact=Contact(
-            phone_masked=_mask_phone(user.phone) if user and user.phone else None,
+            phone_masked=phones.mask(user.phone) if user and user.phone else None,
             verified=bool(user and user.phone),
         ),
         activity=activity,

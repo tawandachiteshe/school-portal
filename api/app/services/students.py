@@ -6,21 +6,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import CurrentUser, require_role
 from app.db import get_db
-from app.models import Enrolment, ModuleOffering, Student
+from app.models import Enrolment, ModuleOffering, Student, User
 
 _student_role = require_role("student")
+
+
+async def active_student(db: AsyncSession, user: User) -> Student | None:
+    """The user's student record, if it's active."""
+    if user.person is None:
+        return None
+    s = (await db.execute(select(Student).where(Student.person_id == user.person.id))).scalar_one_or_none()
+    return s if s and s.status == "active" else None
 
 
 async def current_student(
     cu: CurrentUser = Depends(_student_role), db: AsyncSession = Depends(get_db)
 ) -> Student:
-    person = cu.user.person
-    student = (
-        (await db.execute(select(Student).where(Student.person_id == person.id))).scalar_one_or_none()
-        if person
-        else None
-    )
-    if student is None or student.status != "active":
+    student = await active_student(db, cu.user)
+    if student is None:
         raise HTTPException(403, "No active student record for this account")
     return student
 

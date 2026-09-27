@@ -120,6 +120,10 @@ def _plain(model: BaseModel | None) -> Any:
     return strip(model.model_dump(mode="json")) if model is not None else None
 
 
+def _plain_list(items: list[BaseModel]) -> list:
+    return [_plain(i) for i in items]
+
+
 # --- student tools --------------------------------------------------------------------------
 
 
@@ -132,10 +136,6 @@ async def _deadlines(ctx: Context, a: DaysInput) -> dict:
         "week": d.week,
         "items": _plain_list(items),
     }
-
-
-def _plain_list(items: list[BaseModel]) -> list:
-    return [_plain(i) for i in items]
 
 
 async def _timetable(ctx: Context, a: WeekInput) -> dict:

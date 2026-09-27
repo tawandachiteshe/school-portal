@@ -448,13 +448,15 @@ class AdmissionsSeed:
         events: bool = True,
     ) -> Application:
         submitted = self.at(a.days_ago, a.at)
+        # Paid cash and waiting for Accounts: still a draft, with a payment to confirm.
+        awaiting_fee = a.status == "awaiting_fee"
         app = Application(
             reference=a.ref,
             person=person,
             intake_id=self.intake.id,
             programme_id=self.programmes[a.programme].id,
-            status="draft" if a.status == "awaiting_fee" else a.status,
-            submitted_at=None if a.status == "awaiting_fee" else submitted,
+            status="draft" if awaiting_fee else a.status,
+            submitted_at=None if awaiting_fee else submitted,
             created_at=started,
             consent_processing_at=started,
             assigned_to=self.officer.id if a.owner else None,
@@ -562,7 +564,7 @@ class AdmissionsSeed:
         )
         # Paid by EcoCash just before submitting (design/Submitted "receipt EC-8841027" for Tariro).
         app.declared_at = submitted - timedelta(minutes=2)
-        if a.status == "awaiting_fee":
+        if awaiting_fee:
             self.db.add(
                 ApplicationPayment(
                     application_id=app.id,
@@ -610,7 +612,7 @@ class AdmissionsSeed:
                 created_at=slip_read,
                 via="phone",
             )
-            if a.status != "awaiting_fee":
+            if not awaiting_fee:
                 ev(
                     kind="status",
                     from_status="draft",

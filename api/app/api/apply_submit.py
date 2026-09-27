@@ -2,7 +2,6 @@
 (design/Submit, SubmitDesktop, Payment, PayWaiting, PayFailed, PayOffice, Submitted)."""
 
 import hashlib
-import re
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -33,6 +32,7 @@ from app.models import (
 )
 from app.pdf import make_pdf
 from app.services import clock, eligibility, payments
+from app.services.phones import local_phone, to_e164
 
 router = APIRouter(tags=["apply submit"])
 staff_router = APIRouter(prefix="/staff/accounts", tags=["accounts"])
@@ -58,25 +58,6 @@ class PayStatus(StrEnum):
 
 
 LABEL = {"ecocash": "EcoCash", "onemoney": "OneMoney", "bank": "Bank transfer", "cash": "Cash"}
-
-
-def local_phone(e164: str | None) -> str | None:
-    """+263773184521 → '077 318 4521'"""
-    if not e164 or not e164.startswith("+263") or len(e164) != 13:
-        return None
-    n = "0" + e164[4:]
-    return f"{n[:3]} {n[3:6]} {n[6:]}"
-
-
-def to_e164(raw: str) -> str | None:
-    digits = re.sub(r"\D", "", raw)
-    if digits.startswith("263") and len(digits) == 12:
-        return "+" + digits
-    if digits.startswith("07") and len(digits) == 10:
-        return "+263" + digits[1:]
-    if digits.startswith("7") and len(digits) == 9:
-        return "+263" + digits
-    return None
 
 
 def _money(v) -> str:

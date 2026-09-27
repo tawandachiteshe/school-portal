@@ -1,5 +1,5 @@
-"""Ask TCFL (design/AskStart, AskChat, AskHandoff, DeskAsk) and the Student Affairs inbox for the
-questions students send on. The assistant itself is sandboxed: see app/assistant/__init__.py."""
+"""Ask TCFL (design/AskStart, AskChat, AskHandoff, DeskAsk). The assistant is sandboxed: see
+app/assistant/__init__.py. Student Affairs answers handed-off questions in ask_questions_staff.py."""
 
 import asyncio
 import logging
@@ -21,14 +21,13 @@ from app.assistant.tools import Context, Source, allowed
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
 from app.db import get_db, get_sessionmaker
-from app.models import AskQuestion, ChatMessage, ChatSession, SmsOutbox, Student, User
-from app.services import clock
+from app.models import AskQuestion, ChatMessage, ChatSession, User
+from app.services import clock, phones
+from app.services.students import active_student
 
 router = APIRouter(prefix="/assistant", tags=["assistant"])
-staff_router = APIRouter(prefix="/staff/ask-questions", tags=["assistant"])
 log = logging.getLogger("tcfl.assistant")
 asker = require_role("student", "applicant")
-student_affairs = require_role("student_affairs", "admin")
 
 NOT_SET_UP = (
     "Ask TCFL isn't set up yet, so it can't answer questions. You can send your question to Student "
@@ -51,20 +50,9 @@ SUGGESTIONS = {
 }
 
 
-def _mask(e164: str) -> str:
-    return f"{e164[:4]} {e164[4:6]} ••• {e164[-4:]}"
-
-
 def _enabled() -> None:
     if not get_settings().assistant_enabled:
         raise HTTPException(404, "Ask TCFL is switched off")
-
-
-async def _student(db: AsyncSession, user: User) -> Student | None:
-    if not user.person:
-        return None
-    s = (await db.execute(select(Student).where(Student.person_id == user.person.id))).scalar_one_or_none()
-    return s if s and s.status == "active" else None
 
 
 # --- start page -----------------------------------------------------------------------------
@@ -100,7 +88,7 @@ async def assistant_home(
         .scalars()
         .all()
     )
-    kind = "student" if await _student(db, cu.user) else "applicant"
+    kind = "student" if await active_student(db, cu.user) else "applicant"
     return AssistantHome(
         configured=bool(get_settings().anthropic_api_key),
         suggestions=SUGGESTIONS[kind],
@@ -258,7 +246,7 @@ async def ask(
                 user = (
                     await ro.execute(select(User).where(User.id == user_id).options(selectinload(User.roles)))
                 ).scalar_one()
-                student = await _student(ro, user)
+                student = await active_student(ro, user)
                 roles = {r.role for r in user.roles}
                 ctx = Context(db=ro, cu=CurrentUser(user=user, session=web_session), student=student)
                 tools = allowed(roles, student is not None)
@@ -360,12 +348,12 @@ class AskHandoffPreview(BaseModel):
 async def handoff_preview(
     cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
 ) -> AskHandoffPreview:
-    s = await _student(db, cu.user)
+    s = await active_student(db, cu.user)
     return AskHandoffPreview(
         name=cu.user.display_name or "",
         student_number=s.student_number if s else None,
         class_group=s.class_group if s else None,
-        sms_to=_mask(cu.user.phone) if cu.user.phone else None,
+        sms_to=phones.mask(cu.user.phone) if cu.user.phone else None,
     )
 
 
@@ -392,93 +380,4 @@ async def send_to_student_affairs(
         )
     )
     await db.commit()
-    return AskHandoffOut(reference=reference, sms_to=_mask(cu.user.phone) if cu.user.phone else None)
-
-
-# --- Student Affairs inbox ------------------------------------------------------------------
-
-
-class InboxQuestion(BaseModel):
-    id: uuid.UUID
-    reference: str
-    name: str
-    student_number: str | None
-    class_group: str | None
-    question: str
-    created_at: datetime
-    reply: str | None
-    replied_at: datetime | None
-    replied_by: str | None
-
-
-@staff_router.get("")
-async def ask_questions_inbox(
-    _: CurrentUser = Depends(student_affairs), db: AsyncSession = Depends(get_db)
-) -> list[InboxQuestion]:
-    rows = (
-        await db.execute(
-            select(AskQuestion, User)
-            .join(User, User.id == AskQuestion.user_id)
-            .order_by(AskQuestion.replied_at.is_not(None), AskQuestion.created_at.desc())
-            .limit(200)
-        )
-    ).all()
-    out = []
-    for q, u in rows:
-        s = await _student(db, u)
-        by = await db.get(User, q.replied_by) if q.replied_by else None
-        out.append(
-            InboxQuestion(
-                id=q.id,
-                reference=q.reference,
-                name=u.display_name or u.username or "",
-                student_number=s.student_number if s else None,
-                class_group=s.class_group if s else None,
-                question=q.question,
-                created_at=q.created_at,
-                reply=q.reply,
-                replied_at=q.replied_at,
-                replied_by=by.display_name if by else None,
-            )
-        )
-    return out
-
-
-class AskReplyIn(BaseModel):
-    reply: str = Field(min_length=2, max_length=2000)
-
-
-@staff_router.post("/{question_id}/reply")
-async def reply_to_question(
-    question_id: uuid.UUID,
-    body: AskReplyIn,
-    cu: CurrentUser = Depends(student_affairs),
-    db: AsyncSession = Depends(get_db),
-) -> InboxQuestion:
-    q = await db.get(AskQuestion, question_id)
-    if q is None:
-        raise HTTPException(404, "Question not found")
-    q.reply, q.replied_by, q.replied_at = body.reply, cu.user.id, clock.now()
-    asker_user = await db.get(User, q.user_id)
-    if asker_user and asker_user.phone:
-        db.add(
-            SmsOutbox(
-                to_phone=asker_user.phone,
-                body=f"TCFL Student Affairs replied to {q.reference}. Read it in Ask TCFL on the portal.",
-                purpose="ask_reply",
-            )
-        )
-    await db.commit()
-    s = await _student(db, asker_user) if asker_user else None
-    return InboxQuestion(
-        id=q.id,
-        reference=q.reference,
-        name=asker_user.display_name if asker_user else "",
-        student_number=s.student_number if s else None,
-        class_group=s.class_group if s else None,
-        question=q.question,
-        created_at=q.created_at,
-        reply=q.reply,
-        replied_at=q.replied_at,
-        replied_by=cu.user.display_name,
-    )
+    return AskHandoffOut(reference=reference, sms_to=phones.mask(cu.user.phone) if cu.user.phone else None)

@@ -10,6 +10,7 @@ from app.api import (
     apply_results,
     apply_review,
     apply_submit,
+    ask_questions_staff,
     assistant,
     deadlines,
     internal,
@@ -73,7 +74,7 @@ def create_app() -> FastAPI:
     app.include_router(library_catalogue.router)
     app.include_router(students_staff.router)
     app.include_router(assistant.router)
-    app.include_router(assistant.staff_router)
+    app.include_router(ask_questions_staff.router)
     return app
 
 

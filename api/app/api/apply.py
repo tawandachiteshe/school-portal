@@ -17,7 +17,7 @@ from app.config import get_settings
 from app.db import get_db
 from app.models import Application, ApplicationEvent, ApplicationPayment, Intake, Person, Programme
 from app.pdf import make_pdf
-from app.services import clock
+from app.services import clock, phones
 
 router = APIRouter(prefix="/apply", tags=["apply"])
 applicant = require_role("applicant")
@@ -60,10 +60,6 @@ def add_working_days(d: date, n: int) -> date:
         if d.weekday() < 5:
             n -= 1
     return d
-
-
-def _mask_phone(e164: str) -> str:
-    return f"{e164[:4]} {e164[4:6]} ••• {e164[-4:]}"
 
 
 async def _person(db: AsyncSession, cu: CurrentUser) -> Person:
@@ -303,7 +299,7 @@ async def _out(db: AsyncSession, a: Application) -> MyApplication:
         requests=requests,
         steps=steps,
         next_step=ApplyStep(next_step) if next_step else None,
-        phone_masked=_mask_phone(user.phone) if user and user.phone else None,
+        phone_masked=phones.mask(user.phone) if user and user.phone else None,
         offer=offer,
         fee=fee,
         payment_waiting=bool(pay and pay.status == "awaiting_confirmation"),

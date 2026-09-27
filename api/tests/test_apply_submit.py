@@ -3,8 +3,8 @@ from datetime import timedelta
 import pytest
 
 from app import storage
-from app.api.apply_submit import local_phone, to_e164
 from app.services import clock
+from app.services.phones import local_phone, to_e164
 from tests.helpers import signed_in
 from tests.test_apply_review import _ready, sitting
 
