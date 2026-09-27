@@ -189,7 +189,7 @@ export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
 // 56px top bar with page context on the left and a status line on the right.
 export function StaffTopBar({ left, right }: { left: ReactNode; right?: ReactNode }) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card px-8 text-sm text-muted-foreground">
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-card px-8 text-sm text-muted-foreground">
       <span>{left}</span>
       {right && <span>{right}</span>}
     </header>

@@ -101,7 +101,7 @@ export function DesktopStudentShell() {
 // 56px bar at the top of each desktop page.
 export function DeskBar({ left, right }: { left: ReactNode; right?: ReactNode }) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-8">
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-8">
       <div className="min-w-0 text-sm text-muted-foreground">{left}</div>
       {right}
     </header>
