@@ -17,6 +17,7 @@ import type { ReactNode } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { useOverview } from '@/api/generated/teaching/teaching'
+import { useQueueSummary } from '@/api/generated/admissions/admissions'
 import { useDeskToday } from '@/api/generated/library-desk/library-desk'
 import { homeFor, useMe, useSignOut, type Role } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -107,13 +108,20 @@ function useLibrarianCounts(enabled: boolean): Record<string, number> {
     : {}
 }
 
+// Admissions: open applications and decisions sent (design/StaffQueue "Applications 52").
+function useAdmissionsCounts(enabled: boolean): Record<string, number> {
+  const { data } = useQueueSummary({ query: { enabled, staleTime: 60_000 } })
+  return data ? { '/staff/admissions': data.open, '/staff/admissions/decided': data.decided } : {}
+}
+
 export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
   const { data: me } = useMe()
   const signOut = useSignOut()
   const lecturer = !!me?.roles.includes('lecturer')
   const { counts: lecturerCounts, classes } = useLecturerNav(lecturer)
   const libraryCounts = useLibrarianCounts(!!me?.roles.includes('librarian'))
-  const counts = { ...lecturerCounts, ...libraryCounts }
+  const admissionsCounts = useAdmissionsCounts(!!me?.roles.includes('admissions'))
+  const counts = { ...lecturerCounts, ...libraryCounts, ...admissionsCounts }
   if (!me) return null
   return (
     <div className="flex min-h-dvh bg-background">

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.api import (
+    admissions,
     announcements_staff,
     deadlines,
     library,
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(teaching.router)
     app.include_router(library_desk.router)
     app.include_router(announcements_staff.router)
+    app.include_router(admissions.router)
     return app
 
 

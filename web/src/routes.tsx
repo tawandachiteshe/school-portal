@@ -6,6 +6,8 @@ import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
+import AdmissionsQueue from '@/pages/staff/admissions/Queue'
+import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
 import AnnouncementsStaff from '@/pages/staff/announcements/List'
 import LibraryDesk from '@/pages/staff/library/Desk'
@@ -85,9 +87,10 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <StaffIndex /> },
-      { path: 'admissions', element: <StaffPlaceholder context="Admissions" title="Applications" /> },
-      { path: 'admissions/decided', element: <StaffPlaceholder context="Admissions" title="Decisions sent" /> },
+      { path: 'admissions', element: <AdmissionsQueue /> },
+      { path: 'admissions/decided', element: <AdmissionsQueue decided /> },
       { path: 'admissions/places', element: <StaffPlaceholder context="Admissions" title="Intake places" /> },
+      { path: 'admissions/:reference', element: <AdmissionsReview /> },
       { path: 'teaching', element: <LecturerToday /> },
       { path: 'teaching/marking', element: <Marking /> },
       { path: 'teaching/assessments/:id/marks', element: <Marks /> },

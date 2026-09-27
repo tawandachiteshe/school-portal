@@ -52,6 +52,7 @@ from app.models import (
     Venue,
 )
 from app.pdf import make_pdf
+from app.seed_admissions import AdmissionsSeed
 from app.services import clock
 
 GROUPS = {
@@ -80,6 +81,8 @@ TABLES = [
     "module_offerings",
     "announcements",
     "library_items",
+    "district_codes",
+    "zimsec_subjects",
 ]
 
 ENGLISH_MATHS = {
@@ -248,7 +251,7 @@ class Seeder:
             department=ict,
             position="Lecturer · Programming",
         )
-        self.staff(
+        marufu = self.staff(
             "cmarufu", "TCFL-S-0090", None, "Chipo", "Marufu", ["admissions"], position="Admissions officer"
         )
         self.staff(
@@ -321,6 +324,8 @@ class Seeder:
         self.results(student, offerings, lecturers)
         await self.db.flush()
         await self.classmates(dit, dte, intake, offerings, lecturers)
+        programmes = {p.code: p for p in (dit, dse, dte, ccn)}
+        await AdmissionsSeed(self.db, intake, programmes, marufu.person).run(tariro)
         for a in self._reads:
             self.db.add(AnnouncementRead(announcement_id=a.id, user_id=tariro.user.id))
         await self.db.commit()

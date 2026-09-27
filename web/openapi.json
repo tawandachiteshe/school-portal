@@ -2258,10 +2258,592 @@
           }
         }
       }
+    },
+    "/staff/admissions/summary": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Queue Summary",
+        "operationId": "queue_summary",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Queue",
+        "operationId": "queue",
+        "parameters": [
+          {
+            "name": "tab",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/QueueTab",
+              "default": "to_review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QueueRow"
+                  },
+                  "title": "Response Queue"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications.csv": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Queue Csv",
+        "operationId": "queue_csv",
+        "parameters": [
+          {
+            "name": "tab",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/QueueTab",
+              "default": "to_review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Review",
+        "operationId": "review",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/assign": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Assign To Me",
+        "description": "Opening an unassigned application takes it: it moves to \"In review\" under your name.",
+        "operationId": "assign_to_me",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/identity-checked": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Mark Identity Checked",
+        "operationId": "mark_identity_checked",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/sittings/{sitting_id}/verified": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Mark Zimsec Verified",
+        "operationId": "mark_zimsec_verified",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          },
+          {
+            "name": "sitting_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sitting Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/flags/{flag_id}/resolve": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Resolve Flag",
+        "operationId": "resolve_flag",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          },
+          {
+            "name": "flag_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Flag Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/notes": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Add Note",
+        "operationId": "add_note",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/message": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Send Message",
+        "operationId": "send_message",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/applications/{reference}/decision": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Decide",
+        "operationId": "decide",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reference"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/documents/{document_id}/file": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Document File",
+        "operationId": "document_file",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Activity": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
+          },
+          "by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By"
+          },
+          "note": {
+            "type": "boolean",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "at",
+          "via",
+          "by",
+          "note"
+        ],
+        "title": "Activity"
+      },
       "AnnouncementDetail": {
         "properties": {
           "id": {
@@ -2613,6 +3195,19 @@
         ],
         "title": "Announcements"
       },
+      "ApplicationStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "submitted",
+          "in_review",
+          "more_info",
+          "accepted",
+          "rejected",
+          "withdrawn"
+        ],
+        "title": "ApplicationStatus"
+      },
       "AssessmentKind": {
         "type": "string",
         "enum": [
@@ -2762,6 +3357,14 @@
           "pending_upload"
         ],
         "title": "AssessmentOut"
+      },
+      "AttentionLevel": {
+        "type": "string",
+        "enum": [
+          "amber",
+          "muted"
+        ],
+        "title": "AttentionLevel"
       },
       "Audience": {
         "properties": {
@@ -3370,6 +3973,31 @@
         ],
         "title": "ComposeOptions"
       },
+      "Contact": {
+        "properties": {
+          "phone_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Masked"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          }
+        },
+        "type": "object",
+        "required": [
+          "phone_masked",
+          "verified"
+        ],
+        "title": "Contact"
+      },
       "Dashboard": {
         "properties": {
           "today": {
@@ -3652,6 +4280,39 @@
           "items"
         ],
         "title": "Deadlines"
+      },
+      "Decision": {
+        "type": "string",
+        "enum": [
+          "offer",
+          "decline",
+          "ask"
+        ],
+        "title": "Decision"
+      },
+      "DecisionIn": {
+        "properties": {
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision"
+        ],
+        "title": "DecisionIn"
       },
       "Deleted": {
         "properties": {
@@ -4104,6 +4765,29 @@
         ],
         "title": "Fees"
       },
+      "Flag": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "severity"
+        ],
+        "title": "Flag"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -4178,6 +4862,194 @@
           "closes"
         ],
         "title": "Hours"
+      },
+      "Identity": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "capture_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Device"
+          },
+          "captured_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "id_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Number"
+          },
+          "check_letter_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Letter Valid"
+          },
+          "name_on_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name On Id"
+          },
+          "name_on_slip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name On Slip"
+          },
+          "names_match": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Names Match"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "age_at_intake": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age At Intake"
+          },
+          "registered_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered In"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "edited": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Edited"
+          },
+          "checked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked By"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "capture_device",
+          "captured_at",
+          "id_number",
+          "check_letter_valid",
+          "name_on_id",
+          "name_on_slip",
+          "names_match",
+          "date_of_birth",
+          "age_at_intake",
+          "registered_in",
+          "origin",
+          "edited",
+          "checked_by",
+          "checked_at"
+        ],
+        "title": "Identity"
       },
       "IssueIn": {
         "properties": {
@@ -4933,6 +5805,21 @@
         ],
         "title": "MeOut"
       },
+      "MessageIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "MessageIn"
+      },
       "ModuleAssessment": {
         "properties": {
           "id": {
@@ -5427,6 +6314,21 @@
         ],
         "title": "NoteHit"
       },
+      "NoteIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "NoteIn"
+      },
       "NoteItem": {
         "properties": {
           "id": {
@@ -5768,6 +6670,205 @@
         ],
         "title": "PublishAction"
       },
+      "QueueRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "national_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Id"
+          },
+          "programme_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Programme Id"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "eligible": {
+            "type": "boolean",
+            "title": "Eligible"
+          },
+          "eligibility": {
+            "type": "string",
+            "title": "Eligibility"
+          },
+          "attention": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attention"
+          },
+          "attention_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttentionLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner_initials": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Initials"
+          },
+          "owner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Name"
+          },
+          "owner_is_me": {
+            "type": "boolean",
+            "title": "Owner Is Me"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "name",
+          "national_id",
+          "programme_id",
+          "programme",
+          "status",
+          "submitted_at",
+          "decided_at",
+          "eligible",
+          "eligibility",
+          "attention",
+          "attention_level",
+          "owner_initials",
+          "owner_name",
+          "owner_is_me"
+        ],
+        "title": "QueueRow"
+      },
+      "QueueSummary": {
+        "properties": {
+          "intake": {
+            "type": "string",
+            "title": "Intake"
+          },
+          "to_review": {
+            "type": "integer",
+            "title": "To Review"
+          },
+          "needs_checking": {
+            "type": "integer",
+            "title": "Needs Checking"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting"
+          },
+          "decided": {
+            "type": "integer",
+            "title": "Decided"
+          },
+          "open": {
+            "type": "integer",
+            "title": "Open"
+          },
+          "oldest_waiting_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest Waiting Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intake",
+          "to_review",
+          "needs_checking",
+          "waiting",
+          "decided",
+          "open",
+          "oldest_waiting_days"
+        ],
+        "title": "QueueSummary"
+      },
+      "QueueTab": {
+        "type": "string",
+        "enum": [
+          "to_review",
+          "needs_checking",
+          "waiting",
+          "decided"
+        ],
+        "title": "QueueTab"
+      },
       "Reach": {
         "properties": {
           "students": {
@@ -5790,6 +6891,15 @@
           "phones"
         ],
         "title": "Reach"
+      },
+      "ReadHow": {
+        "type": "string",
+        "enum": [
+          "clear",
+          "unclear_confirmed",
+          "changed"
+        ],
+        "title": "ReadHow"
       },
       "ReadingList": {
         "properties": {
@@ -6085,6 +7195,34 @@
         ],
         "title": "RenewedOut"
       },
+      "RequirementRow": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "needed": {
+            "type": "string",
+            "title": "Needed"
+          },
+          "applicant": {
+            "type": "string",
+            "title": "Applicant"
+          },
+          "met": {
+            "type": "boolean",
+            "title": "Met"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "needed",
+          "applicant",
+          "met"
+        ],
+        "title": "RequirementRow"
+      },
       "ReservationOut": {
         "properties": {
           "id": {
@@ -6147,6 +7285,21 @@
           "position"
         ],
         "title": "ReservationOut"
+      },
+      "ResolveIn": {
+        "properties": {
+          "resolution": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Resolution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolution"
+        ],
+        "title": "ResolveIn"
       },
       "ResultRow": {
         "properties": {
@@ -6362,6 +7515,235 @@
         ],
         "title": "Returned"
       },
+      "Review": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "assigned_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "assigned_to_me": {
+            "type": "boolean",
+            "title": "Assigned To Me"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By"
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Reason"
+          },
+          "nav": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewNav"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eligibility": {
+            "$ref": "#/components/schemas/ReviewEligibility"
+          },
+          "unclear_decides": {
+            "type": "boolean",
+            "title": "Unclear Decides"
+          },
+          "unclear_count": {
+            "type": "integer",
+            "title": "Unclear Count"
+          },
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          },
+          "sittings": {
+            "items": {
+              "$ref": "#/components/schemas/Sitting"
+            },
+            "type": "array",
+            "title": "Sittings"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/Flag"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/Contact"
+          },
+          "activity": {
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            },
+            "type": "array",
+            "title": "Activity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "name",
+          "status",
+          "programme",
+          "submitted_at",
+          "assigned_to",
+          "assigned_to_me",
+          "decided_at",
+          "decided_by",
+          "decision_reason",
+          "nav",
+          "eligibility",
+          "unclear_decides",
+          "unclear_count",
+          "identity",
+          "sittings",
+          "flags",
+          "contact",
+          "activity"
+        ],
+        "title": "Review"
+      },
+      "ReviewEligibility": {
+        "properties": {
+          "eligible": {
+            "type": "boolean",
+            "title": "Eligible"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eligible",
+          "summary",
+          "rows"
+        ],
+        "title": "ReviewEligibility"
+      },
+      "ReviewNav": {
+        "properties": {
+          "tab": {
+            "$ref": "#/components/schemas/QueueTab"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tab",
+          "position",
+          "total",
+          "previous",
+          "next"
+        ],
+        "title": "ReviewNav"
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -6375,6 +7757,19 @@
           "student_affairs"
         ],
         "title": "Role"
+      },
+      "Sent": {
+        "properties": {
+          "sms_queued": {
+            "type": "boolean",
+            "title": "Sms Queued"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sms_queued"
+        ],
+        "title": "Sent"
       },
       "SettingsIn": {
         "properties": {
@@ -6506,6 +7901,84 @@
           "first_material_id"
         ],
         "title": "SharedNote"
+      },
+      "Sitting": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "session": {
+            "type": "string",
+            "title": "Session"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "centre_number": {
+            "type": "string",
+            "title": "Centre Number"
+          },
+          "candidate_number": {
+            "type": "string",
+            "title": "Candidate Number"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "verification": {
+            "type": "string",
+            "title": "Verification"
+          },
+          "verified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified At"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "level",
+          "session",
+          "year",
+          "centre_number",
+          "candidate_number",
+          "document_id",
+          "verification",
+          "verified_at",
+          "rows"
+        ],
+        "title": "Sitting"
       },
       "Slot": {
         "properties": {
@@ -6767,6 +8240,52 @@
           "announcements"
         ],
         "title": "StudentSearchResults"
+      },
+      "SubjectRow": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "grade": {
+            "type": "string",
+            "title": "Grade"
+          },
+          "read": {
+            "$ref": "#/components/schemas/ReadHow"
+          },
+          "read_as": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read As"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "subject",
+          "grade",
+          "read",
+          "read_as"
+        ],
+        "title": "SubjectRow"
       },
       "SubmissionMode": {
         "type": "string",

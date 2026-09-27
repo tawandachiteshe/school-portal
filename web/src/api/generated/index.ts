@@ -1,3 +1,4 @@
+export * from './admissions/admissions';
 export * from './auth/auth';
 export * from './deadlines/deadlines';
 export * from './library/library';

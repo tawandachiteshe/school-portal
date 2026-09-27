@@ -56,7 +56,7 @@ class Intake(Base):
     opens_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     closes_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
-    first_term: Mapped[AcademicTerm | None] = relationship()
+    first_term: Mapped[AcademicTerm | None] = relationship(lazy="joined")
 
 
 class Module(Base):

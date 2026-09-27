@@ -11,6 +11,17 @@ from app.models.academic import (
     ProgrammeModule,
     Venue,
 )
+from app.models.admissions import (
+    Application,
+    ApplicationEvent,
+    ApplicationFlag,
+    DistrictCode,
+    Document,
+    DocumentField,
+    ExamSitting,
+    ExamSubjectResult,
+    ZimsecSubject,
+)
 from app.models.base import Base
 from app.models.content import (
     Announcement,
@@ -45,6 +56,15 @@ from app.models.teaching import (
 )
 
 __all__ = [
+    "Application",
+    "ApplicationEvent",
+    "ApplicationFlag",
+    "DistrictCode",
+    "Document",
+    "DocumentField",
+    "ExamSitting",
+    "ExamSubjectResult",
+    "ZimsecSubject",
     "AcademicTerm",
     "Announcement",
     "AnnouncementRead",
