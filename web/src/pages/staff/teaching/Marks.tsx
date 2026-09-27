@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { CircleAlert } from 'lucide-react'
+import { CircleAlert, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { toast } from 'sonner'
@@ -59,6 +59,8 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
   const [dirty, setDirty] = useState<Set<string>>(new Set())
   const [savedAt, setSavedAt] = useState<string | null>(sheet.saved_at)
   const [confirm, setConfirm] = useState(false)
+  const [find, setFind] = useState('')
+  const [show, setShow] = useState<'all' | 'missing' | 'problems' | 'absent'>('all')
   const inputs = useRef<(HTMLInputElement | null)[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
   const max = sheet.max_mark
@@ -159,6 +161,19 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
     )
   }
 
+  const visible = sheet.rows
+    .map((s, i) => ({ s, n: i + 1 }))
+    .filter(({ s }) => {
+      const t = find.trim().toLowerCase()
+      return !t || s.name.toLowerCase().includes(t) || s.student_number.toLowerCase().includes(t)
+    })
+    .filter(({ s }) => {
+      const r = rows[s.student_id]
+      if (show === 'absent') return r.absent
+      if (show === 'problems') return !r.absent && !!problem(r.mark, max)
+      if (show === 'missing') return !r.absent && r.mark.trim() === ''
+      return true
+    })
   const due = new Date(sheet.due_at)
   // Rows with a problem wait in `dirty` until fixed, so they don't count as "saving".
   const waiting = [...dirty].some((id) => rows[id].absent || !problem(rows[id].mark, max))
@@ -212,6 +227,7 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
           </div>
         </div>
 
+        <div className="sticky top-14 z-[5] -mx-8 flex flex-col bg-background px-8">
         <div className="flex gap-8 border-y py-3 text-sm">
           <span>
             <span className="text-muted-foreground">Entered</span> <span className="font-mono font-semibold">{stats.entered}</span>
@@ -245,6 +261,47 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
           )}
         </div>
 
+        <div className="flex items-center gap-3 border-b py-3">
+          <div className="relative w-[300px]">
+            <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" strokeWidth={1.5} aria-hidden />
+            <input
+              type="search"
+              aria-label="Find a student"
+              placeholder="Find a student by name or number"
+              value={find}
+              onChange={(e) => setFind(e.target.value)}
+              className="h-9 w-full rounded-sm border border-input bg-card pr-2 pl-8 text-sm"
+            />
+          </div>
+          <select
+            aria-label="Show"
+            value={show}
+            onChange={(e) => setShow(e.target.value as typeof show)}
+            className="h-9 rounded-sm border border-input bg-card px-2 text-sm"
+          >
+            <option value="all">All students</option>
+            <option value="missing">Not entered yet</option>
+            <option value="problems">Marks to fix</option>
+            <option value="absent">Absent</option>
+          </select>
+          {(find || show !== 'all') && (
+            <span className="ml-auto text-sm text-muted-foreground" role="status">
+              {visible.length} of {sheet.rows.length} ·{' '}
+              <button
+                type="button"
+                className="text-primary underline underline-offset-2"
+                onClick={() => {
+                  setFind('')
+                  setShow('all')
+                }}
+              >
+                Clear
+              </button>
+            </span>
+          )}
+        </div>
+        </div>
+
         <Table
           head={
             <>
@@ -257,13 +314,13 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
             </>
           }
         >
-          {sheet.rows.map((s, i) => {
+          {visible.map(({ s, n }, i) => {
             const r = rows[s.student_id]
             const err = !r.absent ? problem(r.mark, max) : null
             const pct = !r.absent && r.mark.trim() !== '' && !err ? Math.round((Number(r.mark) / max) * 100) : null
             return (
               <tr key={s.student_id}>
-                <td className={cn(td, 'font-mono text-muted-foreground')}>{i + 1}</td>
+                <td className={cn(td, 'font-mono text-muted-foreground')}>{n}</td>
                 <td className={cn(td, 'font-mono')}>{s.student_number}</td>
                 <td className={td}>{s.name}</td>
                 <td className={td}>

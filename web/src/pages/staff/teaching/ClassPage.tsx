@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Check, Upload } from 'lucide-react'
+import { Check, Search, Upload } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
@@ -187,6 +187,56 @@ function UploadDialog({ c, open, onOpenChange }: { c: ClassData; open: boolean; 
   )
 }
 
+function SearchField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="relative w-[300px]">
+      <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" strokeWidth={1.5} aria-hidden />
+      <Input
+        type="search"
+        aria-label={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="h-9 pl-8 text-sm"
+      />
+    </div>
+  )
+}
+
+function Select({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+}) {
+  return (
+    <select
+      aria-label={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-9 rounded-sm border border-input bg-card px-2 text-sm"
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+const matches = (q: string, ...fields: (string | null | undefined)[]) => {
+  const t = q.trim().toLowerCase()
+  return !t || fields.some((f) => f?.toLowerCase().includes(t))
+}
+
+const LOW_ATTENDANCE = 75 // percent; shown in red
+
 export default function ClassPage() {
   const { id = '' } = useParams()
   const [params, setParams] = useSearchParams()
@@ -198,10 +248,51 @@ export default function ClassPage() {
     else p.delete('upload')
     setParams(p, { replace: true })
   }
+  const [query, setQuery] = useState<Record<Tab, string>>({ students: '', notes: '', assessments: '' })
+  const [attendance, setAttendance] = useState('all')
+  const [week, setWeek] = useState('all')
+  const [kind, setKind] = useState('all')
+  const [status, setStatus] = useState('all')
   const { data: c, isPending, error } = useClassPage(id)
   if (isPending) return <Skeleton className="m-8 h-96" />
   if (error || !c)
     return <p className="p-8 text-muted-foreground">{error instanceof ApiError ? error.message : "Couldn't load this class."}</p>
+
+  const now = new Date()
+  const q = query[tab]
+  const setQ = (v: string) => setQuery((x) => ({ ...x, [tab]: v }))
+  const pct = (s: ClassData['students'][number]) => (s.sessions ? Math.round((s.attended / s.sessions) * 100) : null)
+  const students = c.students
+    .map((s, i) => ({ ...s, n: i + 1 }))
+    .filter((s) => matches(q, s.name, s.student_number))
+    .filter((s) =>
+      attendance === 'low' ? (pct(s) ?? 100) < LOW_ATTENDANCE : attendance === 'none' ? s.sessions === 0 : true,
+    )
+  const weeks = [...new Set(c.notes.map((n) => n.week).filter((w): w is number => w !== null))].sort((a, b) => b - a)
+  const notes = c.notes.filter((n) => matches(q, n.title)).filter((n) => week === 'all' || String(n.week) === week)
+  const aStatus = (a: ClassData['assessments'][number]) =>
+    a.released ? 'published' : new Date(a.due_at) <= now ? 'to_mark' : 'upcoming'
+  const kinds = [...new Set(c.assessments.map((a) => a.kind))]
+  const assessments = c.assessments
+    .filter((a) => matches(q, a.title))
+    .filter((a) => kind === 'all' || a.kind === kind)
+    .filter((a) => status === 'all' || aStatus(a) === status)
+  const shown = { students: students.length, notes: notes.length, assessments: assessments.length }[tab]
+  const total = { students: c.students.length, notes: c.notes.length, assessments: c.assessments.length }[tab]
+  const filtered =
+    q.trim() !== '' ||
+    (tab === 'students' && attendance !== 'all') ||
+    (tab === 'notes' && week !== 'all') ||
+    (tab === 'assessments' && (kind !== 'all' || status !== 'all'))
+  const clear = () => {
+    setQ('')
+    if (tab === 'students') setAttendance('all')
+    if (tab === 'notes') setWeek('all')
+    if (tab === 'assessments') {
+      setKind('all')
+      setStatus('all')
+    }
+  }
 
   const slots = c.weekly_slots.map((s) => `${DAYS[s.day_of_week]} ${s.starts_at}${s.venue ? ` ${s.venue}` : ''}`).join(', ')
   return (
@@ -215,65 +306,141 @@ export default function ClassPage() {
           </Button>
         }
       />
-      <main className="flex flex-col gap-5 px-8 py-6">
-        <div className="flex flex-col gap-1">
+      <Tabs
+        value={tab}
+        onValueChange={(t) => {
+          const p = new URLSearchParams(params)
+          p.set('tab', t)
+          setParams(p, { replace: true })
+        }}
+        className="gap-0"
+      >
+        <div className="flex flex-col gap-1 px-8 pt-6 pb-4">
           <h1 className={staffH1}>
-            <span className="font-mono">{c.module_code}</span> {c.module_name} · <span className="font-mono">{c.class_group}</span>
+            <span className="font-mono">{c.module_code}</span> {c.module_name} ·{' '}
+            <span className="font-mono">{c.class_group}</span>
           </h1>
           <p className="text-sm text-muted-foreground">
             {c.students.length} students{slots && ` · ${slots}`}
           </p>
         </div>
-        <Tabs
-          value={tab}
-          onValueChange={(t) => {
-            const p = new URLSearchParams(params)
-            p.set('tab', t)
-            setParams(p, { replace: true })
-          }}
-          className="gap-5"
-        >
+        {/* Tabs and filters stay in view under the top bar while the list scrolls. */}
+        <div className="sticky top-14 z-[5] flex flex-col bg-background px-8">
           <TabsList>
-            <TabsTrigger value="students">Students</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="assessments">Assessments</TabsTrigger>
+            <TabsTrigger value="students">
+              Students <span className="font-mono text-sm">{c.students.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="notes">
+              Notes <span className="font-mono text-sm">{c.notes.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="assessments">
+              Assessments <span className="font-mono text-sm">{c.assessments.length}</span>
+            </TabsTrigger>
           </TabsList>
+          <div className="flex items-center gap-3 border-b py-3">
+          {tab === 'students' && (
+            <>
+              <SearchField value={q} onChange={setQ} placeholder="Search name or student number" />
+              <Select
+                label="Attendance"
+                value={attendance}
+                onChange={setAttendance}
+                options={[
+                  { value: 'all', label: 'Any attendance' },
+                  { value: 'low', label: `Below ${LOW_ATTENDANCE}%` },
+                  { value: 'none', label: 'No registers yet' },
+                ]}
+              />
+            </>
+          )}
+          {tab === 'notes' && (
+            <>
+              <SearchField value={q} onChange={setQ} placeholder="Search notes" />
+              <Select
+                label="Week"
+                value={week}
+                onChange={setWeek}
+                options={[{ value: 'all', label: 'All weeks' }, ...weeks.map((w) => ({ value: String(w), label: `Week ${w}` }))]}
+              />
+            </>
+          )}
+          {tab === 'assessments' && (
+            <>
+              <SearchField value={q} onChange={setQ} placeholder="Search assessments" />
+              <Select
+                label="Type"
+                value={kind}
+                onChange={setKind}
+                options={[{ value: 'all', label: 'All types' }, ...kinds.map((k) => ({ value: k, label: KIND_LABEL[k] }))]}
+              />
+              <Select
+                label="Status"
+                value={status}
+                onChange={setStatus}
+                options={[
+                  { value: 'all', label: 'Any status' },
+                  { value: 'to_mark', label: 'To mark' },
+                  { value: 'published', label: 'Published' },
+                  { value: 'upcoming', label: 'Coming up' },
+                ]}
+              />
+            </>
+          )}
+          <span className="ml-auto text-sm text-muted-foreground" role="status">
+            {filtered ? (
+              <>
+                {shown} of {total} ·{' '}
+                <button type="button" onClick={clear} className="text-primary underline underline-offset-2">
+                  Clear
+                </button>
+              </>
+            ) : (
+              `${total} ${tab === 'students' ? 'students' : tab === 'notes' ? 'notes' : 'assessments'}`
+            )}
+          </span>
+          </div>
+        </div>
 
+        <main className="px-8 pb-8">
           <TabsContent value="students">
-            <Table
-              head={
-                <>
-                  <th className={cn(th, 'w-10')}>#</th>
-                  <th className={cn(th, 'w-[170px]')}>Student no.</th>
-                  <th className={th}>Name</th>
-                  <th className={cn(th, 'w-[200px] text-right')}>Attendance</th>
-                </>
-              }
-            >
-              {c.students.map((s, i) => {
-                const pct = s.sessions ? Math.round((s.attended / s.sessions) * 100) : null
-                return (
-                  <tr key={s.id}>
-                    <td className={cn(td, 'font-mono text-muted-foreground')}>{i + 1}</td>
-                    <td className={cn(td, 'font-mono')}>{s.student_number}</td>
-                    <td className={td}>{s.name}</td>
-                    <td className={cn(td, 'text-right')}>
-                      {pct === null ? (
-                        <span className="text-muted-foreground">No registers yet</span>
-                      ) : (
-                        <span className={cn('font-mono', pct < 75 && 'font-medium text-destructive')}>
-                          {s.attended}/{s.sessions} · {pct}%
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </Table>
+            {students.length ? (
+              <Table
+                head={
+                  <>
+                    <th className={cn(th, 'w-10')}>#</th>
+                    <th className={cn(th, 'w-[170px]')}>Student no.</th>
+                    <th className={th}>Name</th>
+                    <th className={cn(th, 'w-[200px] text-right')}>Attendance</th>
+                  </>
+                }
+              >
+                {students.map((s) => {
+                  const p = pct(s)
+                  return (
+                    <tr key={s.id}>
+                      <td className={cn(td, 'font-mono text-muted-foreground')}>{s.n}</td>
+                      <td className={cn(td, 'font-mono')}>{s.student_number}</td>
+                      <td className={td}>{s.name}</td>
+                      <td className={cn(td, 'text-right')}>
+                        {p === null ? (
+                          <span className="text-muted-foreground">No registers yet</span>
+                        ) : (
+                          <span className={cn('font-mono', p < LOW_ATTENDANCE && 'font-medium text-destructive')}>
+                            {s.attended}/{s.sessions} · {p}%
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </Table>
+            ) : (
+              <p className="py-4 text-muted-foreground">No students match.</p>
+            )}
           </TabsContent>
 
           <TabsContent value="notes">
-            {c.notes.length ? (
+            {notes.length ? (
               <Table
                 head={
                   <>
@@ -286,7 +453,7 @@ export default function ClassPage() {
                   </>
                 }
               >
-                {c.notes.map((n) => (
+                {notes.map((n) => (
                   <tr key={n.first_material_id}>
                     <td className={cn(td, 'font-medium')}>{n.title}</td>
                     <td className={td}>{n.week ?? '–'}</td>
@@ -300,63 +467,69 @@ export default function ClassPage() {
                 ))}
               </Table>
             ) : (
-              <p className="text-muted-foreground">No notes shared with this class yet.</p>
+              <p className="py-4 text-muted-foreground">
+                {c.notes.length ? 'No notes match.' : 'No notes shared with this class yet.'}
+              </p>
             )}
           </TabsContent>
 
           <TabsContent value="assessments">
-            <Table
-              head={
-                <>
-                  <th className={cn(th, 'w-[110px]')}>Type</th>
-                  <th className={th}>Assessment</th>
-                  <th className={cn(th, 'w-20 text-right')}>Weight</th>
-                  <th className={cn(th, 'w-[170px]')}>Due</th>
-                  <th className={cn(th, 'w-[130px]')}>Marked</th>
-                  <th className={cn(th, 'w-[130px]')}>
-                    <span className="sr-only">Action</span>
-                  </th>
-                </>
-              }
-            >
-              {c.assessments.map((a) => {
-                const past = new Date(a.due_at) <= new Date()
-                return (
-                  <tr key={a.id}>
-                    <td className={td}>
-                      <Badge>{KIND_LABEL[a.kind]}</Badge>
-                    </td>
-                    <td className={cn(td, 'font-medium')}>{a.title}</td>
-                    <td className={cn(td, 'text-right font-mono')}>{a.weight}%</td>
-                    <td className={td}>{shortDateTime(new Date(a.due_at))}</td>
-                    <td className={td}>
-                      {a.released ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Check className="size-4 text-success" strokeWidth={1.5} aria-hidden />
-                          Published
-                        </span>
-                      ) : past ? (
-                        <span className="font-mono">
-                          {a.marked}/{c.students.length}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">Not yet</span>
-                      )}
-                    </td>
-                    <td className={cn(td, 'text-right')}>
-                      {past && (
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/staff/teaching/assessments/${a.id}/marks`}>{a.released ? 'View' : 'Marks'}</Link>
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </Table>
+            {assessments.length ? (
+              <Table
+                head={
+                  <>
+                    <th className={cn(th, 'w-[110px]')}>Type</th>
+                    <th className={th}>Assessment</th>
+                    <th className={cn(th, 'w-20 text-right')}>Weight</th>
+                    <th className={cn(th, 'w-[170px]')}>Due</th>
+                    <th className={cn(th, 'w-[130px]')}>Marked</th>
+                    <th className={cn(th, 'w-[130px]')}>
+                      <span className="sr-only">Action</span>
+                    </th>
+                  </>
+                }
+              >
+                {assessments.map((a) => {
+                  const st = aStatus(a)
+                  return (
+                    <tr key={a.id}>
+                      <td className={td}>
+                        <Badge>{KIND_LABEL[a.kind]}</Badge>
+                      </td>
+                      <td className={cn(td, 'font-medium')}>{a.title}</td>
+                      <td className={cn(td, 'text-right font-mono')}>{a.weight}%</td>
+                      <td className={td}>{shortDateTime(new Date(a.due_at))}</td>
+                      <td className={td}>
+                        {st === 'published' ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Check className="size-4 text-success" strokeWidth={1.5} aria-hidden />
+                            Published
+                          </span>
+                        ) : st === 'to_mark' ? (
+                          <span className="font-mono">
+                            {a.marked}/{c.students.length}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">Not yet</span>
+                        )}
+                      </td>
+                      <td className={cn(td, 'text-right')}>
+                        {st !== 'upcoming' && (
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/staff/teaching/assessments/${a.id}/marks`}>{a.released ? 'View' : 'Marks'}</Link>
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </Table>
+            ) : (
+              <p className="py-4 text-muted-foreground">No assessments match.</p>
+            )}
           </TabsContent>
-        </Tabs>
-      </main>
+        </main>
+      </Tabs>
       <UploadDialog c={c} open={uploadOpen} onOpenChange={setUpload} />
     </>
   )
