@@ -111,6 +111,8 @@ Must-have tests: ID check-letter samples (`08-2047823Q29`, `631222666S70`), elig
 
 ## 6.6 Importing existing data
 
+**Planned, not built yet** ([12](12-status-and-gaps.md)): the commands below are the design for the second release. Today only reference data and intakes load in production (`python -m app.setup`, §6.7).
+
 | Data | Command | Format |
 |------|---------|--------|
 | Programmes & modules | `python -m app.scripts.import_csv modules data/modules.csv` | `programme_code,module_code,name,credits,semester` |
@@ -124,29 +126,38 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 
 ## 6.7 Production deployment (Dokploy)
 
-[Dokploy](https://dokploy.com) runs the stack as a **Compose** application and provides TLS and routing through its built-in Traefik. There's no reverse proxy in this repo.
+[Dokploy](https://dokploy.com) runs the stack as a **Compose** application and provides TLS and routing through its built-in Traefik. There's no reverse proxy in this repo. The first release is **applications only** (landing page, sign-up, the applicant flow, Admissions and Accounts); students and staff tools follow once their data can be imported ([12](12-status-and-gaps.md)).
 
-1. **Server:** Ubuntu 24.04 with Dokploy installed. The firewall allows 80/443 (plus Dokploy's admin port from the staff network only), and SSH is restricted to admin IPs or VPN.
-2. **DNS:** point `portal.tcfl.ac.zw` at the server.
-3. **Create the application:** in Dokploy, go to **Create → Compose**, choose the git repository and branch `main`, and set **Compose path** to `docker-compose.prod.yml`.
-4. **Environment:** paste `.env.example` into the **Environment** tab and change these values for production:
-   - `APP_ENV=production` and `APP_URL=https://portal.tcfl.ac.zw`
-   - `OIDC_ISSUER=https://portal.tcfl.ac.zw/auth/application/o/tcfl-portal/`
-   - `OIDC_REDIRECT_URI=https://portal.tcfl.ac.zw/api/auth/callback`
-   - Keep `OIDC_INTERNAL_BASE_URL=http://authentik-server:9000` so back-channel calls stay on the internal network.
-   - Replace every secret. Replace the `AUTHENTIK_BOOTSTRAP_*` values with a named admin account, and give the portal a dedicated, narrowly scoped service-account token ([10 §10.9](10-authentication.md#109-hardening-checklist)).
-5. **Domains** (Domains tab), all on host `portal.tcfl.ac.zw` with HTTPS and Let's Encrypt:
+1. **Server:** Ubuntu 24.04 with Dokploy installed, at least 4 GB RAM and 2 CPUs (Authentik, Postgres ×2, the API with Tesseract). The firewall allows 80/443, plus Dokploy's admin port from the staff network only. SSH is restricted to admin IPs or VPN. Keep it on TelOne/TCFL infrastructure or in a Zimbabwe data centre ([07](07-security-and-compliance.md)).
+2. **DNS:** point the portal's domain (for example `portal.tcfl.ac.zw`) at the server.
+3. **Environment:** on your own machine, run `python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production`. It fills [.env.production.example](../.env.production.example) with a fresh random value for every secret. Keep the file out of git and somewhere safe (a password manager): it's needed to restore backups.
+4. **Create the application:** in Dokploy, **Create → Compose**, choose the git repository and branch `main`, set **Compose path** to `docker-compose.prod.yml`, and paste `.env.production` into the **Environment** tab.
+5. **Domains** (Domains tab), all on the portal's host, HTTPS with Let's Encrypt:
 
    | Service | Port | Path | Strip path |
    |---------|------|------|------------|
-   | `web` | 80 | `/` | — |
+   | `web` | 80 | `/` | off |
    | `api` | 8000 | `/api` | **on** |
    | `authentik-server` | 9000 | `/auth` | **off** (Authentik expects the `/auth/` prefix) |
 
-6. **Restrict Authentik's admin UI:** add a Traefik `ipAllowList` middleware (staff LAN/VPN ranges) for `PathPrefix(/auth/if/admin)` and `PathPrefix(/auth/api/v3/admin)`. Use Dokploy's advanced Traefik config or labels on `authentik-server`.
-7. **Deploy:** click **Deploy** (or enable auto-deploy on push). After each deploy, run migrations from the `api` service's terminal in Dokploy: `alembic upgrade head`.
-8. **Scale OCR during intake:** the `worker` service (target `worker` in `api/Dockerfile`) is added to the compose files once the Celery app exists. Raise its replicas in Dokploy the day before intake opens.
-9. **Hosting location:** keep the server on TelOne/TCFL infrastructure or in a Zimbabwe-based data centre to simplify data-protection compliance. If it's hosted outside Zimbabwe, declare it on the POTRAZ licence (see [07](07-security-and-compliance.md)).
+6. **Restrict Authentik's admin:** add a Traefik `ipAllowList` middleware (staff LAN/VPN ranges) for `PathPrefix(/auth/if/admin)` and `PathPrefix(/auth/api/v3/admin)`, through Dokploy's advanced Traefik settings or labels on `authentik-server`.
+7. **Deploy.** The API runs migrations and creates its storage buckets every time it starts. Authentik applies the blueprints in `infra/authentik/blueprints/` (groups, the portal's OIDC client, the sign-in and sign-up flows) within a minute or two.
+8. **Load the college's data** from the `api` service's terminal in Dokploy:
+   ```bash
+   python -m app.setup reference                     # programmes, entry rules, district codes, ZIMSEC subjects
+   python -m app.setup intake --code 2027-FEB --name "2027 intake" \
+       --opens 2026-10-01 --closes 2026-11-30 --classes-start 2027-02-01   # the real dates
+   python -m app.setup check                         # must end with "Ready."
+   ```
+   Fuller district and subject lists: `python -m app.setup reference --districts districts.csv --subjects subjects.csv` (columns `code,district,province` and `code,name`).
+9. **Authentik:** sign in at `/auth/if/admin/` as `akadmin` with `AUTHENTIK_BOOTSTRAP_PASSWORD`.
+   - Create a named admin account for each ICT administrator (group `authentik Admins`), then deactivate `akadmin`.
+   - Create a service account for the portal, and a token for it under **Directory → Tokens**. Put the token in `AUTHENTIK_API_TOKEN` and redeploy: password reset by code needs it.
+   - Create the staff who'll use this release and add them to their groups: **`portal-admissions`** (Admissions officers), **`portal-accounts`** (Accounts). Their portal roles follow the groups at every sign-in.
+10. **Try it** before announcing: apply as a test applicant on a phone, pay by cash, confirm the payment as Accounts, review and decide as Admissions. Then delete the test applicant in Authentik.
+11. **Updates:** push to `main` and click **Deploy** (or turn on auto-deploy). Settings that only Authentik reads (for example `SIGNUP_VERIFY_PHONE`, `GOOGLE_CLIENT_ID`, `AUTHENTIK_EMAIL__HOST`) need the Authentik services restarted too, so the blueprints pick them up.
+
+**Opening the student portal later:** import students, staff and modules (not built yet, [12](12-status-and-gaps.md)), set `STUDENT_PORTAL_OPEN=true`, and add staff to `portal-lecturers`, `portal-librarians` and `portal-student-affairs`.
 
 `VITE_*` variables (if any are added) are baked in at **build** time, so redeploy after changing them.
 
