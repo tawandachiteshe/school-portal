@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, Outlet } from 'react-router'
 import { RequireAuth } from '@/components/shell/require-auth'
 import { StaffIndex, StaffShell } from '@/components/shell/staff-shell'
 import { StudentRoot, StudentShell } from '@/components/shell/student-shell'
@@ -6,6 +6,11 @@ import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
+import ApplyIndex from '@/pages/apply/ApplyIndex'
+import ApplyOffer from '@/pages/apply/Offer'
+import ApplyProgramme from '@/pages/apply/Programme'
+import ApplyStatus from '@/pages/apply/Status'
+import StepPending from '@/pages/apply/StepPending'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
 import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
@@ -67,6 +72,25 @@ export const router = createBrowserRouter([
       },
       { path: '/announcements', element: <AnnouncementsList /> },
       { path: '/announcements/:id', element: <AnnouncementDetail /> },
+    ],
+  },
+  {
+    // Applicants (docs/design-handoff.md "Applicant onboarding").
+    path: '/apply',
+    element: (
+      <RequireAuth roles={['applicant']}>
+        <Outlet />
+      </RequireAuth>
+    ),
+    children: [
+      { index: true, element: <ApplyIndex /> },
+      { path: 'programme', element: <ApplyProgramme /> },
+      { path: 'id', element: <StepPending step={2} /> },
+      { path: 'results', element: <StepPending step={3} /> },
+      { path: 'review', element: <StepPending step={4} /> },
+      { path: 'submit', element: <StepPending step={5} /> },
+      { path: 'status', element: <ApplyStatus /> },
+      { path: 'offer', element: <ApplyOffer /> },
     ],
   },
   {

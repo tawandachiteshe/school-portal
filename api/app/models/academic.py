@@ -31,6 +31,7 @@ class Programme(Base):
     duration_terms: Mapped[int] = mapped_column(SmallInteger)
     entry_rules: Mapped[dict] = mapped_column(JSONB, server_default="{}")
     is_accepting_applications: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    award: Mapped[str | None] = mapped_column(Text)  # "HEXCO National Diploma"
 
     department: Mapped[Department | None] = relationship()
 

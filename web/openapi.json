@@ -2792,6 +2792,178 @@
           }
         }
       }
+    },
+    "/apply/programmes": {
+      "get": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "Programmes",
+        "operationId": "programmes",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProgrammeChoice"
+                  },
+                  "type": "array",
+                  "title": "Response Programmes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/application": {
+      "get": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "My Application",
+        "operationId": "my_application",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MyApplication"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response My Application"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/application/programme": {
+      "put": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "Choose Programme",
+        "description": "Starts the application on first choice; the programme can change until it's submitted.",
+        "operationId": "choose_programme",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgrammeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyApplication"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/application/withdraw": {
+      "post": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "Withdraw",
+        "operationId": "withdraw",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyApplication"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/offer": {
+      "post": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "Answer Offer",
+        "operationId": "answer_offer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyApplication"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/offer/letter.pdf": {
+      "get": {
+        "tags": [
+          "apply"
+        ],
+        "summary": "Offer Letter",
+        "operationId": "offer_letter",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3207,6 +3379,17 @@
           "withdrawn"
         ],
         "title": "ApplicationStatus"
+      },
+      "ApplyStep": {
+        "type": "string",
+        "enum": [
+          "programme",
+          "national_id",
+          "results",
+          "review",
+          "submit"
+        ],
+        "title": "ApplyStep"
       },
       "AssessmentKind": {
         "type": "string",
@@ -5051,6 +5234,25 @@
         ],
         "title": "Identity"
       },
+      "InfoRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "at"
+        ],
+        "title": "InfoRequest"
+      },
       "IssueIn": {
         "properties": {
           "person_id": {
@@ -6139,6 +6341,171 @@
         ],
         "title": "ModuleSummary"
       },
+      "MyApplication": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "programme_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Programme Id"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "intake": {
+            "type": "string",
+            "title": "Intake"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "initials": {
+            "type": "string",
+            "title": "Initials"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "review_started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Started At"
+          },
+          "decision_expected_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Expected By"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Reason"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/components/schemas/InfoRequest"
+            },
+            "type": "array",
+            "title": "Requests"
+          },
+          "steps": {
+            "$ref": "#/components/schemas/Steps"
+          },
+          "next_step": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplyStep"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phone_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Masked"
+          },
+          "offer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Offer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "status",
+          "programme_id",
+          "programme",
+          "intake",
+          "name",
+          "initials",
+          "created_at",
+          "submitted_at",
+          "review_started_at",
+          "decision_expected_by",
+          "decided_at",
+          "decision_reason",
+          "requests",
+          "steps",
+          "next_step",
+          "phone_masked",
+          "offer"
+        ],
+        "title": "MyApplication"
+      },
       "NextPayment": {
         "properties": {
           "label": {
@@ -6420,6 +6787,97 @@
         ],
         "title": "Notice"
       },
+      "Offer": {
+        "properties": {
+          "starts_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "accept_by": {
+            "type": "string",
+            "format": "date",
+            "title": "Accept By"
+          },
+          "registration_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration At"
+          },
+          "registration_place": {
+            "type": "string",
+            "title": "Registration Place"
+          },
+          "accepted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "declined_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declined At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_on",
+          "accept_by",
+          "registration_at",
+          "registration_place",
+          "accepted_at",
+          "declined_at"
+        ],
+        "title": "Offer"
+      },
+      "OfferAnswer": {
+        "type": "string",
+        "enum": [
+          "accept",
+          "decline"
+        ],
+        "title": "OfferAnswer"
+      },
+      "OfferIn": {
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/OfferAnswer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer"
+        ],
+        "title": "OfferIn"
+      },
       "OverdueList": {
         "properties": {
           "loans": {
@@ -6631,6 +7089,66 @@
           "received_bytes"
         ],
         "title": "PendingUpload"
+      },
+      "ProgrammeChoice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "award": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Award"
+          },
+          "length": {
+            "type": "string",
+            "title": "Length"
+          },
+          "entry": {
+            "type": "string",
+            "title": "Entry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "award",
+          "length",
+          "entry"
+        ],
+        "title": "ProgrammeChoice"
+      },
+      "ProgrammeIn": {
+        "properties": {
+          "programme_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Programme Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "programme_id"
+        ],
+        "title": "ProgrammeIn"
       },
       "ProgrammeOption": {
         "properties": {
@@ -8163,6 +8681,29 @@
           "position"
         ],
         "title": "StaffInfo"
+      },
+      "Steps": {
+        "properties": {
+          "programme": {
+            "type": "boolean",
+            "title": "Programme"
+          },
+          "national_id": {
+            "type": "boolean",
+            "title": "National Id"
+          },
+          "results": {
+            "type": "boolean",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "programme",
+          "national_id",
+          "results"
+        ],
+        "title": "Steps"
       },
       "StudentInfo": {
         "properties": {

@@ -54,6 +54,13 @@ class Settings(BaseSettings):
     results_remark_days: int = 14  # design/Results: published 16 July, re-mark until 30 July
     results_notice: str = "These results are provisional until confirmed by HEXCO."
 
+    # Admissions (design/Status, OfferReceived). Confirm with admissions.
+    admissions_decision_working_days: int = 14  # "Decision expected by Fri 30 October" after 12 October
+    offer_accept_days: int = 25  # decided 19 October, accept by 13 November
+    registration_time: str = "08:00"  # "Register on Monday 1 February, 08:00"
+    registration_location: str = "Block A"
+    application_fee_usd: str = "20.00"
+
     ocr_llm_mode: str = "fallback"  # off | fallback | always
     claude_model: str = "claude-opus-5"
     assistant_enabled: bool = True

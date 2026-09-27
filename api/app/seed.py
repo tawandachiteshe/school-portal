@@ -141,6 +141,7 @@ class Seeder:
 
         dit = Programme(
             code="DIT",
+            award="HEXCO National Diploma",
             name="Diploma in Information Technology",
             level="diploma",
             department=ict,
@@ -149,6 +150,7 @@ class Seeder:
         )
         dse = Programme(
             code="DSE",
+            award="HEXCO National Diploma",
             name="Diploma in Software Engineering",
             level="diploma",
             department=ict,
@@ -157,6 +159,7 @@ class Seeder:
         )
         dte = Programme(
             code="DTE",
+            award="HEXCO National Diploma",
             name="Diploma in Telecommunications Engineering",
             level="diploma",
             department=tel,
@@ -168,6 +171,7 @@ class Seeder:
         )
         ccn = Programme(
             code="CCN",
+            award="HEXCO National Certificate",
             name="Certificate in Computer Networking",
             level="certificate",
             department=ict,
@@ -292,11 +296,12 @@ class Seeder:
             "TCFL/2027/0142",
             surname="Moyo",
             first_names="Tariro",
-            roles=["student"],
+            # Still an applicant too: her application is in review (design/Status, StaffReview).
+            roles=["student", "applicant"],
             phone="+263773184521",
             email="tariro.moyo@students.tcfl.ac.zw",
             gender="female",
-            date_of_birth=date(2006, 4, 17),
+            date_of_birth=date(2006, 5, 14),
         )
         student = Student(
             person=tariro,

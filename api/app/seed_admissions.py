@@ -553,8 +553,21 @@ class AdmissionsSeed:
                     app.decided_by, app.decided_at, app.decision_reason = self.officer.id, decided, a.decision
         return app
 
+    def dev_applicant(self) -> None:
+        """A new applicant with nothing started, to try the application flow from the beginning.
+        Applicant usernames are the phone number without '+' (docs/design-handoff.md)."""
+        u = User(
+            idp_subject="seed:263772345678",
+            username="263772345678",
+            display_name="Chiedza Nyoni",
+            phone="+263772345678",
+        )
+        u.roles = [UserRole(role="applicant", idp_group="portal-applicants")]
+        self.db.add_all([u, Person(surname="Nyoni", first_names="Chiedza", user=u)])
+
     async def run(self, tariro: Person) -> None:
         self.reference_data()
+        self.dev_applicant()
         # design/StaffReview: Tariro's application, in review with C. Marufu.
         tariro_app = Applicant(
             "APP-27-08813",

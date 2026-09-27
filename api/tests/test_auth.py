@@ -22,7 +22,7 @@ async def test_student_me():
         me = (await c.get("/me")).json()
     assert me["display_name"] == "Tariro Moyo"
     assert me["initials"] == "TM"
-    assert me["roles"] == ["student"]
+    assert me["roles"] == ["applicant", "student"]  # her application is still on record
     assert me["student"] == {
         "student_number": "TCFL/2027/0142",
         "programme_code": "DIT",

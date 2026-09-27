@@ -77,6 +77,8 @@ class Application(Base):
     consent_processing_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     consent_ai_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    offer_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    offer_declined_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
