@@ -182,3 +182,32 @@ async def test_birth_certificate_on_the_review_page():
     async with signed_in("cmarufu") as c:
         r = (await c.get("/staff/admissions/applications/APP-27-08813")).json()
     assert r["identity"]["birth_certificate_id"] and r["identity"]["birth_name"] == "TARIRO MOYO"
+
+
+def test_parse_real_card_noise():
+    """Specks after a name, small-caps labels ("FIrsT NAME") and the citizenship code after the number."""
+    text = (
+        "REPUBLIC OF ZIMBABWE g f\nID NUMBER 63-2438247 B 49 CIT M\nSURNAME CHITESHE 2\n"
+        "FIrsT NAME TAWANDA NYASHA\nDATE OF BIRTH 26/06/1999\n"
+    )
+    r = parse(text, 0.8)
+    assert (r.id_number, r.surname, r.first_names, r.date_of_birth) == (
+        "63-2438247 B 49",
+        "CHITESHE",
+        "TAWANDA NYASHA",
+        date(1999, 6, 26),
+    )
+
+
+def test_photo_variants():
+    import io
+
+    from PIL import Image
+
+    from app.ocr.id_reader import _variants
+
+    buf = io.BytesIO()
+    Image.new("RGB", (800, 500), (200, 210, 255)).save(buf, format="JPEG")
+    out = _variants(buf.getvalue())
+    assert len(out) == 3 and Image.open(io.BytesIO(out[0])).size == (1600, 1000)  # blue channel, enlarged
+    assert _variants(b"not an image") == [b"not an image"]

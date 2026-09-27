@@ -62,6 +62,45 @@ DOB = re.compile(r"\b(\d{2})\s*[/.-]\s*(\d{2})\s*[/.-]\s*(\d{4})\b")
 NAME = re.compile(r"^[A-Z][A-Z' -]{1,40}$")
 
 
+def _clean_name(value: str) -> str:
+    """'CHITESHE 2' → 'CHITESHE': drop specks OCR reads as digits, marks or lone letters."""
+    words = [w for w in re.sub(r"[^A-Z' -]", " ", value.upper()).split() if len(w.strip("'-")) >= 2]
+    return " ".join(words)
+
+
+def _variants(image: bytes) -> list[bytes]:
+    """The photo, and copies that read better: the blue channel (drops the blue hologram and the
+    yellow band on plastic IDs), stretched to full contrast, and a plain grey copy, both enlarged
+    when small. Without Pillow, only the photo."""
+    try:
+        from PIL import Image, ImageOps
+    except ImportError:
+        return [image]
+    try:
+        img = Image.open(io.BytesIO(image))
+        img = ImageOps.exif_transpose(img).convert("RGB")
+    except Exception:
+        return [image]
+    if img.width < 1600:
+        img = img.resize((img.width * 2, img.height * 2), Image.Resampling.LANCZOS)
+    out = []
+    for band in (img.getchannel("B"), ImageOps.grayscale(img)):
+        buf = io.BytesIO()
+        ImageOps.autocontrast(band, cutoff=1).save(buf, format="PNG")
+        out.append(buf.getvalue())
+    return [*out, image]
+
+
+def _score(r: "IdReading") -> tuple[int, float]:
+    fields = [r.id_number, r.surname, r.first_names, r.date_of_birth]
+    d = decode(r.id_number or "")
+    confs = list(r.confidence.values())
+    return (
+        sum(f is not None for f in fields) + (1 if d and d.check_letter_valid else 0),
+        sum(confs) / len(confs) if confs else 0,
+    )
+
+
 def parse(text: str, confidence: float) -> IdReading:
     """ID card text → fields. Labels are followed by the value on the same line or the next."""
     r = IdReading(text=text, engine="tesseract")
@@ -75,7 +114,7 @@ def parse(text: str, confidence: float) -> IdReading:
             m = rx.match(ln)
             if not m:
                 continue
-            value = m[1].strip() or (lines[i + 1] if i + 1 < len(lines) else "")
+            value = _clean_name(m[1].strip() or (lines[i + 1] if i + 1 < len(lines) else ""))
             if NAME.match(value):
                 setattr(r, key, value)
                 r.confidence[key] = confidence
@@ -159,8 +198,20 @@ def read_national_id(image: bytes, mime: str, *, allow_llm: bool) -> IdReading:
     s = get_settings()
     reading = IdReading()
     if mime in READABLE:
-        text, conf = _tesseract(image)
-        reading = parse(text, conf) if text else reading
+        # First complete reading wins; otherwise the one with the most fields.
+        for variant in _variants(image):
+            text, conf = _tesseract(variant)
+            if not text:
+                continue
+            r = parse(text, conf)
+            if _score(r) > _score(reading):
+                reading = r
+            if (
+                reading.complete
+                and decode(reading.id_number or "")
+                and decode(reading.id_number).check_letter_valid
+            ):
+                break
     low = any(v < s.ocr_min_confidence for v in reading.confidence.values())
     want_llm = s.ocr_llm_mode == "always" or (s.ocr_llm_mode == "fallback" and (not reading.complete or low))
     if allow_llm and want_llm and mime in READABLE:
