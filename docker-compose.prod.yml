@@ -38,7 +38,13 @@ services:
   api:
     build: { context: ./api, target: prod }
     env_file: .env
-    command: sh -c "alembic upgrade head && exec gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app"
+    # Migrations and storage buckets on every start (both are safe to repeat), then the API.
+    command: >-
+      sh -c "alembic upgrade head && python -m app.storage &&
+      exec gunicorn -k uvicorn.workers.UvicornWorker -w $${WEB_CONCURRENCY:-2} -b 0.0.0.0:8000 app.main:app"
+    environment:
+      # Only Traefik reaches the API: trust its X-Forwarded-For, so audit logs keep the visitor's IP.
+      FORWARDED_ALLOW_IPS: "*"
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }

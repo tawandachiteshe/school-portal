@@ -33,31 +33,9 @@ from app.models import (
     ZimsecSubject,
 )
 from app.ocr.national_id import expected_letter
+from app.reference_data import DISTRICTS, SUBJECTS
 from app.services import clock
 
-# docs/01 §1.3 examples. The full list is reference data admissions maintain.
-DISTRICTS = {
-    "02": ("Beitbridge", "Matabeleland South"),
-    "08": ("Bulawayo", "Bulawayo"),
-    "22": ("Masvingo", "Masvingo"),
-    "29": ("Gweru", "Midlands"),
-    "58": ("Kwekwe", "Midlands"),
-    "63": ("Harare", "Harare"),
-    "75": ("Mutare", "Manicaland"),
-}
-
-SUBJECTS = {
-    "1122": "English Language",
-    "4004": "Mathematics",
-    "5009": "Physical Science",
-    "4021": "Computer Science",
-    "2248": "Geography",
-    "3159": "Shona",
-    "2167": "History",
-    "4006": "Combined Science",
-    "7116": "Principles of Accounts",
-    "5008": "Biology",
-}
 CODE = {v: k for k, v in SUBJECTS.items()}
 
 

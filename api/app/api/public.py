@@ -40,6 +40,7 @@ class PublicHome(BaseModel):
     classes_start: date | None
     registration_place: str
     admissions_contact: str  # "" until confirmed
+    students_open: bool  # False while only applications are live (STUDENT_PORTAL_OPEN)
 
 
 @router.get("/home")
@@ -82,4 +83,5 @@ async def public_home(db: AsyncSession = Depends(get_db)) -> PublicHome:
         classes_start=starts,
         registration_place=s.registration_location,
         admissions_contact=s.admissions_contact,
+        students_open=s.student_portal_open,
     )

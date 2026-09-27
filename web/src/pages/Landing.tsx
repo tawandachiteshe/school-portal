@@ -43,7 +43,8 @@ const STUDENTS = [
 // "Applying for the 2027 intake": the intake's name, when there is one.
 const intakeLabel = (home?: PublicHome) => home?.intake?.name ?? 'the next intake'
 
-function Header() {
+function Header({ studentsOpen }: { studentsOpen: boolean }) {
+  const nav = studentsOpen ? NAV : NAV.filter((n) => n.href !== '#students')
   const [open, setOpen] = useState(false)
   return (
     <header className="sticky top-0 z-10 border-b bg-card">
@@ -53,7 +54,7 @@ function Header() {
             <Wordmark />
           </Link>
           <nav aria-label="Main" className="hidden gap-7 text-sm md:flex">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <a key={n.href} href={n.href} className="hover:underline">
                 {n.label}
               </a>
@@ -87,7 +88,7 @@ function Header() {
       {open && (
         <nav id="landing-menu" aria-label="Main" className="border-t px-4 md:hidden">
           <ul className="divide-y">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <li key={n.href}>
                 <a href={n.href} onClick={() => setOpen(false)} className="flex min-h-12 items-center">
                   {n.label}
@@ -217,11 +218,12 @@ const lead = 'text-muted-foreground md:text-lg md:leading-7'
 
 export default function Landing() {
   const { data: home } = usePublicHome({ query: { staleTime: 5 * 60_000 } })
+  const studentsOpen = home?.students_open ?? true
   const applyLabel = home?.intake?.open ? `Apply for the ${home.intake.name}` : 'Start an application'
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <Header />
+      <Header studentsOpen={home?.students_open ?? true} />
       <main className="flex flex-col">
         {/* Hero */}
         <div className="border-b">
@@ -234,8 +236,14 @@ export default function Landing() {
                 Apply, study and keep up with college in one place.
               </h1>
               <p className="max-w-[600px] text-[17px] leading-[26px] text-muted-foreground md:text-xl md:leading-[30px]">
-                Apply for the {intakeLabel(home)} from your phone, with no forms to print. Students see their timetable, deadlines, notes and
-                results here<span className="hidden md:inline">, instead of on notice boards, WhatsApp groups and office counters</span>.
+                Apply for the {intakeLabel(home)} from your phone, with no forms to print.
+                {studentsOpen && (
+                  <>
+                    {' '}
+                    Students see their timetable, deadlines, notes and results here
+                    <span className="hidden md:inline">, instead of on notice boards, WhatsApp groups and office counters</span>.
+                  </>
+                )}
               </p>
               <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
                 <Button asChild className="md:h-12 md:px-5">
@@ -338,30 +346,32 @@ export default function Landing() {
           </section>
         </div>
 
-        {/* Students */}
-        <div className="border-b">
-          <section id="students" aria-labelledby="h-stu" className={cn(section, 'flex scroll-mt-16 flex-col gap-5 md:gap-8')}>
-            <div className="flex max-w-[720px] flex-col gap-1 md:gap-2">
-              <h2 id="h-stu" className={h2}>
-                Already a student?
-              </h2>
-              <p className={lead}>Sign in with your student number. Everything the college sends you is in one place.</p>
-            </div>
-            <div className="grid gap-5 md:grid-cols-3 md:gap-12">
-              {STUDENTS.map(([title, body]) => (
-                <div key={title} className="flex flex-col gap-1.5 border-t-2 border-foreground pt-3 md:gap-2 md:pt-4">
-                  <h3 className="text-lg leading-6 font-semibold">{title}</h3>
-                  <p className="text-sm text-muted-foreground md:text-base">{body}</p>
-                </div>
-              ))}
-            </div>
-            <div>
-              <Button variant="outline" asChild className="w-full md:w-auto">
-                <Link to="/login">Sign in with your student number</Link>
-              </Button>
-            </div>
-          </section>
-        </div>
+        {/* Students: hidden while only applications are live (STUDENT_PORTAL_OPEN) */}
+        {studentsOpen && (
+          <div className="border-b">
+            <section id="students" aria-labelledby="h-stu" className={cn(section, 'flex scroll-mt-16 flex-col gap-5 md:gap-8')}>
+              <div className="flex max-w-[720px] flex-col gap-1 md:gap-2">
+                <h2 id="h-stu" className={h2}>
+                  Already a student?
+                </h2>
+                <p className={lead}>Sign in with your student number. Everything the college sends you is in one place.</p>
+              </div>
+              <div className="grid gap-5 md:grid-cols-3 md:gap-12">
+                {STUDENTS.map(([title, body]) => (
+                  <div key={title} className="flex flex-col gap-1.5 border-t-2 border-foreground pt-3 md:gap-2 md:pt-4">
+                    <h3 className="text-lg leading-6 font-semibold">{title}</h3>
+                    <p className="text-sm text-muted-foreground md:text-base">{body}</p>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <Button variant="outline" asChild className="w-full md:w-auto">
+                  <Link to="/login">Sign in with your student number</Link>
+                </Button>
+              </div>
+            </section>
+          </div>
+        )}
 
         {/* Dates and help */}
         <div className={cn(section, 'grid gap-8 md:grid-cols-2 md:gap-20')}>

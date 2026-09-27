@@ -52,6 +52,7 @@ from app.models import (
     Venue,
 )
 from app.pdf import make_pdf
+from app.reference_data import DEPARTMENTS, PROGRAMMES
 from app.seed_admissions import AdmissionsSeed
 from app.services import clock
 
@@ -85,13 +86,6 @@ TABLES = [
     "district_codes",
     "zimsec_subjects",
 ]
-
-ENGLISH_MATHS = {
-    "min_passes": 5,
-    "min_grade": "C",
-    "level": "O",
-    "required_subjects": ["English Language", "Mathematics"],
-}
 
 
 def term_start(today: date) -> date:
@@ -136,50 +130,22 @@ class Seeder:
     async def run(self) -> None:
         start = term_start(self.today)
 
-        ict = Department(code="ICT", name="Information and Communication Technology")
-        tel = Department(code="TEL", name="Telecommunications Engineering")
-        self.db.add_all([ict, tel])
-
-        dit = Programme(
-            code="DIT",
-            award="HEXCO National Diploma",
-            name="Diploma in Information Technology",
-            level="diploma",
-            department=ict,
-            duration_terms=6,
-            entry_rules=ENGLISH_MATHS,
-        )
-        dse = Programme(
-            code="DSE",
-            award="HEXCO National Diploma",
-            name="Diploma in Software Engineering",
-            level="diploma",
-            department=ict,
-            duration_terms=6,
-            entry_rules=ENGLISH_MATHS,
-        )
-        dte = Programme(
-            code="DTE",
-            award="HEXCO National Diploma",
-            name="Diploma in Telecommunications Engineering",
-            level="diploma",
-            department=tel,
-            duration_terms=6,
-            entry_rules={
-                **ENGLISH_MATHS,
-                "required_subjects": ["English Language", "Mathematics", "Physical Science"],
-            },
-        )
-        ccn = Programme(
-            code="CCN",
-            award="HEXCO National Certificate",
-            name="Certificate in Computer Networking",
-            level="certificate",
-            department=ict,
-            duration_terms=4,
-            entry_rules=ENGLISH_MATHS,
-        )
-        self.db.add_all([dit, dse, dte, ccn])
+        depts = {code: Department(code=code, name=name) for code, name in DEPARTMENTS.items()}
+        progs = {
+            code: Programme(
+                code=code,
+                name=p.name,
+                award=p.award,
+                level=p.level,
+                department=depts[p.department],
+                duration_terms=p.terms,
+                entry_rules=p.entry_rules,
+            )
+            for code, p in PROGRAMMES.items()
+        }
+        self.db.add_all([*depts.values(), *progs.values()])
+        ict, tel = depts["ICT"], depts["TEL"]
+        dit, dse, dte, ccn = (progs[c] for c in ("DIT", "DSE", "DTE", "CCN"))
 
         term = AcademicTerm(
             code="2027-S1",

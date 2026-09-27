@@ -98,6 +98,9 @@ class Settings(BaseSettings):
     ocr_claude_model: str = "claude-sonnet-5"
     # Ask TCFL (docs/04). ASSISTANT_ENABLED=false hides it everywhere. Without ANTHROPIC_API_KEY it
     # says it isn't set up yet.
+    # First release is applications only (docs/12): until students are imported, the landing page
+    # doesn't advertise the student portal.
+    student_portal_open: bool = True
     assistant_enabled: bool = True
     assistant_model: str = "claude-sonnet-5"
     assistant_max_tokens: int = 1200  # per answer

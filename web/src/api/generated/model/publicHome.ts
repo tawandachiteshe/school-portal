@@ -16,4 +16,5 @@ export interface PublicHome {
   classes_start: string | null;
   registration_place: string;
   admissions_contact: string;
+  students_open: boolean;
 }

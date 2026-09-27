@@ -11978,6 +11978,10 @@
           "admissions_contact": {
             "type": "string",
             "title": "Admissions Contact"
+          },
+          "students_open": {
+            "type": "boolean",
+            "title": "Students Open"
           }
         },
         "type": "object",
@@ -11989,7 +11993,8 @@
           "registration_at",
           "classes_start",
           "registration_place",
-          "admissions_contact"
+          "admissions_contact",
+          "students_open"
         ],
         "title": "PublicHome"
       },

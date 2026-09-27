@@ -49,11 +49,13 @@ entries:
       authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
       # Signing out of the portal ends the Authentik session too, then comes back to /login.
       invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
+      # The portal's own address (APP_URL: https://portal.tcfl.ac.zw in production, the Vite dev
+      # server in development).
       redirect_uris:
-        - { matching_mode: strict, url: "http://localhost:5173/api/auth/callback" }
-        - { matching_mode: strict, url: "https://portal.tcfl.ac.zw/api/auth/callback" }
-        - { matching_mode: strict, url: "http://localhost:5173/login", redirect_uri_type: logout }
-        - { matching_mode: strict, url: "https://portal.tcfl.ac.zw/login", redirect_uri_type: logout }
+        - { matching_mode: strict, url: !Format ["%s/api/auth/callback", !Env [APP_URL, "http://localhost:5173"]] }
+        - matching_mode: strict
+          url: !Format ["%s/login", !Env [APP_URL, "http://localhost:5173"]]
+          redirect_uri_type: logout
       sub_mode: user_uuid
       access_token_validity: minutes=5
       refresh_token_validity: days=14
@@ -68,4 +70,4 @@ entries:
     attrs:
       name: TCFL Portal
       provider: !KeyOf provider
-      meta_launch_url: https://portal.tcfl.ac.zw/
+      meta_launch_url: !Format ["%s/", !Env [APP_URL, "http://localhost:5173"]]
