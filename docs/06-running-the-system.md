@@ -134,18 +134,11 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 4. **Create the application:** in Dokploy, **Create → Compose**, choose the git repository and branch `main`, set **Compose path** to `docker-compose.prod.yml`, and paste `.env.production` into the **Environment** tab.
 5. **Routing** is in the Traefik labels in `docker-compose.prod.yml`, from `APP_HOST` and `ID_HOST`: nothing to add in Dokploy's **Domains** tab (remove any domains added there, or Traefik gets two routes for one host). The web, api and authentik-server containers join Dokploy's `dokploy-network`.
 
-   **Cloudflare in front** (how the labels are set up): Cloudflare holds the certificate and reaches the server over plain http, so the routers use Dokploy's http entrypoint (`web`, port 80) and add `X-Forwarded-Proto: https`, which Authentik needs to issue `https://` addresses that match `OIDC_ISSUER`. In Cloudflare:
+   **Cloudflare in front** (how the labels are set up): Cloudflare holds the public certificate. Every route answers on both of Dokploy's entrypoints, http (`web`) and https (`websecure`, with Traefik's own certificate), and adds `X-Forwarded-Proto: https`, which Authentik needs to issue `https://` addresses that match `OIDC_ISSUER`. In Cloudflare:
    - DNS: `APP_HOST` and `ID_HOST` as **proxied** records (orange cloud) pointing at the server.
-   - SSL/TLS mode **Flexible**, and **Always Use HTTPS** on. Don't use Full: the server has no certificate.
+   - SSL/TLS mode **Full** (encrypts Cloudflare to the server; Traefik's certificate is accepted). Flexible works too, but that leg is then unencrypted. Not **Full (strict)**: the server has no public certificate. **Always Use HTTPS** on.
    - Leave Rocket Loader off (it rewrites the app's scripts). WebSockets on (Authentik uses them).
-   - On the server, allow port 80 only from [Cloudflare's IP ranges](https://www.cloudflare.com/ips/): between Cloudflare and the server, traffic isn't encrypted.
-
-   | Address | Goes to |
-   |---------|---------|
-   | `https://APP_HOST/` | `web` (port 80) |
-   | `https://APP_HOST/api` | `api` (port 8000), `/api` stripped |
-   | `https://APP_HOST/auth` | `authentik-server` (port 9000), kept (Authentik expects `/auth/`) |
-   | `https://ID_HOST/` | `authentik-server`; `/` goes to the admin console `/auth/if/admin/` |
+   - On the server, allow ports 80 and 443 only from [Cloudflare's IP ranges](https://www.cloudflare.com/ips/).
 
 6. **Restrict Authentik's admin:** add a Traefik `ipAllowList` middleware (staff LAN/VPN ranges) for `PathPrefix(/auth/if/admin)` and `PathPrefix(/auth/api/v3/admin)`, through Dokploy's advanced Traefik settings or labels on `authentik-server`.
 7. **Deploy.** The API runs migrations and creates its storage buckets every time it starts. Authentik applies the blueprints in `infra/authentik/blueprints/` (groups, the portal's OIDC client, the sign-in and sign-up flows) within a minute or two.

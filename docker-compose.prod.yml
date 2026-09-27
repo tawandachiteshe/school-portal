@@ -1,8 +1,9 @@
 # Production stack for Dokploy (Compose deployment, compose path: docker-compose.prod.yml).
 # No host ports. Routing is in the Traefik labels below (Dokploy's Traefik reads them from
 # containers on dokploy-network), so there's nothing to add in Dokploy's Domains tab.
-# Cloudflare holds the certificate and reaches the server over plain http (SSL mode Flexible), so
-# the routers use Dokploy's http entrypoint and tell the apps the visitor came over https:
+# Cloudflare holds the public certificate. Each route answers on both of Dokploy's entrypoints:
+# http (SSL mode Flexible) and https with Traefik's own certificate (SSL mode Full, which encrypts
+# Cloudflare to the server too). Either way the apps are told the visitor came over https:
 #   https://${APP_HOST}/       → web:80
 #   https://${APP_HOST}/api    → api:8000              (/api stripped)
 #   https://${APP_HOST}/auth   → authentik-server:9000 (Authentik serves under /auth/)
@@ -62,9 +63,14 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-api.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tcfl-api-tls.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tcfl-api-tls.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-api-tls.tls=true"
       - "traefik.http.routers.tcfl-api.entrypoints=web"
       - "traefik.http.routers.tcfl-api.middlewares=tcfl-api-strip@docker,tcfl-https-proto@docker"
+      - "traefik.http.routers.tcfl-api-tls.middlewares=tcfl-api-strip@docker,tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-api.service=tcfl-api"
+      - "traefik.http.routers.tcfl-api-tls.service=tcfl-api"
       - "traefik.http.services.tcfl-api.loadbalancer.server.port=8000"
       - "traefik.http.middlewares.tcfl-api-strip.stripprefix.prefixes=/api"
 
@@ -86,9 +92,14 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-web.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.tcfl-web-tls.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.tcfl-web-tls.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-web-tls.tls=true"
       - "traefik.http.routers.tcfl-web.entrypoints=web"
       - "traefik.http.routers.tcfl-web.middlewares=tcfl-https-proto@docker"
+      - "traefik.http.routers.tcfl-web-tls.middlewares=tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-web.service=tcfl-web"
+      - "traefik.http.routers.tcfl-web-tls.service=tcfl-web"
       - "traefik.http.services.tcfl-web.loadbalancer.server.port=80"
       - "traefik.http.middlewares.tcfl-https-proto.headers.customrequestheaders.X-Forwarded-Proto=https"
 
@@ -124,14 +135,24 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-auth.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
+      - "traefik.http.routers.tcfl-auth-tls.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
+      - "traefik.http.routers.tcfl-auth-tls.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-auth-tls.tls=true"
       - "traefik.http.routers.tcfl-auth.entrypoints=web"
       - "traefik.http.routers.tcfl-auth.middlewares=tcfl-https-proto@docker"
+      - "traefik.http.routers.tcfl-auth-tls.middlewares=tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-auth.service=tcfl-auth"
+      - "traefik.http.routers.tcfl-auth-tls.service=tcfl-auth"
       - "traefik.http.services.tcfl-auth.loadbalancer.server.port=9000"
       - "traefik.http.routers.tcfl-id.rule=Host(`${ID_HOST}`)"
+      - "traefik.http.routers.tcfl-id-tls.rule=Host(`${ID_HOST}`)"
+      - "traefik.http.routers.tcfl-id-tls.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-id-tls.tls=true"
       - "traefik.http.routers.tcfl-id.entrypoints=web"
       - "traefik.http.routers.tcfl-id.middlewares=tcfl-id-admin@docker,tcfl-https-proto@docker"
+      - "traefik.http.routers.tcfl-id-tls.middlewares=tcfl-id-admin@docker,tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-id.service=tcfl-auth"
+      - "traefik.http.routers.tcfl-id-tls.service=tcfl-auth"
       - "traefik.http.middlewares.tcfl-id-admin.redirectregex.regex=^https?://[^/]+/$$"
       - "traefik.http.middlewares.tcfl-id-admin.redirectregex.replacement=https://${ID_HOST}/auth/if/admin/"
 
