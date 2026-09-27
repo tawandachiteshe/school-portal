@@ -21,6 +21,7 @@ import { HandoffBirth, HandoffId, HandoffLanding, HandoffMismatch, HandoffResult
 import ApplyResults from '@/pages/apply/results/Results'
 import NationalId from '@/pages/apply/id/NationalId'
 import AccountsPayments from '@/pages/staff/accounts/Payments'
+import AskQuestions from '@/pages/staff/studentaffairs/AskQuestions'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
 import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
@@ -45,6 +46,7 @@ import Fees from '@/pages/student/Fees'
 import StudentCard from '@/pages/student/StudentCard'
 import Library, { LibrarySearch, ReadingListPage } from '@/pages/student/Library'
 import Search from '@/pages/student/Search'
+import Ask from '@/pages/student/Ask'
 import { AnnouncementDetail, AnnouncementsList } from '@/pages/student/Announcements'
 
 // Route map follows docs/design-handoff.md. Screens are added as they are built.
@@ -78,6 +80,7 @@ export const router = createBrowserRouter([
       { path: '/card', element: <StudentCard /> },
       { path: '/library/search', element: <LibrarySearch /> },
       { path: '/search', element: <Search /> },
+      { path: '/ask', element: <Ask /> },
       { path: '/library/lists/:code', element: <ReadingListPage /> },
       {
         element: <StudentShell avatar={false} />,
@@ -150,7 +153,7 @@ export const router = createBrowserRouter([
       { path: 'announcements', element: <AnnouncementsStaff /> },
       { path: 'announcements/new', element: <AnnouncementCompose /> },
       { path: 'announcements/:id', element: <AnnouncementCompose /> },
-      { path: 'ask-questions', element: <StaffPlaceholder context="Student Affairs" title="Questions from Ask TCFL" /> },
+      { path: 'ask-questions', element: <AskQuestions /> },
       { path: 'students', element: <StaffPlaceholder context="College" title="Find a student" /> },
     ],
   },

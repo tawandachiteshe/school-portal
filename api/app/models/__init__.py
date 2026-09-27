@@ -24,6 +24,7 @@ from app.models.admissions import (
     ExamSubjectResult,
     ZimsecSubject,
 )
+from app.models.assistant import AskQuestion, ChatMessage, ChatSession
 from app.models.base import Base
 from app.models.content import (
     Announcement,
@@ -60,6 +61,9 @@ from app.models.teaching import (
 )
 
 __all__ = [
+    "AskQuestion",
+    "ChatMessage",
+    "ChatSession",
     "Application",
     "ApplicationEvent",
     "ApplicationFlag",

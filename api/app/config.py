@@ -96,6 +96,14 @@ class Settings(BaseSettings):
     ocr_min_confidence: float = 0.80
     anthropic_api_key: str = ""
     ocr_claude_model: str = "claude-sonnet-5"
+    # Ask TCFL (docs/04). ASSISTANT_ENABLED=false hides it everywhere. Without ANTHROPIC_API_KEY it
+    # says it isn't set up yet.
+    assistant_enabled: bool = True
+    assistant_model: str = "claude-sonnet-5"
+    assistant_max_tokens: int = 1200  # per answer
+    assistant_max_tool_rounds: int = 4  # model turns that may call tools, per question
+    assistant_per_hour: int = 30
+    assistant_per_day: int = 200
     # Phone handoff (docs/10 §10.10): a link works for 15 minutes; a claimed phone for 2 hours.
     handoff_claim_minutes: int = 15
     handoff_session_hours: int = 2

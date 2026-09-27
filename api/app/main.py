@@ -9,6 +9,7 @@ from app.api import (
     apply_results,
     apply_review,
     apply_submit,
+    assistant,
     deadlines,
     internal,
     library,
@@ -65,6 +66,8 @@ def create_app() -> FastAPI:
     app.include_router(apply_submit.staff_router)
     app.include_router(internal.router)
     app.include_router(public.router)
+    app.include_router(assistant.router)
+    app.include_router(assistant.staff_router)
     return app
 
 

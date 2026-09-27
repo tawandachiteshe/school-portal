@@ -4691,6 +4691,258 @@
           }
         }
       }
+    },
+    "/assistant": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Home",
+        "operationId": "assistant_home",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantHome"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assistant/ask": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Ask",
+        "operationId": "ask",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "text/event-stream of AskEvent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskEvent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assistant/messages/{message_id}/feedback": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Answer Feedback",
+        "operationId": "answer_feedback",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Message Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerFeedbackIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerFeedbackOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assistant/handoff": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Handoff Preview",
+        "operationId": "handoff_preview",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskHandoffPreview"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Send To Student Affairs",
+        "operationId": "send_to_student_affairs",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskHandoffIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskHandoffOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/ask-questions": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Ask Questions Inbox",
+        "operationId": "ask_questions_inbox",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InboxQuestion"
+                  },
+                  "type": "array",
+                  "title": "Response Ask Questions Inbox"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/ask-questions/{question_id}/reply": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Reply To Question",
+        "operationId": "reply_to_question",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskReplyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxQuestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5094,6 +5346,94 @@
         ],
         "title": "Announcements"
       },
+      "AnswerFeedbackIn": {
+        "properties": {
+          "helpful": {
+            "type": "boolean",
+            "title": "Helpful"
+          }
+        },
+        "type": "object",
+        "required": [
+          "helpful"
+        ],
+        "title": "AnswerFeedbackIn"
+      },
+      "AnswerFeedbackOut": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok"
+        ],
+        "title": "AnswerFeedbackOut"
+      },
+      "AnswerOut": {
+        "properties": {
+          "message_id": {
+            "type": "integer",
+            "title": "Message Id"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/AnswerSource"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "handoff": {
+            "type": "boolean",
+            "title": "Handoff"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_id",
+          "session_id",
+          "text",
+          "sources",
+          "handoff"
+        ],
+        "title": "AnswerOut"
+      },
+      "AnswerSource": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "href": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Href"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "href"
+        ],
+        "title": "AnswerSource"
+      },
       "ApplicantEligibility": {
         "properties": {
           "eligible": {
@@ -5237,6 +5577,201 @@
           "submit"
         ],
         "title": "ApplyStep"
+      },
+      "AskEvent": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "status",
+              "answer",
+              "error"
+            ],
+            "title": "Type"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnswerOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "AskEvent",
+        "description": "One Server-Sent Event from POST /assistant/ask: `status` while tools run (\"Looking at your\ndeadlines…\"), then `answer` or `error`."
+      },
+      "AskHandoffIn": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Question"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AskHandoffIn"
+      },
+      "AskHandoffOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "sms_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "sms_to"
+        ],
+        "title": "AskHandoffOut"
+      },
+      "AskHandoffPreview": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "student_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "sms_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "student_number",
+          "class_group",
+          "sms_to"
+        ],
+        "title": "AskHandoffPreview",
+        "description": "What Student Affairs will see about the sender (design/AskHandoff)."
+      },
+      "AskIn": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 2,
+            "title": "Question"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AskIn"
+      },
+      "AskReplyIn": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 2,
+            "title": "Reply"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply"
+        ],
+        "title": "AskReplyIn"
       },
       "AssessmentKind": {
         "type": "string",
@@ -5387,6 +5922,35 @@
           "pending_upload"
         ],
         "title": "AssessmentOut"
+      },
+      "AssistantHome": {
+        "properties": {
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          },
+          "suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          },
+          "sent": {
+            "items": {
+              "$ref": "#/components/schemas/SentQuestion"
+            },
+            "type": "array",
+            "title": "Sent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configured",
+          "suggestions",
+          "sent"
+        ],
+        "title": "AssistantHome"
       },
       "AttentionLevel": {
         "type": "string",
@@ -7746,6 +8310,102 @@
           "birth_date_of_birth"
         ],
         "title": "Identity"
+      },
+      "InboxQuestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "student_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
+          "replied_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replied At"
+          },
+          "replied_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replied By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "name",
+          "student_number",
+          "class_group",
+          "question",
+          "created_at",
+          "reply",
+          "replied_at",
+          "replied_by"
+        ],
+        "title": "InboxQuestion"
       },
       "InfoRequest": {
         "properties": {
@@ -11860,6 +12520,55 @@
           "sms_queued"
         ],
         "title": "Sent"
+      },
+      "SentQuestion": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
+          "replied_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replied At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "question",
+          "created_at",
+          "reply",
+          "replied_at"
+        ],
+        "title": "SentQuestion"
       },
       "SettingsIn": {
         "properties": {
