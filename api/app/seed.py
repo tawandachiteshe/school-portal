@@ -7,12 +7,14 @@ current term is in week 6 of 16. Never runs in production.
 """
 
 import asyncio
+import re
 import sys
 from datetime import UTC, date, datetime, time, timedelta
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import storage
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.models import (
@@ -42,6 +44,7 @@ from app.models import (
     UserRole,
     Venue,
 )
+from app.seed_files import make_pdf
 from app.services import clock
 
 GROUPS = {
@@ -432,46 +435,49 @@ class Seeder:
             submission_mode="none",
         )
 
+    # (module, title, week, size, age). All PDFs: they're generated so downloads work.
+    MATERIALS = [
+        ("DCN201", "Amplitude and frequency modulation", 6, 1_200_000, timedelta(hours=2)),
+        ("NET202", "IPv4 subnetting worked examples", 6, 3_400_000, timedelta(days=1)),
+        ("PRG101", "Arrays in C: lecture notes", 5, 640_000, timedelta(days=5)),
+        ("DCN201", "Test 1 revision questions", 5, 310_000, timedelta(days=7)),
+        ("DCN201", "Analogue and digital signals", 4, 4_800_000, timedelta(days=14)),
+        ("DCN201", "Digital modulation: ASK, FSK and PSK", 5, 1_300_000, timedelta(days=10)),
+        ("DCN201", "Transmission media", 3, 920_000, timedelta(days=21)),
+        ("DCN201", "Assignment 1 brief: signal types", 2, 180_000, timedelta(days=30)),
+        ("DCN201", "Signals, bandwidth and data rate", 2, 1_600_000, timedelta(days=30)),
+        ("DCN201", "The OSI and TCP/IP models", 1, 2_100_000, timedelta(days=36)),
+        ("DCN201", "Module outline and assessment plan", 1, 150_000, timedelta(days=37)),
+        ("NET202", "Network topologies", 4, 1_100_000, timedelta(days=15)),
+        ("PRG101", "Loops: while, do-while and for", 4, 520_000, timedelta(days=12)),
+        ("MTH110", "Differentiation: rules and examples", 5, 880_000, timedelta(days=6)),
+    ]
+
     def materials(self, offerings, lecturers) -> None:
         now = clock.now()
-        rows = [
-            (
-                "DCN201",
-                "Amplitude and frequency modulation",
-                6,
-                "application/pdf",
-                1_200_000,
-                timedelta(hours=2),
-            ),
-            (
-                "NET202",
-                "IPv4 subnetting worked examples",
-                6,
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                3_400_000,
-                timedelta(days=1),
-            ),
-            ("PRG101", "Arrays in C: lecture notes", 5, "application/pdf", 640_000, timedelta(days=5)),
-            ("DCN201", "Test 1 revision questions", 5, "application/pdf", 310_000, timedelta(days=7)),
-            (
-                "DCN201",
-                "Analogue and digital signals",
-                4,
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                4_800_000,
-                timedelta(days=14),
-            ),
-        ]
-        for code, title, week, mime, size, ago in rows:
-            slug = title.lower().replace(" ", "-").replace(":", "")
+        bucket = get_settings().s3_bucket_content
+        try:
+            storage.ensure_buckets()
+            upload = True
+        except Exception as e:  # storage not running: seed the rows anyway
+            print(f"Object storage unavailable ({e.__class__.__name__}); notes will not download.")
+            upload = False
+        for code, title, week, size, ago in self.MATERIALS:
+            slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+            key = f"seed/materials/{code}/{slug}.pdf"
+            if upload:
+                pdf = make_pdf(
+                    title, [f"{code} · Week {week}", "Sample course note for the development seed."], size
+                )
+                storage.put(bucket, key, pdf, "application/pdf")
             self.db.add(
                 CourseMaterial(
                     offering=offerings[code],
                     title=title,
                     week=week,
-                    mime_type=mime,
+                    mime_type="application/pdf",
                     size_bytes=size,
-                    object_key=f"seed/materials/{code}/{slug}",
+                    object_key=key,
                     uploaded_by=lecturers[code].person.user.id,
                     published_at=now - ago,
                 )

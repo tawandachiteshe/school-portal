@@ -1,8 +1,17 @@
-import { Check, Clock, Download, Pin } from 'lucide-react'
+import { Check, ChevronRight, Clock, Download, Pin } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { fileKind, fileSize, isUrgent, postedAt, relativeDue, shortDate, shortDateTime } from '@/lib/format'
+import {
+  calendarDaysBetween,
+  fileKind,
+  fileSize,
+  isUrgent,
+  postedAt,
+  relativeDue,
+  shortDate,
+  shortDateTime,
+} from '@/lib/format'
 import { KIND_LABEL, type AnnouncementItem, type DueItem, type LoanItem, type NoteItem } from '@/lib/student'
 import { cn } from '@/lib/utils'
 
@@ -67,30 +76,63 @@ export function AnnouncementRow({ item, now }: { item: AnnouncementItem; now: Da
   )
 }
 
-export function NoteRow({ item }: { item: NoteItem }) {
+export function NoteRow({
+  item,
+  onDownload,
+  showModule = true,
+  now,
+}: {
+  item: NoteItem & { downloaded?: boolean }
+  onDownload: () => void
+  showModule?: boolean
+  now?: Date
+}) {
   const kind = fileKind(item.mime_type)
   const size = item.size_bytes ? fileSize(item.size_bytes) : null
-  const meta = [item.week && `Week ${item.week}`, size].filter(Boolean).join(' · ')
+  const when = now ? noteAge(new Date(item.published_at), now) : null
+  const meta = [item.week && `Week ${item.week}`, size, !item.downloaded && when].filter(Boolean).join(' · ')
   return (
     <li className="flex items-center gap-3 py-2">
       <Badge className="w-11 justify-center font-mono">{kind}</Badge>
       <div className="min-w-0 grow">
         <div className="font-medium">{item.title}</div>
         <div className="text-sm text-muted-foreground">
-          <span className="font-mono">{item.module_code}</span>
-          {meta && ` · ${meta}`}
+          {showModule && (
+            <>
+              <span className="font-mono">{item.module_code}</span>
+              {meta && ' · '}
+            </>
+          )}
+          {meta}
+          {item.downloaded && (
+            <>
+              {' · '}
+              <span className="text-success">downloaded</span>
+            </>
+          )}
         </div>
       </div>
-      <Button variant="ghost" size="icon" asChild>
-        <a
-          href={`/api/student/materials/${item.id}/download`}
-          aria-label={`Download ${item.title}, ${kind}${size ? `, ${size}` : ''}`}
-        >
-          <Download strokeWidth={1.5} />
-        </a>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onDownload}
+        aria-label={
+          item.downloaded ? `Open ${item.title}` : `Download ${item.title}, ${kind}${size ? `, ${size}` : ''}`
+        }
+      >
+        {item.downloaded ? <ChevronRight strokeWidth={1.5} /> : <Download strokeWidth={1.5} />}
       </Button>
     </li>
   )
+}
+
+// "today", "yesterday", "3 days ago", or a date after a week.
+function noteAge(d: Date, now: Date): string {
+  const days = calendarDaysBetween(d, now)
+  if (days <= 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 7) return `${days} days ago`
+  return shortDate(d)
 }
 
 export function LoanRow({

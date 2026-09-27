@@ -56,7 +56,7 @@ Once the API has migrations and scripts (Phase 1 of the roadmap):
 
 ```bash
 docker compose exec api alembic upgrade head                 # create tables
-docker compose exec api python -m app.scripts.init_storage   # create MinIO buckets
+docker compose exec api python -m app.storage   # create the S3 buckets
 docker compose exec api python -m app.scripts.seed_reference # districts, ZIMSEC subjects, programmes
 docker compose exec api python -m app.scripts.seed_demo      # demo Authentik users + portal data
 docker compose exec api python -m app.scripts.grant_role --email you@tcfl.ac.zw --role admin
@@ -66,7 +66,7 @@ Open:
 - Portal: http://localhost:5173 (the Foundations page shows the design tokens and primitives)
 - API docs (Swagger): http://localhost:8000/docs, or through the proxy at http://localhost:5173/api/docs
 - Authentik: http://localhost:5173/auth/ (admin at `/auth/if/admin/`, user `akadmin`)
-- MinIO console: http://localhost:9001
+- Object storage (SeaweedFS S3 API): http://localhost:8333
 
 `seed_demo` creates demo accounts **in Authentik** (development only) and adds each one to its group: `student@demo.local`, `lecturer@demo.local`, `admissions@demo.local` and `librarian@demo.local`. Their password is printed in the command output. Staff demo accounts must set up TOTP on first login, because the MFA policy applies to them too.
 
@@ -76,7 +76,7 @@ The first PaddleOCR run downloads its models (~100 MB).
 
 ```bash
 # Backing services still run in Docker
-docker compose up -d postgres redis minio authentik-db authentik-server authentik-worker
+docker compose up -d postgres redis s3 authentik-db authentik-server authentik-worker
 
 # API (uv manages the venv and lockfile)
 cd api
@@ -163,7 +163,7 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 | MinIO buckets | `mc mirror` to a second MinIO/S3 target | nightly | 30 days |
 | `.env` / secrets | Offline encrypted copy held by ICT manager | on change | — |
 
-Dokploy's own **Volume backups** can additionally snapshot the named volumes (`pgdata`, `minio`, `authentik-db`, `authentik-data`) to S3. They're a complement to logical dumps, not a replacement.
+Dokploy's own **Volume backups** can additionally snapshot the named volumes (`pgdata`, `s3data`, `authentik-db`, `authentik-data`) to S3. They're a complement to logical dumps, not a replacement.
 
 **Test a restore every term:** restore into a staging Dokploy project and log in as a demo user.
 

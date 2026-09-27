@@ -10,6 +10,7 @@ describe('format', () => {
     expect(relativeDue(new Date('2027-03-11T15:00:00Z'), now)).toBe('today')
     expect(relativeDue(new Date('2027-03-12T15:00:00Z'), now)).toBe('tomorrow')
     expect(relativeDue(new Date('2027-03-15T21:59:00Z'), now)).toBe('in 4 days')
+    expect(relativeDue(new Date('2027-04-09T15:00:00Z'), now)).toBe('in 4 weeks')
   })
 
   it('counts calendar days in Harare, not UTC', () => {

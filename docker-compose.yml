@@ -13,14 +13,21 @@ services:
   redis:
     image: redis:7-alpine
 
-  minio:
-    image: minio/minio
-    command: server /data --console-address ":9001"
+  # S3-compatible object storage (SeaweedFS). MinIO no longer publishes free images; the API
+  # only speaks S3, so any S3 store works (S3_ENDPOINT). Credentials come from S3_ACCESS_KEY/S3_SECRET_KEY.
+  s3:
+    image: chrislusf/seaweedfs:${SEAWEEDFS_TAG:-latest}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        printf '{"identities":[{"name":"portal","credentials":[{"accessKey":"%s","secretKey":"%s"}],"actions":["Admin","Read","Write","List","Tagging"]}]}'
+        "$$S3_ACCESS_KEY" "$$S3_SECRET_KEY" > /etc/s3.json &&
+        exec weed server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/s3.json -master.volumeSizeLimitMB=1024
     environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
-    volumes: [minio:/data]
-    ports: ["9000:9000", "9001:9001"]
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+    volumes: [s3data:/data]
+    ports: ["${S3_PORT:-8333}:8333"]
 
   api:
     build: { context: ./api, target: dev }
@@ -80,4 +87,4 @@ services:
     shm_size: 512mb
     depends_on: { authentik-db: { condition: service_healthy } }
 
-volumes: { pgdata: {}, minio: {}, authentik-db: {}, authentik-data: {} }
+volumes: { pgdata: {}, s3data: {}, authentik-db: {}, authentik-data: {} }

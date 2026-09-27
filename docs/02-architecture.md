@@ -17,7 +17,7 @@
                     └──┬─────────┬──────────┬──────────┬─────────┘
                        │         │          │          │
               ┌────────▼──┐ ┌────▼────┐ ┌───▼─────┐ ┌──▼──────────────┐
-              │ PostgreSQL│ │  Redis  │ │ MinIO   │ │ Claude API      │
+              │ PostgreSQL│ │  Redis  │ │ S3 store│ │ Claude API      │
               │ + pgvector│ │ queue / │ │ (S3)    │ │ (vision extract │
               │           │ │ cache   │ │ scans,  │ │  + chat)        │
               └────────▲──┘ └────┬────┘ │ notes   │ └──▲──────────────┘
@@ -42,7 +42,7 @@
 | OCR | **OpenCV** (preprocess) + **PaddleOCR** (primary) + **Tesseract** (fallback) | See [research §1.4](01-research.md#14-ocr-technology-options) |
 | LLM | **Claude** via the official `anthropic` Python SDK — model `claude-opus-5` (configurable) | Structured extraction from images; student assistant |
 | Database | **PostgreSQL 16** + **pgvector** | Relational academic data + vector search for the assistant in one DB |
-| Object storage | **MinIO** (S3-compatible, self-hosted) | Scans and lecture notes stay on-premises |
+| Object storage | **SeaweedFS** S3 API (self-hosted; any S3 store works via `S3_ENDPOINT`) | Scans and lecture notes stay on-premises. MinIO stopped publishing free images in 2025 |
 | Auth | **Authentik** (self-hosted identity provider) over OIDC. FastAPI is a confidential client using the **backend-for-frontend** pattern: authorization code + PKCE, with the browser holding only an httpOnly session cookie. Roles come from Authentik groups. See [10-authentication.md](10-authentication.md). | Sign-up, MFA, passkeys, SMS verification, password recovery, and LDAP/AD for staff, all without building auth ourselves. Credentials stay on campus. The same identity provider can later front Moodle, Koha and Wi-Fi. |
 | Notifications | Email (SMTP), SMS gateway (e.g. local bulk-SMS provider), Web Push | Deadline and announcement reminders |
 | Deployment | **Dokploy** (self-hosted PaaS): Compose deployment, Traefik routing and Let's Encrypt TLS | The ICT team deploys from git through a web UI on one server, with no hand-written proxy config |

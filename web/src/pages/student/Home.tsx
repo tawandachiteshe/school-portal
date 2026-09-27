@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { AnnouncementRow, DueRow, LoanRow, NoteRow } from '@/components/student/rows'
 import { Empty, Section } from '@/components/student/section'
 import { TodayTimeline } from '@/components/student/today-timeline'
+import { useNoteDownload } from '@/components/student/use-note-download'
 import { api, ApiError } from '@/lib/api'
 import { useMe } from '@/lib/auth'
 import { calendarDaysBetween, formatLongDate, greeting, shortDate, time, weekday } from '@/lib/format'
@@ -79,6 +80,7 @@ export default function Home() {
   const { data, isPending, isError, refetch } = useDashboard()
   const now = useNow()
   const qc = useQueryClient()
+  const download = useNoteDownload()
   const renew = useMutation({
     mutationFn: (id: string) => api<{ id: string; due_at: string }>(`/library/loans/${id}/renew`, { method: 'POST' }),
     onSuccess: (r) => {
@@ -104,7 +106,18 @@ export default function Home() {
       </main>
     )
 
-  return <DashboardView data={data} now={now} onRenew={renew.mutate} renewing={renew.isPending} />
+  return (
+    <>
+      <DashboardView
+        data={data}
+        now={now}
+        onRenew={renew.mutate}
+        renewing={renew.isPending}
+        onDownload={(n) => download.request(n)}
+      />
+      {download.sheet}
+    </>
+  )
 }
 
 function DashboardView({
@@ -112,11 +125,13 @@ function DashboardView({
   now,
   onRenew,
   renewing,
+  onDownload,
 }: {
   data: Dashboard
   now: Date
   onRenew: (id: string) => void
   renewing: boolean
+  onDownload: (n: Dashboard['notes'][number]) => void
 }) {
   const next = data.next_class
   const ann = data.announcements
@@ -177,7 +192,7 @@ function DashboardView({
         {data.notes.length ? (
           <ul className={list}>
             {data.notes.map((n) => (
-              <NoteRow key={n.id} item={n} />
+              <NoteRow key={n.id} item={n} onDownload={() => onDownload(n)} />
             ))}
           </ul>
         ) : (

@@ -12,7 +12,13 @@ from app.models.academic import (
     Venue,
 )
 from app.models.base import Base
-from app.models.content import Announcement, AnnouncementRead, AnnouncementTarget, CourseMaterial
+from app.models.content import (
+    Announcement,
+    AnnouncementRead,
+    AnnouncementTarget,
+    CourseMaterial,
+    MaterialDownload,
+)
 from app.models.identity import NotificationPreference, Person, User, UserRole, WebSession
 from app.models.library import LibraryCopy, LibraryItem, LibraryLoan
 from app.models.people import Staff, Student
@@ -40,6 +46,7 @@ __all__ = [
     "LibraryCopy",
     "LibraryItem",
     "LibraryLoan",
+    "MaterialDownload",
     "Module",
     "ModuleOffering",
     "ModuleResult",

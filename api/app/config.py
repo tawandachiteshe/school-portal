@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     # Sign in as a seeded user without Authentik. Never enabled in production.
     dev_login: bool = True
 
+    s3_endpoint: str = "http://localhost:8333"
+    s3_access_key: str = ""
+    s3_secret_key: str = ""
+    s3_region: str = "us-east-1"
+    s3_bucket_documents: str = "applicant-documents"
+    s3_bucket_content: str = "course-content"
+
     timezone: str = "Africa/Harare"
     # Library policy (design/LibraryDesk, Library). Confirm with the librarian.
     library_loan_days: int = 14

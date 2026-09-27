@@ -30,7 +30,7 @@ It replaces the manual, paper-heavy onboarding process with:
 
 ```bash
 cp .env.example .env              # replace every change-me (see docs/06)
-docker compose up -d --build      # postgres, redis, minio, authentik, api, web
+docker compose up -d --build      # postgres, redis, s3 (SeaweedFS), authentik, api, web
 open http://localhost:5173        # portal (Foundations page for now)
 open http://localhost:5173/auth/  # Authentik (admin at /auth/if/admin/)
 open http://localhost:8000/docs   # API docs

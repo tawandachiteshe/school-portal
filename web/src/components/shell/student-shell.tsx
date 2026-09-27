@@ -1,7 +1,10 @@
 import { BookOpen, CalendarDays, House, Layers, Menu, MessageSquare } from 'lucide-react'
+import { useEffect } from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
+import { watchWifiQueue } from '@/lib/downloads'
 import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
 
@@ -67,6 +70,14 @@ export function BottomNav() {
 // Tab pages: top bar + bottom nav. Pages render their own <main>.
 // `avatar={false}` on More, which is the account page itself (design/More).
 export function StudentShell({ avatar = true }: { avatar?: boolean }) {
+  // Notes queued with "Download when I'm on Wi-Fi" start as soon as the phone is on Wi-Fi.
+  useEffect(
+    () =>
+      watchWifiQueue((titles) =>
+        toast(titles.length === 1 ? `On Wi-Fi: downloading ${titles[0]}.` : `On Wi-Fi: downloading ${titles.length} notes.`),
+      ),
+    [],
+  )
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <StudentTopBar avatar={avatar} />

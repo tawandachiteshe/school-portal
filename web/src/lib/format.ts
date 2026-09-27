@@ -54,6 +54,7 @@ export function relativeDue(due: Date, now: Date): string {
   const days = calendarDaysBetween(now, due)
   if (days === 0) return 'today'
   if (days === 1) return 'tomorrow'
+  if (days >= 14) return `in ${Math.round(days / 7)} weeks`
   return `in ${days} days`
 }
 

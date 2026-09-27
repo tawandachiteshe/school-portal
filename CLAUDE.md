@@ -7,7 +7,7 @@ library and announcements. Staff (admissions, lecturers, librarians, Student Aff
 ## Stack
 
 - React + TypeScript + Vite (SPA, Bun), shadcn/ui, Tailwind CSS v4 (theme in `web/src/globals.css`)
-- API: FastAPI (Python 3.12+, uv), PostgreSQL 16 + pgvector, Redis, MinIO, Celery; Claude for OCR structuring + assistant
+- API: FastAPI (Python 3.12+, uv), PostgreSQL 16 + pgvector, Redis, S3 object storage (SeaweedFS in compose), Celery; Claude for OCR structuring + assistant
 - Icons: lucide-react, `strokeWidth={1.5}`, 16–20px, only where they aid recognition
 - Fonts: IBM Plex Sans (UI), IBM Plex Mono (IDs, codes, numbers that are identifiers)
 - Auth: Authentik, served under `/auth/` on the portal origin. The React app renders its own screens by driving
