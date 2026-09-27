@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
 import { watchWifiQueue } from '@/lib/downloads'
+import { dismissUpload, resumeSavedUploads } from '@/lib/uploads'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
 
@@ -69,7 +71,17 @@ export function BottomNav() {
 
 // Tab pages: top bar + bottom nav. Pages render their own <main>.
 // `avatar={false}` on More, which is the account page itself (design/More).
-export function StudentShell({ avatar = true }: { avatar?: boolean }) {
+// Root of the student area (tab pages and sub-pages): work that carries on while the student
+// moves around the app.
+export function StudentRoot() {
+  const qc = useQueryClient()
+  useEffect(() => {
+    // Runs for every finished upload: refresh deadlines and receipts, then drop the progress state.
+    void resumeSavedUploads((assessmentId) => {
+      toast('Your work has been submitted.')
+      void qc.invalidateQueries({ queryKey: ['student'] }).then(() => dismissUpload(assessmentId))
+    })
+  }, [qc])
   // Notes queued with "Download when I'm on Wi-Fi" start as soon as the phone is on Wi-Fi.
   useEffect(
     () =>
@@ -78,6 +90,10 @@ export function StudentShell({ avatar = true }: { avatar?: boolean }) {
       ),
     [],
   )
+  return <Outlet />
+}
+
+export function StudentShell({ avatar = true }: { avatar?: boolean }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <StudentTopBar avatar={avatar} />

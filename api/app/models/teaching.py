@@ -12,6 +12,7 @@ from sqlalchemy import (
     SmallInteger,
     Text,
     Time,
+    func,
 )
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -88,6 +89,8 @@ class Assessment(Base):
     submission_mode: Mapped[str] = mapped_column(SUBMISSION_MODE, server_default="online")
     allow_late_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     allow_resubmission: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    accepted_extensions: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    max_file_mb: Mapped[int] = mapped_column(SmallInteger, server_default="20")
     marks_released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -106,6 +109,7 @@ class Submission(Base):
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     mark: Mapped[float | None] = mapped_column(Numeric(6, 2))
     feedback_md: Mapped[str | None] = mapped_column(Text)
+    student_note: Mapped[str | None] = mapped_column(Text)
     marked_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     marked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -124,7 +128,7 @@ class SubmissionFile(Base):
     mime_type: Mapped[str] = mapped_column(Text)
     size_bytes: Mapped[int] = mapped_column(Integer)
     sha256: Mapped[bytes] = mapped_column(LargeBinary)
-    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class ModuleResult(Base):
@@ -144,3 +148,19 @@ class ModuleResult(Base):
     remarks: Mapped[str | None] = mapped_column(Text)
     entered_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     approved_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+
+
+class UploadSession(Base):
+    __tablename__ = "upload_sessions"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    assessment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("assessments.id", ondelete="CASCADE"))
+    student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"))
+    filename: Mapped[str] = mapped_column(Text)
+    mime_type: Mapped[str] = mapped_column(Text)
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    received_bytes: Mapped[int] = mapped_column(Integer, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

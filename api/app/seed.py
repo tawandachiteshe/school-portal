@@ -394,6 +394,7 @@ class Seeder:
                 submitted_at=local(-27, "21:40"),
                 mark=16,
                 marked_at=now - timedelta(days=12),
+                feedback_md="Clear diagrams. Label the axes on every waveform next time.",
             )
         )
         add(
@@ -417,7 +418,56 @@ class Seeder:
             duration_minutes=90,
             submission_mode="none",
         )
-        add("PRG101", "assignment", "Lab sheet 4: Loops and arrays", local(1, "17:00"), 5)
+        add(
+            "PRG101",
+            "assignment",
+            "Lab sheet 4: Loops and arrays",
+            local(1, "17:00"),
+            5,
+            accepted_extensions=[".c", ".pdf"],
+            max_file_mb=10,
+            description_md="Complete exercises 1 to 6. Upload your .c file, or a PDF with your code and output.",
+        )
+        add(
+            "PRG101",
+            "assignment",
+            "Lab sheet 5: Functions",
+            local(8, "17:00"),
+            5,
+            accepted_extensions=[".c", ".pdf"],
+        )
+        add(
+            "NET202",
+            "practical",
+            "Cable termination practical",
+            local(9, "12:00"),
+            10,
+            venue=venues["LAB-3"],
+            duration_minutes=90,
+            submission_mode="none",
+        )
+        mth1 = add(
+            "MTH110",
+            "test",
+            "Test 1: Limits and continuity",
+            local(-20, "08:00"),
+            15,
+            venue=venues["LR-B2"],
+            duration_minutes=90,
+            submission_mode="none",
+            max_mark=40,
+            marks_released_at=now - timedelta(days=9),
+        )
+        self.db.add(
+            Submission(
+                assessment=mth1,
+                student=student,
+                status="marked",
+                mark=29,
+                marked_at=now - timedelta(days=9),
+                feedback_md="Good on limits. Revise the squeeze theorem: question 4 lost most marks.",
+            )
+        )
         sub = add("NET202", "assignment", "Subnetting worksheet", local(4, "23:59"), 5)
         self.db.add(
             Submission(

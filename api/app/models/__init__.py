@@ -30,6 +30,7 @@ from app.models.teaching import (
     SubmissionFile,
     TimetableException,
     TimetableSlot,
+    UploadSession,
 )
 
 __all__ = [
@@ -62,6 +63,7 @@ __all__ = [
     "TimetableException",
     "TimetableSlot",
     "User",
+    "UploadSession",
     "UserRole",
     "Venue",
     "WebSession",

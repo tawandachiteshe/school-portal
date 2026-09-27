@@ -9,7 +9,7 @@ export class ApiError extends Error {
   }
 }
 
-function readCookie(name: string): string | undefined {
+export function readCookie(name: string): string | undefined {
   return document.cookie
     .split('; ')
     .find((c) => c.startsWith(`${name}=`))

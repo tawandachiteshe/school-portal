@@ -51,6 +51,23 @@ def size(bucket: str, key: str) -> int | None:
         return None
 
 
+def get(bucket: str, key: str) -> bytes:
+    return client().get_object(Bucket=bucket, Key=key)["Body"].read()
+
+
+def list_keys(bucket: str, prefix: str) -> list[str]:
+    keys: list[str] = []
+    for page in client().get_paginator("list_objects_v2").paginate(Bucket=bucket, Prefix=prefix):
+        keys += [o["Key"] for o in page.get("Contents", [])]
+    return sorted(keys)
+
+
+def delete_prefix(bucket: str, prefix: str) -> None:
+    keys = list_keys(bucket, prefix)
+    for i in range(0, len(keys), 1000):
+        client().delete_objects(Bucket=bucket, Delete={"Objects": [{"Key": k} for k in keys[i : i + 1000]]})
+
+
 def stream(bucket: str, key: str) -> Iterator[bytes]:
     body = client().get_object(Bucket=bucket, Key=key)["Body"]
     try:

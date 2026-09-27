@@ -1,7 +1,7 @@
-import { createBrowserRouter, Outlet } from 'react-router'
+import { createBrowserRouter } from 'react-router'
 import { RequireAuth } from '@/components/shell/require-auth'
 import { StaffIndex, StaffShell } from '@/components/shell/staff-shell'
-import { StudentShell } from '@/components/shell/student-shell'
+import { StudentRoot, StudentShell } from '@/components/shell/student-shell'
 import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
@@ -10,6 +10,8 @@ import Home from '@/pages/student/Home'
 import More from '@/pages/student/More'
 import ModuleDetail from '@/pages/student/ModuleDetail'
 import Modules from '@/pages/student/Modules'
+import Deadlines from '@/pages/student/Deadlines'
+import SubmitWork from '@/pages/student/SubmitWork'
 import { AnnouncementDetail, AnnouncementsList } from '@/pages/student/Announcements'
 
 // Route map follows docs/design-handoff.md. Screens are added as they are built.
@@ -19,7 +21,7 @@ export const router = createBrowserRouter([
   {
     element: (
       <RequireAuth roles={['student']}>
-        <Outlet />
+        <StudentRoot />
       </RequireAuth>
     ),
     children: [
@@ -28,9 +30,11 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Home /> },
           { path: '/modules', element: <Modules /> },
+          { path: '/deadlines', element: <Deadlines /> },
         ],
       },
       { path: '/modules/:code', element: <ModuleDetail /> },
+      { path: '/deadlines/:id/submit', element: <SubmitWork /> },
       { element: <StudentShell avatar={false} />, children: [{ path: '/more', element: <More /> }] },
       { path: '/announcements', element: <AnnouncementsList /> },
       { path: '/announcements/:id', element: <AnnouncementDetail /> },
