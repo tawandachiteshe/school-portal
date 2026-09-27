@@ -172,13 +172,19 @@ entries:
         - !KeyOf mobile-username
         - !KeyOf password-policy
 
+  # Declared here too (tcfl-portal.yaml has it): blueprints apply in no fixed order, and a !Find
+  # before tcfl-portal has run leaves new applicants with no group, so the portal turns them away.
+  - model: authentik_core.group
+    id: applicants
+    identifiers: { name: portal-applicants }
+
   - model: authentik_stages_user_write.userwritestage
     id: signup-write
     identifiers: { name: tcfl-signup-write }
     attrs:
       user_creation_mode: always_create
       create_users_as_inactive: false
-      create_users_group: !Find [authentik_core.group, [name, portal-applicants]]
+      create_users_group: !KeyOf applicants
       user_type: internal
 
   - model: authentik_stages_authenticator_sms.authenticatorsmsstage

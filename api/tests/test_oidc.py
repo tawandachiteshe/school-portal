@@ -373,3 +373,35 @@ async def test_without_smtp_nothing_is_emailed(email_only, monkeypatch):
     monkeypatch.setattr(mail, "_send", lambda *a: sent.append(a))
     assert (await _start("rudo.google@gmail.com")).json() == {"minutes": 10}
     assert sent == []
+
+
+async def test_a_recreated_authentik_account_keeps_the_same_portal_user(monkeypatch):
+    first = {
+        "sub": "ak-first",
+        "preferred_username": "263779990031",
+        "name": "Rudo Dube",
+        "groups": ["portal-applicants"],
+    }
+    async with client() as c:
+        await _callback(monkeypatch, c, first)
+        before = (await c.get("/me")).json()
+    # ICT deletes the account and makes it again: same username, new Authentik id.
+    again = {**first, "sub": "ak-second"}
+    async with client() as c:
+        r = await _callback(monkeypatch, c, again)
+        after = (await c.get("/me")).json()
+    assert r.status_code == 302 and after["id"] == before["id"] and after["phone"] == "+263779990031"
+
+
+async def test_a_number_on_another_account_does_not_break_sign_in(monkeypatch):
+    # A different username (an email) whose phone_number claim is a number someone already has.
+    claims = {
+        "sub": "ak-google-1",
+        "preferred_username": "rudo@example.org",
+        "phone_number": "+263779990031",
+        "groups": ["portal-applicants"],
+    }
+    async with client() as c:
+        r = await _callback(monkeypatch, c, claims)
+        me = (await c.get("/me")).json()
+    assert r.headers["location"] == "/apply" and me["phone"] is None
