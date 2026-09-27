@@ -9,7 +9,7 @@ import json
 import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException
@@ -105,10 +105,16 @@ class Tool:
         return {"name": self.name, "description": self.description, "input_schema": s}
 
 
+_INSTANT = re.compile(r"\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(Z|[+-]\d\d:\d\d)")
+
+
 def _plain(model: BaseModel | None) -> Any:
-    """The page's data as compact JSON, without internal ids."""
+    """The page's data as compact JSON, without internal ids, and times in Harare time (the pages
+    send UTC; the model shouldn't have to convert, and smaller models don't)."""
 
     def strip(v: Any) -> Any:
+        if isinstance(v, str) and _INSTANT.fullmatch(v):
+            return datetime.fromisoformat(v).astimezone(clock.tz()).isoformat(timespec="minutes")
         if isinstance(v, dict):
             return {
                 k: strip(x) for k, x in v.items() if k != "id" and not k.endswith("_id") and x is not None

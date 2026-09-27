@@ -267,3 +267,18 @@ async def test_student_affairs_gets_the_question_only_when_the_student_sends_it(
         assert (await c.get("/staff/ask-questions")).status_code == 403
     mine = next(s for s in home["sent"] if s["reference"] == ref)
     assert mine["reply"] == "Yes, apply by 30 June."
+
+
+def test_tool_results_give_times_in_harare_time():
+    from datetime import UTC, datetime
+
+    from pydantic import BaseModel
+
+    from app.assistant.tools import _plain
+
+    class Item(BaseModel):
+        due_at: datetime
+        title: str
+
+    out = _plain(Item(due_at=datetime(2026, 9, 28, 6, 0, tzinfo=UTC), title="2026-09-28T06:00Z is text"))
+    assert out["due_at"] == "2026-09-28T08:00+02:00"

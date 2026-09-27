@@ -95,7 +95,7 @@ class Settings(BaseSettings):
     ocr_llm_mode: str = "fallback"  # off | fallback | always
     ocr_min_confidence: float = 0.80
     anthropic_api_key: str = ""
-    ocr_claude_model: str = "claude-sonnet-5"
+    ocr_claude_model: str = "claude-haiku-4-5-20251001"
     # Ask TCFL (docs/04). ASSISTANT_ENABLED=false hides it everywhere. Without ANTHROPIC_API_KEY it
     # says it isn't set up yet.
     # First release is applications only (docs/12): until students are imported, the landing page
@@ -105,7 +105,7 @@ class Settings(BaseSettings):
     # (app.seed, app.authentik_dev). Never on a site with real applicants: seeding wipes everything.
     demo: bool = False
     assistant_enabled: bool = True
-    assistant_model: str = "claude-sonnet-5"
+    assistant_model: str = "claude-haiku-4-5-20251001"
     assistant_max_tokens: int = 1200  # per answer
     assistant_max_tool_rounds: int = 4  # model turns that may call tools, per question
     assistant_per_hour: int = 30
