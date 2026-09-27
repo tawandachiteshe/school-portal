@@ -354,32 +354,33 @@ function ReviewView({ r }: { r: ReviewData }) {
         )}
       </header>
 
-      <main className="flex flex-col gap-6 px-8 py-6">
-        <div className="flex items-start justify-between gap-6 border-b pb-5">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <h1 className={staffH1}>{r.name}</h1>
-              <Badge variant={status.variant}>{status.label}</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {r.programme}
-              {r.submitted_at && ` · Submitted ${submittedText(new Date(r.submitted_at))}`}
-              {r.assigned_to && ` · ${r.assigned_to_me ? 'Assigned to you' : `Assigned to ${r.assigned_to}`}`}
-            </p>
+      {/* The applicant and the decision buttons stay in view under the top bar while the page scrolls. */}
+      <div className="sticky top-14 z-[5] flex items-start justify-between gap-6 border-b bg-background px-8 pt-6 pb-5">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <h1 className={staffH1}>{r.name}</h1>
+            <Badge variant={status.variant}>{status.label}</Badge>
           </div>
-          {open && (
-            <div className="flex shrink-0 gap-2">
-              <Button variant="outline" onClick={() => setDialog('ask')}>
-                Ask for information
-              </Button>
-              <Button variant="destructive" onClick={() => setDialog('decline')}>
-                Decline
-              </Button>
-              <Button onClick={() => setDialog('offer')}>Offer a place</Button>
-            </div>
-          )}
+          <p className="text-sm text-muted-foreground">
+            {r.programme}
+            {r.submitted_at && ` · Submitted ${submittedText(new Date(r.submitted_at))}`}
+            {r.assigned_to && ` · ${r.assigned_to_me ? 'Assigned to you' : `Assigned to ${r.assigned_to}`}`}
+          </p>
         </div>
+        {open && (
+          <div className="flex shrink-0 gap-2">
+            <Button variant="outline" onClick={() => setDialog('ask')}>
+              Ask for information
+            </Button>
+            <Button variant="destructive" onClick={() => setDialog('decline')}>
+              Decline
+            </Button>
+            <Button onClick={() => setDialog('offer')}>Offer a place</Button>
+          </div>
+        )}
+      </div>
 
+      <main className="flex flex-col gap-6 px-8 py-6">
         {(r.status === 'accepted' || r.status === 'rejected') && (
           <Alert variant={r.status === 'accepted' ? 'success' : 'default'}>
             {r.status === 'accepted' ? <Check strokeWidth={1.5} /> : <CircleAlert strokeWidth={1.5} />}
