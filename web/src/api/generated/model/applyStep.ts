@@ -11,6 +11,7 @@ export type ApplyStep = typeof ApplyStep[keyof typeof ApplyStep];
 export const ApplyStep = {
   programme: 'programme',
   national_id: 'national_id',
+  birth_certificate: 'birth_certificate',
   results: 'results',
   review: 'review',
   submit: 'submit',

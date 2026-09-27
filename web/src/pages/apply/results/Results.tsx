@@ -276,10 +276,10 @@ function Mobile({ app }: { app: MyApplication }) {
   return (
     <ResultsFlow
       api={api}
-      onBack={() => navigate(STEP_PATH.national_id)}
+      onBack={() => navigate(STEP_PATH.birth_certificate)}
       onSaved={() => navigate(STEP_PATH.review)}
       frame={(children) => (
-        <ApplyShell step={3} app={app}>
+        <ApplyShell step={4} app={app}>
           <main className="flex grow flex-col gap-6 px-4 py-6">{children}</main>
         </ApplyShell>
       )}
@@ -295,7 +295,7 @@ export default function Results() {
   if (!app || app.status !== 'draft') return <Navigate to={applyHome(app)} replace />
   if (!desktop) return <Mobile app={app} />
   return (
-    <ApplyShell step={3} app={app}>
+    <ApplyShell step={4} app={app}>
       <main className="flex flex-col gap-6 px-20 py-10">
         <Desktop app={app} />
       </main>

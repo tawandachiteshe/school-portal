@@ -68,7 +68,7 @@ async def test_upload_read_and_confirm_on_the_computer():
         s = (await c.put("/apply/national-id", json=ok)).json()
         assert s["status"] == "confirmed" and s["fields"]["surname"] == "NYONI"
         a = (await c.get("/apply/application")).json()
-        assert a["steps"]["national_id"] and a["next_step"] == "results"
+        assert a["steps"]["national_id"] and a["next_step"] == "birth_certificate"
 
 
 async def test_unreadable_photo_asks_the_applicant_to_type_it():
@@ -137,3 +137,48 @@ async def test_expired_link_and_mismatch(monkeypatch):
             assert (await phone.post(f"/handoff/{h2['code']}/mismatch")).status_code == 200
             assert (await phone.get(f"/handoff/{h2['code']}")).json()["state"] == "closed"
         assert (await desk.get("/apply/handoffs/current")).json()["state"] == "ended"
+
+
+async def test_birth_certificate_step():
+    async with signed_in(NEW) as c:
+        await _start(c)
+        await c.put(
+            "/apply/national-id",
+            json={
+                "id_number": "08-2047823 Q 29",
+                "surname": "NYONI",
+                "first_names": "CHIEDZA",
+                "date_of_birth": "2006-05-14",
+            },
+        )
+        a = (await c.get("/apply/application")).json()
+        assert a["next_step"] == "birth_certificate" and not a["steps"]["birth_certificate"]
+        s = (await c.get("/apply/birth-certificate")).json()
+        assert s["status"] == "none" and s["name"] == "CHIEDZA NYONI"  # starts from the ID
+        assert (
+            await c.put(
+                "/apply/birth-certificate", json={"name": "CHIEDZA NYONI", "date_of_birth": "2006-05-14"}
+            )
+        ).status_code == 409
+        await c.post("/apply/birth-certificate", files={"file": ("bc.jpg", b"certificate", "image/jpeg")})
+        s = (
+            await c.put(
+                "/apply/birth-certificate", json={"name": "Chiedza  Nyoni", "date_of_birth": "2006-05-14"}
+            )
+        ).json()
+        assert s["status"] == "confirmed" and s["matches_id"]
+        a = (await c.get("/apply/application")).json()
+        assert a["steps"]["birth_certificate"] and a["next_step"] in ("results", "review")
+        # A different name is kept, and flagged for Admissions.
+        s = (
+            await c.put(
+                "/apply/birth-certificate", json={"name": "CHIEDZA MOYO", "date_of_birth": "2006-05-14"}
+            )
+        ).json()
+        assert s["matches_id"] is False
+
+
+async def test_birth_certificate_on_the_review_page():
+    async with signed_in("cmarufu") as c:
+        r = (await c.get("/staff/admissions/applications/APP-27-08813")).json()
+    assert r["identity"]["birth_certificate_id"] and r["identity"]["birth_name"] == "TARIRO MOYO"

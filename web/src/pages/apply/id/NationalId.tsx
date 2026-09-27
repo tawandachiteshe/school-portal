@@ -382,8 +382,8 @@ function Connected({ h, onContinue }: { h: HandoffOut; onContinue: () => void })
             <li className="grid grid-cols-[24px_minmax(0,1fr)] gap-x-3 p-5">
               <span aria-hidden className="mt-0.5 block size-5 rounded-full border-[1.5px] border-input" />
               <div className="flex items-baseline justify-between gap-4">
-                <span className="font-medium">ZIMSEC results</span>
-                <span className="text-sm text-muted-foreground">{h.results_started ? 'Started' : 'Not started'}</span>
+                <span className="font-medium">Birth certificate</span>
+                <span className="text-sm text-muted-foreground">Next</span>
               </div>
             </li>
           </ul>
@@ -396,7 +396,7 @@ function Connected({ h, onContinue }: { h: HandoffOut; onContinue: () => void })
           </p>
           <div>
             <Button disabled={!done} onClick={onContinue}>
-              Continue to ZIMSEC results
+              Continue to birth certificate
             </Button>
           </div>
         </aside>
@@ -410,13 +410,13 @@ function Added({ s, onChange, onContinue }: { s: NationalIdState; onChange: () =
     <>
       <div role="status" className="flex max-w-[720px] flex-col gap-2">
         <h1 className={h1}>National ID added</h1>
-        <p className="text-muted-foreground">We'll compare these details with your ZIMSEC results.</p>
+        <p className="text-muted-foreground">We'll compare these details with your birth certificate and ZIMSEC results.</p>
       </div>
       <section className="max-w-[720px] rounded-md border bg-card p-6">
         <IdDetails s={s} />
       </section>
       <div className="flex items-center gap-6">
-        <Button onClick={onContinue}>Continue to ZIMSEC results</Button>
+        <Button onClick={onContinue}>Continue to birth certificate</Button>
         <button type="button" onClick={onChange} className="text-primary hover:underline">
           Use a different photo
         </button>
@@ -481,7 +481,7 @@ function Desktop({ app }: { app: MyApplication }) {
     }
   }
   if (!id || h === undefined) return <Skeleton className="h-80 max-w-[1040px]" />
-  const goOn = () => navigate(STEP_PATH.results)
+  const goOn = () => navigate(STEP_PATH.birth_certificate)
   const newLink = () => start.mutate({ data: { start_step: 'national_id' } })
   const usePhone = h && view === 'auto' && ['waiting', 'connected', 'expired'].includes(h.state)
 
@@ -539,8 +539,8 @@ function Mobile({ app }: { app: MyApplication }) {
         </div>
         <IdDetails s={id} />
         <div className="mt-auto flex flex-col gap-3">
-          <Button block onClick={() => navigate(STEP_PATH.results)}>
-            Continue to ZIMSEC results
+          <Button block onClick={() => navigate(STEP_PATH.birth_certificate)}>
+            Continue to birth certificate
           </Button>
           <Button block variant="outline" onClick={() => setAgain(true)}>
             Use a different photo

@@ -28,6 +28,7 @@ OPEN = ("submitted", "in_review", "more_info")
 class ApplyStep(StrEnum):
     programme = "programme"
     national_id = "national_id"
+    birth_certificate = "birth_certificate"
     results = "results"
     review = "review"
     submit = "submit"
@@ -156,6 +157,7 @@ async def programmes(
 class Steps(BaseModel):
     programme: bool
     national_id: bool
+    birth_certificate: bool
     results: bool
 
 
@@ -217,12 +219,23 @@ async def _out(db: AsyncSession, a: Application) -> MyApplication:
     steps = Steps(
         programme=True,
         national_id=a.person.national_id_enc is not None,
+        birth_certificate=any(
+            d.kind == "birth_certificate" and d.status in ("confirmed", "approved") for d in a.documents
+        ),
         results=bool(a.sittings),
     )
     next_step = None
     if a.status == "draft":
         next_step = next(
-            (k for k, done in (("national_id", steps.national_id), ("results", steps.results)) if not done),
+            (
+                k
+                for k, done in (
+                    ("national_id", steps.national_id),
+                    ("birth_certificate", steps.birth_certificate),
+                    ("results", steps.results),
+                )
+                if not done
+            ),
             "review",
         )
     offer = None

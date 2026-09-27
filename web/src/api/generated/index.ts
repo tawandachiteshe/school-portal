@@ -1,5 +1,6 @@
 export * from './admissions/admissions';
 export * from './apply/apply';
+export * from './apply-birth-certificate/apply-birth-certificate';
 export * from './apply-id/apply-id';
 export * from './apply-results/apply-results';
 export * from './auth/auth';

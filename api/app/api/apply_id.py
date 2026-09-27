@@ -573,7 +573,11 @@ def _mine(h: DeviceHandoff, request: Request) -> bool:
     return bool(cookie and h.session_hash and crypto.sha256(cookie) == h.session_hash)
 
 
-STEP_LABEL = {"national_id": "Step 2 of 5, National ID", "results": "Step 3 of 5, ZIMSEC results"}
+STEP_LABEL = {
+    "national_id": "Step 2 of 6, National ID",
+    "birth_certificate": "Step 3 of 6, Birth certificate",
+    "results": "Step 4 of 6, ZIMSEC results",
+}
 
 
 @router.get("/handoff/{code}")

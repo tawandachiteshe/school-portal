@@ -4,6 +4,7 @@ from app.api import (
     admissions,
     announcements_staff,
     apply,
+    apply_birth,
     apply_id,
     apply_results,
     deadlines,
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(admissions.router)
     app.include_router(apply.router)
     app.include_router(apply_id.router)
+    app.include_router(apply_birth.router)
     app.include_router(apply_results.router)
     return app
 

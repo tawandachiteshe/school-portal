@@ -11,7 +11,8 @@ import ApplyOffer from '@/pages/apply/Offer'
 import ApplyProgramme from '@/pages/apply/Programme'
 import ApplyStatus from '@/pages/apply/Status'
 import StepPending from '@/pages/apply/StepPending'
-import { HandoffId, HandoffLanding, HandoffMismatch, HandoffResults } from '@/pages/apply/id/Handoff'
+import BirthCertificate from '@/pages/apply/birth/BirthCertificate'
+import { HandoffBirth, HandoffId, HandoffLanding, HandoffMismatch, HandoffResults } from '@/pages/apply/id/Handoff'
 import ApplyResults from '@/pages/apply/results/Results'
 import NationalId from '@/pages/apply/id/NationalId'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
   { path: '/h/:code', element: <HandoffLanding /> },
   { path: '/h/:code/mismatch', element: <HandoffMismatch /> },
   { path: '/h/:code/id', element: <HandoffId /> },
+  { path: '/h/:code/birth-certificate', element: <HandoffBirth /> },
   { path: '/h/:code/results', element: <HandoffResults /> },
   {
     // Applicants (docs/design-handoff.md "Applicant onboarding").
@@ -94,9 +96,10 @@ export const router = createBrowserRouter([
       { index: true, element: <ApplyIndex /> },
       { path: 'programme', element: <ApplyProgramme /> },
       { path: 'id', element: <NationalId /> },
+      { path: 'birth-certificate', element: <BirthCertificate /> },
       { path: 'results', element: <ApplyResults /> },
-      { path: 'review', element: <StepPending step={4} /> },
-      { path: 'submit', element: <StepPending step={5} /> },
+      { path: 'review', element: <StepPending step={5} /> },
+      { path: 'submit', element: <StepPending step={6} /> },
       { path: 'status', element: <ApplyStatus /> },
       { path: 'offer', element: <ApplyOffer /> },
     ],

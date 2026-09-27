@@ -23,6 +23,7 @@ from app.models import (
     ApplicationFlag,
     DistrictCode,
     Document,
+    DocumentField,
     Notification,
     NotificationDelivery,
     Person,
@@ -368,6 +369,9 @@ class Identity(BaseModel):
     edited: list[str]
     checked_by: str | None
     checked_at: datetime | None
+    birth_certificate_id: uuid.UUID | None
+    birth_name: str | None  # as printed on the certificate, confirmed by the applicant
+    birth_date_of_birth: date | None
 
 
 class ReadHow(StrEnum):
@@ -489,6 +493,14 @@ async def _identity(db: AsyncSession, a: Application, people: dict[uuid.UUID, Pe
     }
     district = lambda c: districts.get(c, f"district {c}") if c else None  # noqa: E731
     checked = doc and doc.status == "approved"
+    births = [
+        d for d in a.documents if d.kind == "birth_certificate" and d.status in ("confirmed", "approved")
+    ]
+    birth = max(births, key=lambda d: d.created_at) if births else None
+    bf: dict[str, str | None] = {}
+    if birth:
+        rows = await db.execute(select(DocumentField).where(DocumentField.document_id == birth.id))
+        bf = {f.field: f.confirmed_value for f in rows.scalars()}
     return Identity(
         document_id=doc.id if doc else None,
         capture_device=doc.capture_device if doc else None,
@@ -505,6 +517,9 @@ async def _identity(db: AsyncSession, a: Application, people: dict[uuid.UUID, Pe
         edited=[FIELD_LABELS.get(f.field, f.field) for f in fields.values() if f.edited_by_applicant],
         checked_by=_short_name(people.get(doc.reviewed_by)) if checked and doc.reviewed_by else None,
         checked_at=doc.reviewed_at if checked else None,
+        birth_certificate_id=birth.id if birth else None,
+        birth_name=bf.get("full_name"),
+        birth_date_of_birth=date.fromisoformat(bf["date_of_birth"]) if bf.get("date_of_birth") else None,
     )
 
 

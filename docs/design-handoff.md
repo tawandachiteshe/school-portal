@@ -51,6 +51,7 @@ Identification stage only matches username/email/UPN: set applicant usernames to
 | PhoneCheck | D · Decoded ID, editable name and DOB | `/h/:code/check` |
 | IdError | F · Invalid check letter, highlighted character | same |
 | PhoneDone / PhoneDisconnected | D · Done; computer ended session | `/h/:code/done` |
+| (no design yet) | Birth certificate: photo or scan, name and date of birth as printed; follows the National ID screens. Steps become Programme · National ID · Birth certificate · ZIMSEC results · Review · Submit | `/apply/birth-certificate`, phone `/h/:code/birth-certificate` |
 | ZimsecCamera / ZimsecPages | E · Slip capture (A4 outline), page review | `/apply/results/scan` |
 | Zimsec / ZimsecDesktop | E · Editable results table, low-confidence cells with crop | `/apply/results` |
 | ReviewEligible / ReviewNotEligible / ReviewDesktop | G · Review + eligibility | `/apply/review` |

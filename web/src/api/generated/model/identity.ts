@@ -21,4 +21,7 @@ export interface Identity {
   edited: string[];
   checked_by: string | null;
   checked_at: string | null;
+  birth_certificate_id: string | null;
+  birth_name: string | null;
+  birth_date_of_birth: string | null;
 }

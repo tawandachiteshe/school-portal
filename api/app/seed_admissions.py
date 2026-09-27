@@ -305,6 +305,23 @@ def _id_svg(name: str, number: str, dob: date) -> bytes:
     )
 
 
+def _birth_svg(name: str, dob: date) -> bytes:
+    return _svg(
+        700,
+        990,
+        "#F1EEE4",
+        [
+            _t(48, 80, 22, "REPUBLIC OF ZIMBABWE"),
+            _t(48, 120, 26, "BIRTH CERTIFICATE", bold=True),
+            _t(48, 220, 18, "NAME OF CHILD", fill="#3E3A33"),
+            _t(48, 250, 22, name.upper()),
+            _t(48, 320, 18, "DATE OF BIRTH", fill="#3E3A33"),
+            _t(48, 350, 22, f"{dob.day} {dob:%B %Y}".upper()),
+            _t(48, 900, 18, "SAMPLE · development seed, not a real document", fill="#9A2B1F"),
+        ],
+    )
+
+
 def _slip_svg(name: str, sitting: ExamSitting, grades: list[tuple[str, str]]) -> bytes:
     head = f"{sitting.level}-LEVEL {sitting.session} {sitting.year}"
     rows = []
@@ -501,6 +518,21 @@ class AdmissionsSeed:
                         confidence=0.55 if first else 0.96,
                     )
                 )
+        birth = self.document(
+            app,
+            "birth_certificate",
+            f"seed/applications/{a.ref}/birth-certificate.svg",
+            _birth_svg(name, a.dob),
+            id_read + timedelta(minutes=5),
+            "phone (Android · Chrome)",
+        )
+        await self.db.flush()
+        self.db.add_all(
+            [
+                DocumentField(document_id=birth.id, field="full_name", confirmed_value=name.upper()),
+                DocumentField(document_id=birth.id, field="date_of_birth", confirmed_value=a.dob.isoformat()),
+            ]
+        )
         for code, severity, text in a.flags:
             self.db.add(
                 ApplicationFlag(

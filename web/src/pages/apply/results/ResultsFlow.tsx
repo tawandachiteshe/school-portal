@@ -160,7 +160,7 @@ export function ResultsFlow({
   frame,
   onBack,
   onSaved,
-  step = 'Step 3 of 5',
+  step = 'Step 4 of 6',
 }: {
   api: ResultsApi
   frame: (children: React.ReactNode) => React.ReactNode

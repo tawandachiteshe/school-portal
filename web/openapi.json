@@ -3426,6 +3426,204 @@
         }
       }
     },
+    "/apply/birth-certificate": {
+      "get": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Birth Certificate",
+        "operationId": "birth_certificate",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Confirm Birth Certificate",
+        "operationId": "confirm_birth_certificate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmBirthIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Upload Birth Certificate",
+        "operationId": "upload_birth_certificate",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_birth_certificate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/birth-certificate": {
+      "get": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Phone Birth Certificate",
+        "operationId": "phone_birth_certificate",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Phone Confirm Birth Certificate",
+        "operationId": "phone_confirm_birth_certificate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmBirthIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apply birth certificate"
+        ],
+        "summary": "Phone Upload Birth Certificate",
+        "operationId": "phone_upload_birth_certificate",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_phone_upload_birth_certificate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BirthCertificateState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/apply/results": {
       "get": {
         "tags": [
@@ -4290,6 +4488,7 @@
         "enum": [
           "programme",
           "national_id",
+          "birth_certificate",
           "results",
           "review",
           "submit"
@@ -4515,6 +4714,102 @@
         ],
         "title": "AudienceKind"
       },
+      "BirthCertificateState": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/BirthStatus"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "received_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Received At"
+          },
+          "capture_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Device"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "matches_id": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matches Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "document_id",
+          "received_at",
+          "capture_device",
+          "name",
+          "date_of_birth",
+          "matches_id"
+        ],
+        "title": "BirthCertificateState"
+      },
+      "BirthStatus": {
+        "type": "string",
+        "enum": [
+          "none",
+          "uploaded",
+          "confirmed"
+        ],
+        "title": "BirthStatus"
+      },
       "Body_add_results_page": {
         "properties": {
           "file": {
@@ -4587,6 +4882,20 @@
         ],
         "title": "Body_phone_add_results_page"
       },
+      "Body_phone_upload_birth_certificate": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_phone_upload_birth_certificate"
+      },
       "Body_phone_upload_national_id": {
         "properties": {
           "file": {
@@ -4600,6 +4909,20 @@
           "file"
         ],
         "title": "Body_phone_upload_national_id"
+      },
+      "Body_upload_birth_certificate": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_birth_certificate"
       },
       "Body_upload_national_id": {
         "properties": {
@@ -5173,6 +5496,27 @@
           "sms_max"
         ],
         "title": "ComposeOptions"
+      },
+      "ConfirmBirthIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 3,
+            "title": "Name"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "title": "Date Of Birth"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "date_of_birth"
+        ],
+        "title": "ConfirmBirthIn"
       },
       "ConfirmIdIn": {
         "properties": {
@@ -6480,6 +6824,41 @@
               }
             ],
             "title": "Checked At"
+          },
+          "birth_certificate_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Certificate Id"
+          },
+          "birth_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Name"
+          },
+          "birth_date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date Of Birth"
           }
         },
         "type": "object",
@@ -6498,7 +6877,10 @@
           "origin",
           "edited",
           "checked_by",
-          "checked_at"
+          "checked_at",
+          "birth_certificate_id",
+          "birth_name",
+          "birth_date_of_birth"
         ],
         "title": "Identity"
       },
@@ -10553,6 +10935,10 @@
             "type": "boolean",
             "title": "National Id"
           },
+          "birth_certificate": {
+            "type": "boolean",
+            "title": "Birth Certificate"
+          },
           "results": {
             "type": "boolean",
             "title": "Results"
@@ -10562,6 +10948,7 @@
         "required": [
           "programme",
           "national_id",
+          "birth_certificate",
           "results"
         ],
         "title": "Steps"

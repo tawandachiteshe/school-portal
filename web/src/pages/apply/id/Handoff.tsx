@@ -27,9 +27,17 @@ import {
   phoneSaveResults,
   usePhoneResults,
 } from '@/api/generated/apply-results/apply-results'
+import {
+  getPhoneBirthCertificateQueryKey,
+  phoneConfirmBirthCertificate,
+  phoneUploadBirthCertificate,
+  usePhoneBirthCertificate,
+} from '@/api/generated/apply-birth-certificate/apply-birth-certificate'
+import { BirthFlow } from '../birth/BirthCertificate'
 import { ResultsFlow } from '../results/ResultsFlow'
 import { PhoneFlow } from './PhoneFlow'
 
+const PHONE_PATH: Record<string, string> = { national_id: 'id', birth_certificate: 'birth-certificate', results: 'results' }
 const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const title = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
 
@@ -88,7 +96,7 @@ export function HandoffLanding() {
   const { data, isPending, error } = useHandoffLanding(code, { query: { retry: false } })
   const claim = useClaimHandoff({
     mutation: {
-      onSuccess: () => navigate(`/h/${code}/${data?.start_step === 'results' ? 'results' : 'id'}`, { replace: true }),
+      onSuccess: () => navigate(`/h/${code}/${PHONE_PATH[data?.start_step ?? ''] ?? 'id'}`, { replace: true }),
       onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't connect. Try again."),
     },
   })
@@ -102,7 +110,7 @@ export function HandoffLanding() {
         <p>{error instanceof ApiError ? error.message : 'Check the link, or create a new one on your computer.'}</p>
       </PhoneFrame>
     )
-  if (data.state === 'yours') return <Navigate to={`/h/${code}/${data.start_step === 'results' ? 'results' : 'id'}`} replace />
+  if (data.state === 'yours') return <Navigate to={`/h/${code}/${PHONE_PATH[data.start_step] ?? 'id'}`} replace />
   if (data.state === 'expired')
     return (
       <PhoneFrame linked={false}>
@@ -186,11 +194,11 @@ function Done({ code, id, onMore }: { code: string; id: NationalIdState; onMore:
     <PhoneFrame code={code}>
       <div className="-mt-4 flex flex-col gap-2">
         <div className="flex justify-between text-sm">
-          <span className="font-medium">Step 2 of 5 · National ID</span>
-          <span className="text-muted-foreground">Next: ZIMSEC results</span>
+          <span className="font-medium">Step 2 of 6 · National ID</span>
+          <span className="text-muted-foreground">Next: Birth certificate</span>
         </div>
-        <div className="grid grid-cols-5 gap-1" aria-hidden>
-          {[0, 1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-6 gap-1" aria-hidden>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
             <span key={i} className={i < 2 ? 'h-1 rounded-full bg-primary' : 'h-1 rounded-full bg-border'} />
           ))}
         </div>
@@ -216,7 +224,7 @@ function Done({ code, id, onMore }: { code: string; id: NationalIdState; onMore:
       </dl>
       <div className="mt-auto flex flex-col gap-3">
         <Button block onClick={onMore}>
-          Continue to ZIMSEC results
+          Continue to birth certificate
         </Button>
         <Button block variant="outline" onClick={() => toast('Carry on on your computer. You can close this page.')}>
           I'll finish on my computer
@@ -242,7 +250,7 @@ export function HandoffId() {
   if (!data) return <Disconnected />
   const refresh = () => qc.invalidateQueries({ queryKey: getPhoneStateQueryKey() })
   if (data.national_id.status === 'confirmed')
-    return <Done code={data.match_code} id={data.national_id} onMore={() => navigate(`/h/${code}/results`)} />
+    return <Done code={data.match_code} id={data.national_id} onMore={() => navigate(`/h/${code}/birth-certificate`)} />
   return (
     <PhoneFlow
       state={data.national_id}
@@ -299,9 +307,34 @@ export function HandoffResults() {
         save: (body) => phoneSaveResults(body).then(put),
         fileUrl: (id) => `/api${getPhoneDocumentFileUrl(id)}`,
       }}
-      onBack={() => navigate(`/h/${code}/id`)}
+      onBack={() => navigate(`/h/${code}/birth-certificate`)}
       onSaved={() => setSaved(true)}
       frame={(children) => <PhoneFrame code={match}>{children}</PhoneFrame>}
+    />
+  )
+}
+
+// /h/:code/birth-certificate on the linked phone.
+export function HandoffBirth() {
+  const { code = '' } = useParams()
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const session = usePhoneState({ query: { retry: false } })
+  const { data, error } = usePhoneBirthCertificate({ query: { retry: false } })
+  if ((error instanceof ApiError && error.status === 410) || (session.error instanceof ApiError && session.error.status === 410))
+    return <Disconnected />
+  const put = (s: unknown) => qc.setQueryData(getPhoneBirthCertificateQueryKey(), s)
+  return (
+    <BirthFlow
+      api={{
+        state: data,
+        upload: (file) => phoneUploadBirthCertificate({ file }).then(put),
+        confirm: (body) => phoneConfirmBirthCertificate(body).then(put),
+        fileUrl: (id) => `/api${getPhoneDocumentFileUrl(id)}`,
+      }}
+      onBack={() => navigate(`/h/${code}/id`)}
+      onDone={() => navigate(`/h/${code}/results`)}
+      frame={(children) => <PhoneFrame code={session.data?.match_code}>{children}</PhoneFrame>}
     />
   )
 }

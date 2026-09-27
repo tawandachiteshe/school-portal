@@ -7,9 +7,10 @@ import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
 
-export const STEPS = ['Programme', 'National ID', 'ZIMSEC results', 'Review', 'Submit'] as const
+// The designs have five steps; Birth certificate was added after them.
+export const STEPS = ['Programme', 'National ID', 'Birth certificate', 'ZIMSEC results', 'Review', 'Submit'] as const
 
-// Mobile: "Step 1 of 5 · Programme / Next: National ID" over five 4px segments (design/ProgrammeMobile).
+// Mobile: "Step 1 of 6 · Programme / Next: National ID" over one 4px segment per step (design/ProgrammeMobile).
 function MobileSteps({ step }: { step: number }) {
   return (
     <div className="flex flex-col gap-2 bg-background px-4 pt-4 pb-3">
@@ -25,7 +26,8 @@ function MobileSteps({ step }: { step: number }) {
         aria-valuemax={STEPS.length}
         aria-valuenow={step}
         aria-label={`Step ${step} of ${STEPS.length}`}
-        className="grid grid-cols-5 gap-1"
+        className="grid gap-1"
+        style={{ gridTemplateColumns: `repeat(${STEPS.length}, minmax(0, 1fr))` }}
       >
         {STEPS.map((s, i) => (
           <span key={s} className={cn('h-1 rounded-full bg-border', i < step && 'bg-primary')} />

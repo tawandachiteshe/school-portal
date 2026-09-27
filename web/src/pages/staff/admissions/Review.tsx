@@ -65,6 +65,9 @@ const longDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long
 const sep = (s: string) => s.replace('Sept', 'Sep')
 const submittedText = (d: Date) => sep(withYear.format(d).replace(/,/g, '').replace(/ (\d\d:\d\d)$/, ', $1'))
 const fileUrl = (id: string) => `/api${getDocumentFileUrl(id)}`
+const words = (s?: string | null) => (s ?? '').toUpperCase().split(/[^A-Z]+/).filter(Boolean).sort().join(' ')
+const birthMatches = (i: ReviewData['identity']) =>
+  words(i.birth_name) === words(i.name_on_id) && (!i.date_of_birth || i.birth_date_of_birth === i.date_of_birth)
 const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
 
 function useRefresh(reference: string) {
@@ -530,6 +533,30 @@ function ReviewView({ r }: { r: ReviewData }) {
                     {[idn.registered_in && `Registered in ${idn.registered_in}`, idn.origin && `Origin ${idn.origin}`]
                       .filter(Boolean)
                       .join(' · ') || '—'}
+                  </dd>
+                  <dt className="text-muted-foreground">Birth certificate</dt>
+                  <dd>
+                    {idn.birth_certificate_id ? (
+                      <span className="flex flex-wrap items-center gap-x-2">
+                        {idn.birth_name}
+                        {idn.birth_date_of_birth && ` · ${longDate.format(new Date(`${idn.birth_date_of_birth}T12:00:00`))}`}
+                        {idn.name_on_id && idn.birth_name && (
+                          birthMatches(idn) ? (
+                            <span className="inline-flex items-center gap-1 text-success">
+                              <Check className="size-4" strokeWidth={1.5} aria-hidden />
+                              matches ID
+                            </span>
+                          ) : (
+                            <span className="font-medium text-urgent">differs from ID</span>
+                          )
+                        )}
+                        <a href={fileUrl(idn.birth_certificate_id)} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                          Open
+                        </a>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">Not added</span>
+                    )}
                   </dd>
                   <dt className="text-muted-foreground">Edited by applicant</dt>
                   <dd className={cn(!idn.edited.length && 'text-muted-foreground', idn.edited.length && 'font-medium text-urgent')}>

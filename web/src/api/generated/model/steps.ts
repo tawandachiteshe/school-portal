@@ -8,5 +8,6 @@
 export interface Steps {
   programme: boolean;
   national_id: boolean;
+  birth_certificate: boolean;
   results: boolean;
 }

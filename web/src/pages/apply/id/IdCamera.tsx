@@ -129,6 +129,13 @@ const KINDS = {
     help: 'The photo is taken by itself when your ID is steady and inside the outline.',
     upload: 'Gallery',
   },
+  certificate: {
+    title: 'Birth certificate',
+    frame: 'aspect-[1/1.414] h-[88%] max-w-[82%] rounded-sm',
+    crop: [0.7, 0.9],
+    help: 'Lay the certificate flat. The photo is taken by itself when all four corners are inside.',
+    upload: 'Upload a file',
+  },
   slip: {
     title: 'ZIMSEC result slip',
     frame: 'aspect-[1/1.414] h-[88%] max-w-[82%] rounded-sm',
@@ -143,7 +150,7 @@ export function IdCamera({
   onPhoto,
   onType,
   onBack,
-  step = 'Step 2 of 5',
+  step = 'Step 2 of 6',
   kind = 'id',
   page,
 }: {

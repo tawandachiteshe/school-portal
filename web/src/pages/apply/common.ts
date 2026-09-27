@@ -3,6 +3,7 @@ import type { ApplyStep, MyApplication } from '@/api/generated/model'
 export const STEP_PATH: Record<ApplyStep, string> = {
   programme: '/apply/programme',
   national_id: '/apply/id',
+  birth_certificate: '/apply/birth-certificate',
   results: '/apply/results',
   review: '/apply/review',
   submit: '/apply/submit',
