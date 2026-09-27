@@ -50,7 +50,8 @@ function Password({ id, value, onChange, error }: { id: string; value: string; o
 
 // design/SignIn (phone) and StaffSignIn (computer): our screen for Authentik's identification stage.
 export default function SignIn() {
-  const desktop = useIsDesktop()
+  // StaffSignIn from tablet width up: staff laptops at 125–150% scaling are often under 1024px.
+  const desktop = useIsDesktop('(min-width: 768px)')
   const [params] = useSearchParams()
   const next = params.get('next') ?? '/'
   const ids = { id: useId(), pw: useId(), shared: useId() }
@@ -187,7 +188,7 @@ export default function SignIn() {
         <header className="flex h-16 shrink-0 items-center border-b bg-card px-8">
           <Wordmark />
         </header>
-        <main className="grid grid-cols-[400px_360px] items-start gap-24 px-20 py-16">
+        <main className="grid grid-cols-[minmax(0,400px)_minmax(0,360px)] items-start gap-12 px-8 py-16 lg:gap-24 lg:px-20">
           <section className="flex flex-col gap-6">
             {heading}
             {signedIn || ((challenge || down) && form)}
@@ -220,7 +221,7 @@ export default function SignIn() {
     )
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-background">
       <header className="flex h-14 shrink-0 items-center px-4">
         <Wordmark />
       </header>
