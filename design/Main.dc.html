@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div class="tc {{theme}}" style="width: 390px; height: 2240px; display: flex; flex-direction: column; background: var(--background)">
+<div class="tc {{theme}}" style="width: 390px; height: 2320px; display: flex; flex-direction: column; background: var(--background)">
 
 <header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 16px; flex: none">
 <div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
@@ -210,7 +210,7 @@
 </nav>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":2240}}'>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":2320}}'>
 class Component extends DCLogic {
   renderVals() {
     return { theme: this.props.theme ?? 'light' };

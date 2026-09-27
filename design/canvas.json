@@ -3,7 +3,7 @@
  "attachments": {},
  "boards": {
   "AnnouncementCompose.dc.html": {
-   "h": 1000,
+   "h": 1080,
    "page": "staff",
    "title": "Write an announcement",
    "w": 1280,
@@ -99,7 +99,7 @@
    "y": 0
   },
   "Foundations.dc.html": {
-   "h": 1720,
+   "h": 1840,
    "page": "dashboard",
    "title": "Foundations · tokens and primitives",
    "w": 1280,
@@ -203,7 +203,7 @@
    "y": 0
   },
   "Main.dc.html": {
-   "h": 2240,
+   "h": 2320,
    "page": "dashboard",
    "title": "Dashboard · light",
    "w": 390,
@@ -211,7 +211,7 @@
    "y": 0
   },
   "MainDark.dc.html": {
-   "h": 2240,
+   "h": 2320,
    "page": "dashboard",
    "title": "Dashboard · dark",
    "w": 390,
@@ -355,7 +355,7 @@
    "y": 0
   },
   "StaffQueue.dc.html": {
-   "h": 900,
+   "h": 960,
    "page": "staff",
    "title": "Applications queue",
    "w": 1280,
@@ -585,6 +585,62 @@
    "h": 1040,
    "title": "Step 5 · Pay by bank transfer",
    "page": "onboarding"
+  },
+  "DeskHome.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 1320,
+   "title": "Dashboard · desktop",
+   "page": "studentdesk"
+  },
+  "DeskTimetable.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Timetable · week grid",
+   "page": "studentdesk"
+  },
+  "DeskModule.dc.html": {
+   "x": 2720,
+   "y": 0,
+   "w": 1280,
+   "h": 1000,
+   "title": "Module · DCN201 notes",
+   "page": "studentdesk"
+  },
+  "DeskDeadlines.dc.html": {
+   "x": 4080,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Deadlines · desktop",
+   "page": "studentdesk"
+  },
+  "DeskResults.dc.html": {
+   "x": 0,
+   "y": 1720,
+   "w": 1280,
+   "h": 820,
+   "title": "Results · desktop",
+   "page": "studentdesk"
+  },
+  "DeskLibrary.dc.html": {
+   "x": 1360,
+   "y": 1720,
+   "w": 1280,
+   "h": 900,
+   "title": "Library · desktop",
+   "page": "studentdesk"
+  },
+  "DeskAsk.dc.html": {
+   "x": 2720,
+   "y": 1720,
+   "w": 1280,
+   "h": 1000,
+   "title": "Ask TCFL · desktop",
+   "page": "studentdesk"
   }
  },
  "createdOnFiles": {
@@ -724,6 +780,22 @@
    "kind": "title1",
    "maxW": 5360,
    "page": "onboarding"
+  },
+  "t-sd1": {
+   "x": 0,
+   "y": -300,
+   "text": "Student app on a computer (lab PCs, laptops)",
+   "kind": "title1",
+   "maxW": 5360,
+   "page": "studentdesk"
+  },
+  "t-sd2": {
+   "x": 0,
+   "y": 1420,
+   "text": "Results, library and Ask TCFL on a computer",
+   "kind": "title1",
+   "maxW": 4000,
+   "page": "studentdesk"
   }
  },
  "order": [
@@ -799,7 +871,14 @@
   "Payment.dc.html",
   "PayWaiting.dc.html",
   "PayFailed.dc.html",
-  "PayOffice.dc.html"
+  "PayOffice.dc.html",
+  "DeskHome.dc.html",
+  "DeskTimetable.dc.html",
+  "DeskModule.dc.html",
+  "DeskDeadlines.dc.html",
+  "DeskResults.dc.html",
+  "DeskLibrary.dc.html",
+  "DeskAsk.dc.html"
  ],
  "pages": [
   {
@@ -825,6 +904,10 @@
   {
    "id": "student",
    "name": "Student app"
+  },
+  {
+   "id": "studentdesk",
+   "name": "Student app · desktop"
   },
   {
    "id": "staff",

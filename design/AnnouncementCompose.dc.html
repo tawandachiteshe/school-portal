@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div class="tc {{theme}}" style="width: 1280px; height: 1000px; display: flex">
+<div class="tc {{theme}}" style="width: 1280px; height: 1080px; display: flex">
 <aside class="side" aria-label="Staff">
 <div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px 12px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span><span class="badge" style="margin-left: auto">Staff</span></div>
 <nav style="display: flex; flex-direction: column; gap: 2px">
@@ -75,7 +75,7 @@
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1000}}'>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1080}}'>
 class Component extends DCLogic {
   renderVals() {
     return { theme: this.props.theme ?? 'light' };
