@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in on a computer</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 800px; display: flex; flex-direction: column">
+<header class="bar" style="height: 64px; display: flex; align-items: center; padding: 0 32px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+</header>
+<main style="padding: 64px 80px; display: grid; grid-template-columns: 400px 360px; gap: 96px; align-items: start">
+<section style="display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1d">Sign in</h1>
+<p class="muted">Students, applicants and staff all sign in here.</p>
+</div>
+<form style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="id">Student number, staff email or mobile number</label>
+<input class="input" id="id" value="f.chikore@tcfl.ac.zw" autocomplete="username">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><label class="label" for="pw">Password</label><a class="link sm" href="ForgotPassword.dc.html">Forgot it?</a></div>
+<input class="input" id="pw" type="password" value="••••••••••••" autocomplete="current-password">
+</div>
+<label style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer">
+<span class="check" style="margin-top: 3px; background: var(--primary); border-color: var(--primary); display: inline-flex; align-items: center; justify-content: center; color: var(--primary-foreground); flex: none"><svg class="ic" viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke-width: 3"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<span><span style="display: block">This is a shared computer</span><span class="sm muted">You'll be signed out when you close the browser</span></span>
+</label>
+<div><button class="btn btn-primary" type="submit" style="min-width: 160px">Sign in</button></div>
+</form>
+<p class="sm muted">New applicant? <a class="link" href="Register.dc.html">Start an application</a></p>
+</section>
+
+<aside style="padding-top: 72px; display: flex; flex-direction: column; gap: 16px">
+<h2 class="h3">On a college lab computer?</h2>
+<ul class="sm" style="display: flex; flex-direction: column; gap: 10px">
+<li style="display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 8px"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--foreground); margin-top: 8px"></span><span>Don't let the browser save your password.</span></li>
+<li style="display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 8px"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--foreground); margin-top: 8px"></span><span>Sign out from the menu when you're done.</span></li>
+<li style="display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 8px"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--foreground); margin-top: 8px"></span><span>Need to scan a document? You can continue on your phone at that step.</span></li>
+</ul>
+<p class="sm muted" style="padding-top: 16px; border-top: 1px solid var(--border)">Can't sign in? ICT Services, Block C.</p>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Camera access blocked</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 900px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<a class="icon-btn" href="#" aria-label="Back" style="color: var(--foreground)"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></a>
+<span class="fw6">Front of National ID</span>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<svg class="ic muted" viewBox="0 0 24 24" style="width: 32px; height: 32px"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle><path d="m2 2 20 20"></path></svg>
+<h1 class="h1">Camera access is off</h1>
+<p>Your browser is blocking the camera for this site, so we can't take the photo.</p>
+</div>
+
+<section aria-labelledby="h-fix" style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2" id="h-fix">Turn it on in Chrome</h2>
+<ol style="display: flex; flex-direction: column; gap: 12px">
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><span class="mono muted">1</span><span>Tap the icon to the left of <span class="mono sm">portal.tcfl.ac.zw</span> in the address bar.</span></li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><span class="mono muted">2</span><span>Tap <span class="fw6">Permissions</span>, then <span class="fw6">Camera</span>.</span></li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><span class="mono muted">3</span><span>Choose <span class="fw6">Allow</span>, then come back and tap Try again.</span></li>
+</ol>
+<a class="tlink" href="#">Using a different browser?</a>
+</section>
+
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+<button class="btn btn-primary btn-block">Try again</button>
+<button class="btn btn-secondary btn-block">Upload a photo from my gallery</button>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

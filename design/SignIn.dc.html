@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column">
+<header style="height: 56px; display: flex; align-items: center; padding: 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">Sign in</h1>
+<p class="muted">Students, applicants and staff all sign in here.</p>
+</div>
+
+<form style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="id">Student number, staff email or mobile number</label>
+<input class="input mono" id="id" value="TCFL/2027/0142" autocomplete="username">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="pw">Password</label>
+<div style="position: relative">
+<input class="input" id="pw" type="password" value="••••••••••" autocomplete="current-password" style="padding-right: 72px">
+<button type="button" class="btn btn-ghost btn-sm" style="position: absolute; right: 4px; top: 4px">Show</button>
+</div>
+</div>
+<button class="btn btn-primary btn-block" type="submit">Sign in</button>
+<a class="tlink" href="ForgotPassword.dc.html">Forgot your password?</a>
+</form>
+
+<section aria-labelledby="h-new" class="hair" style="padding-top: 24px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
+<h2 class="h3" id="h-new">Applying to TCFL?</h2>
+<p class="sm muted">Apply for the 2027 intake. Have your National ID and ZIMSEC results with you.</p>
+<a class="btn btn-secondary" href="Register.dc.html" style="margin-top: 4px">Start an application</a>
+</section>
+
+<p class="sm muted" style="margin-top: auto">Can't sign in? ICT Services, Block C.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

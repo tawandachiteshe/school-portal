@@ -1,0 +1,84 @@
+# Production stack for Dokploy (Compose deployment, compose path: docker-compose.prod.yml).
+# No host ports: Dokploy's Traefik routes the portal domain to the services (docs/06 §6.7):
+#   https://portal.tcfl.ac.zw/        → web:80
+#   https://portal.tcfl.ac.zw/api     → api:8000            (strip path prefix: on)
+#   https://portal.tcfl.ac.zw/auth    → authentik-server:9000 (strip path prefix: off)
+# Environment variables are set in Dokploy's Environment tab (template: .env.example).
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"], interval: 5s }
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes: [minio:/data]
+    restart: unless-stopped
+
+  api:
+    build: { context: ./api, target: prod }
+    env_file: .env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    restart: unless-stopped
+
+  web:
+    build: { context: ./web, target: prod }
+    restart: unless-stopped
+
+  authentik-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_PG_PASS}
+    volumes: [authentik-db:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -d authentik -U authentik"], interval: 10s }
+    restart: unless-stopped
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG}
+    command: server
+    env_file: .env
+    environment: &authentik-env
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS}
+      AUTHENTIK_WEB__PATH: /auth/
+    volumes:
+      - authentik-data:/data
+      - ./infra/authentik/blueprints:/blueprints/custom:ro
+      - ./infra/authentik/custom-templates:/templates
+    shm_size: 512mb
+    depends_on: { authentik-db: { condition: service_healthy } }
+    restart: unless-stopped
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG}
+    command: worker
+    env_file: .env
+    environment: *authentik-env
+    volumes:
+      - authentik-data:/data
+      - ./infra/authentik/blueprints:/blueprints/custom:ro
+      - ./infra/authentik/custom-templates:/templates
+    shm_size: 512mb
+    depends_on: { authentik-db: { condition: service_healthy } }
+    restart: unless-stopped
+
+volumes: { pgdata: {}, minio: {}, authentik-db: {}, authentik-data: {} }

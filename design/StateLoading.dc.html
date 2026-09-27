@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard loading</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+<div style="display: flex; align-items: center"><a class="btn btn-ghost" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Ask TCFL</a><button class="icon-btn" aria-label="Account: Tariro Moyo"><span class="avatar">TM</span></button></div>
+</header>
+<main aria-busy="true" style="padding: 24px 16px; display: flex; flex-direction: column; gap: 32px; flex-grow: 1; overflow: hidden">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">Good morning, Tariro</h1>
+<p class="muted">Thursday 11 March · Week 6 of 16</p>
+</div>
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2">Today</h2>
+<div style="display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; padding: 8px 0"><span class="skel" style="height: 14px"></span><span style="display: flex; flex-direction: column; gap: 8px"><span class="skel" style="height: 14px; width: 70%"></span><span class="skel" style="height: 12px; width: 45%"></span></span></div>
+<div style="display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; padding: 8px 0"><span class="skel" style="height: 14px"></span><span style="display: flex; flex-direction: column; gap: 8px"><span class="skel" style="height: 14px; width: 60%"></span><span class="skel" style="height: 12px; width: 40%"></span></span></div>
+<div style="display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; padding: 8px 0"><span class="skel" style="height: 14px"></span><span style="display: flex; flex-direction: column; gap: 8px"><span class="skel" style="height: 14px; width: 75%"></span><span class="skel" style="height: 12px; width: 50%"></span></span></div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2">Due in the next 7 days</h2>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 8px 0"><span class="skel" style="height: 20px; width: 120px"></span><span class="skel" style="height: 14px; width: 80%"></span><span class="skel" style="height: 12px; width: 50%"></span></div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 8px 0"><span class="skel" style="height: 20px; width: 120px"></span><span class="skel" style="height: 14px; width: 70%"></span><span class="skel" style="height: 12px; width: 45%"></span></div>
+</section>
+<p class="sm muted" role="status" style="display: flex; gap: 8px; align-items: center"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>Loading your day. Slow connection, this may take a few seconds.</p>
+</main>
+<nav aria-label="Main" class="bnav">
+<a class="bn" href="#" aria-current="page"><svg class="ic" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>Modules</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Deadlines</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>Library</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12h16"></path><path d="M4 6h16"></path><path d="M4 18h16"></path></svg>More</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ZIMSEC results</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1500px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+<button class="btn btn-ghost">Save and exit</button>
+</header>
+<div style="padding: 16px 16px 0; display: flex; flex-direction: column; gap: 8px">
+<div class="sm" style="display: flex; justify-content: space-between"><span class="fw5">Step 3 of 5 · ZIMSEC results</span><span class="muted">Next: Review</span></div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="3" aria-label="Step 3 of 5"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span></div>
+</div>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">ZIMSEC results</h1>
+<p class="muted">Photograph each result slip or certificate. We fill in the grades, then you check them.</p>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="h2">O-Level · November 2022</h2>
+<p class="sm muted">Centre <span class="mono fg">123456</span> · Candidate <span class="mono fg">0457</span></p>
+</div>
+
+<div style="display: flex; gap: 12px; align-items: center">
+<div aria-hidden="true" style="width: 48px; height: 64px; border-radius: 4px; background: var(--muted); border: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; gap: 4px; flex: none">
+<span style="height: 3px; width: 80%; background: var(--border-strong)"></span><span style="height: 3px; width: 100%; background: var(--border-strong)"></span><span style="height: 3px; width: 100%; background: var(--border-strong)"></span><span style="height: 3px; width: 100%; background: var(--border-strong)"></span><span style="height: 3px; width: 60%; background: var(--border-strong)"></span>
+</div>
+<div style="flex-grow: 1"><div class="fw5">Result slip</div><div class="sm muted">1 photo · read 09:52</div></div>
+<button class="btn btn-ghost">Add photo</button>
+</div>
+
+<div class="alert alert-amber">
+<svg class="ic amber" viewBox="0 0 24 24" style="margin-top: 2px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+<p>We weren't sure about 2 grades. They're outlined below, next to the part of your slip we read.</p>
+</div>
+
+<table style="width: 100%; border-collapse: collapse">
+<thead>
+<tr class="sm muted"><th scope="col" style="text-align: left; font-weight: 500; padding: 8px 0; width: 56px; border-bottom: 1px solid var(--border)">Code</th><th scope="col" style="text-align: left; font-weight: 500; padding: 8px 0; border-bottom: 1px solid var(--border)">Subject</th><th scope="col" style="text-align: right; font-weight: 500; padding: 8px 0; width: 132px; border-bottom: 1px solid var(--border)">Grade</th></tr>
+</thead>
+<tbody>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border)">1122</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)">English Language</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end"><select class="input mono" aria-label="Grade for English Language" style="width: 64px; padding: 0 8px"><option>B</option></select></div></td></tr>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border)">4004</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)">Mathematics</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end"><select class="input mono" aria-label="Grade for Mathematics" style="width: 64px; padding: 0 8px"><option>C</option></select></div></td></tr>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; padding-top: 18px">5009</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; padding-top: 18px"><div>Physical Science</div><div class="sm amber fw5">Check this grade</div></td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px"><figure style="width: 56px; height: 44px; border-radius: 4px; border: 1px solid var(--border); background: #EDEAE3; display: flex; align-items: center; justify-content: center; flex: none" role="img" aria-label="Crop from your slip: the grade looks like B or 8"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; line-height: 1; color: #58534B; font-weight: 500; opacity: 0.8">B</span></figure><select class="input input-low mono" aria-label="Grade for Physical Science, please check" style="width: 64px; padding: 0 8px"><option>B</option></select></div></td></tr>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border)">4021</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)">Computer Science</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end"><select class="input mono" aria-label="Grade for Computer Science" style="width: 64px; padding: 0 8px"><option>A</option></select></div></td></tr>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; padding-top: 18px">2248</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; padding-top: 18px"><div>Geography</div><div class="sm amber fw5">Check this grade</div></td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px"><figure style="width: 56px; height: 44px; border-radius: 4px; border: 1px solid var(--border); background: #E4E0D7; display: flex; align-items: center; justify-content: center; flex: none" role="img" aria-label="Crop from your slip: the grade is smudged and looks like C or G"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; line-height: 1; color: #6A655C; font-weight: 500; opacity: 0.7">C</span></figure><select class="input input-low mono" aria-label="Grade for Geography, please check" style="width: 64px; padding: 0 8px"><option>C</option></select></div></td></tr>
+<tr><td class="mono sm" style="padding: 8px 0; border-bottom: 1px solid var(--border)">3159</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)">Shona</td><td style="padding: 8px 0; border-bottom: 1px solid var(--border)"><div style="display: flex; justify-content: flex-end"><select class="input mono" aria-label="Grade for Shona" style="width: 64px; padding: 0 8px"><option>B</option></select></div></td></tr>
+</tbody>
+</table>
+<div><button class="btn btn-ghost" style="padding: 0 4px"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add a subject we missed</button></div>
+</section>
+
+<section class="hair" style="padding-top: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+<h2 class="h3">Wrote any subjects again?</h2>
+<p class="sm muted">Add each sitting, for example a June resit. We use your best grade for each subject.</p>
+<button class="btn btn-secondary"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add another sitting</button>
+</section>
+
+<div style="margin-top: auto"><button class="btn btn-primary btn-block">Save and continue</button></div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

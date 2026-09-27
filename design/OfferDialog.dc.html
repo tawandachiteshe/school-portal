@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offer a place</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 1240px; position: relative">
+<div aria-hidden="true" style="position: absolute; inset: 0"><dc-import name="StaffReview" theme="{{theme}}" hint-size="1280px,1240px"></dc-import></div>
+<div style="position: absolute; inset: 0; background: rgba(20, 19, 17, 0.48)"></div>
+
+<div role="dialog" aria-modal="true" aria-labelledby="of-t" class="card" style="position: absolute; left: 400px; top: 140px; width: 600px; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 12px 16px 24px; border-bottom: 1px solid var(--border)">
+<h2 class="h2" id="of-t">Offer Tariro Moyo a place</h2>
+<button class="icon-btn" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 20px">
+<dl style="display: grid; grid-template-columns: 140px minmax(0, 1fr); row-gap: 8px" class="sm">
+<dt class="muted">Programme</dt><dd class="fw5">Diploma in Information Technology</dd>
+<dt class="muted">Places left</dt><dd><span class="mono">12</span> of <span class="mono">80</span> for the 2027 intake</dd>
+</dl>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="cg">Class group</label><select class="input mono" id="cg"><option>DIT-1A</option></select><span class="hint"><span class="mono">34</span> of <span class="mono">40</span> places taken</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="ab">Accept by</label><input class="input" id="ab" value="Fri 13 Nov 2026"><span class="hint">4 weeks from today</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="label">Tariro will get</span>
+<ul class="list sm" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<li style="display: flex; justify-content: space-between; padding: 10px 0"><span>Offer letter in the portal (PDF)</span><a class="link" href="#">Preview</a></li>
+<li style="display: flex; justify-content: space-between; padding: 10px 0; gap: 16px"><span>SMS to <span class="mono">+263 77 ••• 4521</span></span><span class="muted">“TCFL: You've been offered a place on the Diploma in IT. Accept by 13 Nov at portal.tcfl.ac.zw”</span></li>
+</ul>
+</div>
+<p class="sm muted">Identity checked · ZIMSEC not yet verified. The offer letter says it depends on ZIMSEC confirming the results.</p>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border)">
+<button class="btn btn-secondary">Cancel</button>
+<button class="btn btn-primary">Send offer</button>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

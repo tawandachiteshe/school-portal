@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ZIMSEC results</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 1000px; display: flex; flex-direction: column">
+<header class="bar" style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex: none">
+<div style="display: flex; align-items: center; gap: 16px"><div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div><span style="width: 1px; height: 20px; background: var(--border)"></span><span class="sm muted">Application · 2027 intake</span></div>
+<div style="display: flex; align-items: center; gap: 16px"><span class="sm muted">Reference <span class="mono fg">APP-27-08813</span></span><button class="btn btn-secondary btn-sm">Save and exit</button></div>
+</header>
+<nav aria-label="Application steps" class="bar" style="padding: 0 32px; flex: none">
+<ol class="steps">
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>Programme</li>
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>National ID</li>
+<li class="st cur" aria-current="step"><span class="stn">3</span>ZIMSEC results</li>
+<li class="st"><span class="stn">4</span>Review</li>
+<li class="st"><span class="stn">5</span>Submit</li>
+</ol>
+</nav>
+<main style="padding: 40px 80px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h1d">ZIMSEC results</h1>
+<p class="muted">Check each grade against your slip. We've outlined the 2 we weren't sure about.</p>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--border)">
+<h2 class="h2">O-Level · November 2022</h2>
+<span class="sm muted">Centre <span class="mono fg">123456</span> · Candidate <span class="mono fg">0457</span></span>
+</div>
+<table class="tbl" style="font-size: 16px; line-height: 24px; margin-top: -16px">
+<thead><tr><th style="width: 90px">Code</th><th>Subject</th><th style="width: 180px">From your slip</th><th style="width: 110px">Grade</th></tr></thead>
+<tbody>
+<tr><td class="mono">1122</td><td>English Language</td><td class="sm muted">Clear</td><td><select class="input mono" aria-label="Grade for English Language" style="width: 72px; height: 40px"><option>B</option></select></td></tr>
+<tr><td class="mono">4004</td><td>Mathematics</td><td class="sm muted">Clear</td><td><select class="input mono" aria-label="Grade for Mathematics" style="width: 72px; height: 40px"><option>C</option></select></td></tr>
+<tr><td class="mono">5009</td><td><div>Physical Science</div><div class="sm amber fw5">Check this grade</div></td><td><figure role="img" aria-label="Crop from your slip: looks like B or 8" style="width: 64px; height: 44px; border-radius: 4px; border: 1px solid var(--border); background: #EDEAE3; display: flex; align-items: center; justify-content: center"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: #58534B; opacity: 0.8">B</span></figure></td><td><select class="input input-low mono" aria-label="Grade for Physical Science, please check" style="width: 72px; height: 40px"><option>B</option></select></td></tr>
+<tr><td class="mono">4021</td><td>Computer Science</td><td class="sm muted">Clear</td><td><select class="input mono" aria-label="Grade for Computer Science" style="width: 72px; height: 40px"><option>A</option></select></td></tr>
+<tr><td class="mono">2248</td><td><div>Geography</div><div class="sm amber fw5">Check this grade</div></td><td><figure role="img" aria-label="Crop from your slip: smudged, C or G" style="width: 64px; height: 44px; border-radius: 4px; border: 1px solid var(--border); background: #E4E0D7; display: flex; align-items: center; justify-content: center"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: #6A655C; opacity: 0.7">C</span></figure></td><td><select class="input input-low mono" aria-label="Grade for Geography, please check" style="width: 72px; height: 40px"><option>C</option></select></td></tr>
+<tr><td class="mono">3159</td><td>Shona</td><td class="sm muted">Clear</td><td><select class="input mono" aria-label="Grade for Shona" style="width: 72px; height: 40px"><option>B</option></select></td></tr>
+</tbody>
+</table>
+<div style="display: flex; gap: 16px; align-items: center">
+<button class="btn btn-ghost" style="padding: 0 4px"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add a subject we missed</button>
+<button class="btn btn-secondary"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add another sitting</button>
+</div>
+<div style="display: flex; gap: 24px; align-items: center; padding-top: 8px">
+<button class="btn btn-primary">Save and continue</button>
+<span class="sm muted">Next: review everything before you submit</span>
+</div>
+</div>
+
+<aside style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px">
+<span class="label">Your slip</span>
+<div role="img" aria-label="Scan of your result slip" style="aspect-ratio: 1 / 1.414; border: 1px solid var(--border); border-radius: 4px; background: #E9E5DC; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+<span style="height: 8px; width: 50%; background: #7C766B"></span><span style="height: 5px; width: 70%; background: #A39C8F"></span><span style="height: 1px; background: #8F887B; margin: 8px 0"></span>
+<span style="height: 5px; width: 90%; background: #5E594F"></span><span style="height: 5px; width: 80%; background: #5E594F"></span><span style="height: 5px; width: 88%; background: #5E594F"></span><span style="height: 5px; width: 84%; background: #5E594F"></span><span style="height: 5px; width: 70%; background: #5E594F"></span><span style="height: 5px; width: 64%; background: #5E594F"></span>
+</div>
+<p class="sm muted">Scanned on your phone, 12 Oct 09:52 · 1 page</p>
+<a class="tlink" href="#">Open full size</a>
+<a class="tlink" href="Handoff.dc.html">Retake on my phone</a>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

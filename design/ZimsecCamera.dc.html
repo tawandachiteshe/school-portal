@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scan your result slip</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc" style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #0F0F0E; color: #F4F2EE">
+<div style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<button class="icon-btn" aria-label="Cancel and go back" style="color: #F4F2EE"><svg class="ic ic24" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+<div style="display: flex; flex-direction: column; flex-grow: 1"><span class="fw5">ZIMSEC result slip · page 1</span><span class="xs" style="color: #B8B3AA">Step 3 of 5</span></div>
+</div>
+
+<div role="status" aria-live="polite" style="margin: 8px 16px 0; padding: 12px 16px; border-radius: 6px; background: #F4F2EE; color: #1B1A18; display: flex; gap: 12px; align-items: flex-start; min-height: 72px">
+<svg class="ic" viewBox="0 0 24 24" style="color: #8A4B00; margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="fw6">Bottom of the slip is cut off</span>
+<span class="sm" style="color: #4A463F">Move your phone back so all the subjects fit inside.</span>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 390 480" width="390" height="480" role="img" aria-label="Camera view with a page-shaped outline to line up your result slip">
+<rect x="0" y="0" width="390" height="480" fill="#3A3833"></rect>
+<g transform="translate(46 58) rotate(-1)">
+<rect x="0" y="0" width="300" height="440" fill="#E9E5DC"></rect>
+<rect x="24" y="22" width="140" height="10" fill="#7C766B"></rect>
+<rect x="24" y="40" width="200" height="6" fill="#A39C8F"></rect>
+<rect x="24" y="54" width="170" height="6" fill="#A39C8F"></rect>
+<rect x="24" y="80" width="252" height="1" fill="#8F887B"></rect>
+<rect x="24" y="96" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="96" width="140" height="7" fill="#5E594F"></rect><rect x="252" y="96" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="118" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="118" width="100" height="7" fill="#5E594F"></rect><rect x="252" y="118" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="140" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="140" width="126" height="7" fill="#5E594F"></rect><rect x="252" y="140" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="162" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="162" width="130" height="7" fill="#5E594F"></rect><rect x="252" y="162" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="184" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="184" width="84" height="7" fill="#5E594F"></rect><rect x="252" y="184" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="206" width="36" height="7" fill="#5E594F"></rect><rect x="72" y="206" width="60" height="7" fill="#5E594F"></rect><rect x="252" y="206" width="14" height="7" fill="#5E594F"></rect>
+<rect x="24" y="250" width="252" height="1" fill="#8F887B"></rect>
+<rect x="24" y="266" width="220" height="6" fill="#A39C8F"></rect>
+<rect x="24" y="280" width="180" height="6" fill="#A39C8F"></rect>
+</g>
+<path d="M0 0h390v480H0z M55 24v396h280V24z" fill="#000000" opacity="0.5" fill-rule="evenodd"></path>
+<path d="M55 56V24h32 M303 24h32v32 M335 388v32h-32 M87 420H55v-32" fill="none" stroke="#F4F2EE" stroke-width="3" stroke-linecap="round"></path>
+<path d="M60 420h270" stroke="#F2B55C" stroke-width="3" stroke-dasharray="8 6"></path>
+</svg>
+</div>
+
+<div style="padding: 0 16px 24px; display: flex; flex-direction: column; gap: 16px; align-items: center; flex: none">
+<p class="sm" style="color: #B8B3AA; text-align: center">Lay the slip flat. The photo is taken by itself when all four corners are inside.</p>
+<div style="display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; width: 100%">
+<button class="icon-btn" aria-label="Turn on torch" style="color: #F4F2EE; justify-self: start"><svg class="ic ic24" viewBox="0 0 24 24"><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12z"></path><line x1="6" x2="18" y1="6" y2="6"></line><line x1="12" x2="12" y1="12" y2="12"></line></svg></button>
+<button aria-label="Take photo now" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid #F4F2EE; background: none; padding: 5px; cursor: pointer"><span style="display: block; width: 100%; height: 100%; border-radius: 50%; background: #F4F2EE"></span></button>
+<a href="#" class="tlink" style="color: #A9CBF2; justify-self: end">Upload a file</a>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

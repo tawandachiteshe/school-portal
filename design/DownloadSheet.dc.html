@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Large download warning</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column; position: relative">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none" aria-hidden="true">
+<span class="icon-btn"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></span><span class="mono fw5">DCN201</span>
+</header>
+<div aria-hidden="true" style="padding: 20px 16px; display: flex; flex-direction: column; gap: 16px">
+<span class="h1">Data Communications</span>
+<ul class="list">
+<li style="display: flex; gap: 12px; align-items: center; padding: 8px 0"><span class="badge mono" style="width: 44px; justify-content: center">PDF</span><span>Amplitude and frequency modulation</span></li>
+<li style="display: flex; gap: 12px; align-items: center; padding: 8px 0"><span class="badge mono" style="width: 44px; justify-content: center">PPTX</span><span>Analogue and digital signals</span></li>
+</ul>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(20, 19, 17, 0.48)"></div>
+<div role="dialog" aria-modal="true" aria-labelledby="dl-t" style="position: absolute; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--border); border-radius: 12px 12px 0 0; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
+<span style="width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); align-self: center"></span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2" id="dl-t">This file is 4.8 MB</h2>
+<p class="sm muted">Analogue and digital signals · PPTX · Week 4</p>
+</div>
+<p>You're on mobile data. It could take a few minutes on a slow connection and use some of your bundle.</p>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<button class="btn btn-primary btn-block">Download now</button>
+<button class="btn btn-secondary btn-block">Download when I'm on Wi-Fi</button>
+</div>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 44px; cursor: pointer">
+<span class="check" style="flex: none"></span>
+<span class="sm">Don't ask again for files under 10 MB</span>
+</label>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

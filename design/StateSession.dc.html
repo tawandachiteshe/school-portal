@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Signed out</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column; position: relative">
+<header class="bar" style="height: 56px; display: flex; align-items: center; padding: 0 16px; flex: none" aria-hidden="true">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+</header>
+<div aria-hidden="true" style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px">
+<span class="h1">Submit work</span>
+<span class="skel" style="height: 44px"></span><span class="skel" style="height: 120px"></span>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(20, 19, 17, 0.48)"></div>
+<div role="dialog" aria-modal="true" aria-labelledby="se-t" style="position: absolute; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--border); border-radius: 12px 12px 0 0; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
+<span style="width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); align-self: center"></span>
+<h2 class="h2" id="se-t">You've been signed out</h2>
+<p>For your security, TCFL Portal signs you out after a while without use. What you typed on this page is saved on this phone.</p>
+<button class="btn btn-primary btn-block">Sign in again</button>
+<p class="sm muted">You'll come back to this page after signing in.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

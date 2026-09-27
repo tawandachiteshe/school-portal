@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Photograph your National ID</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc" style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #0F0F0E; color: #F4F2EE">
+<div style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<button class="icon-btn" aria-label="Cancel and go back" style="color: #F4F2EE"><svg class="ic ic24" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+<div style="display: flex; flex-direction: column"><span class="fw5">Front of National ID</span><span class="xs" style="color: #B8B3AA">Step 2 of 5</span></div>
+</div>
+
+<div role="status" aria-live="polite" style="margin: 8px 16px 0; padding: 12px 16px; border-radius: 6px; background: #F4F2EE; color: #1B1A18; display: flex; gap: 12px; align-items: flex-start; min-height: 72px">
+<sc-if value="{{steady}}" hint-placeholder-val="{{ false }}"><svg class="ic" viewBox="0 0 24 24" style="color: #1D6B3A; margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg></sc-if>
+<sc-if value="{{notSteady}}" hint-placeholder-val="{{ true }}"><svg class="ic" viewBox="0 0 24 24" style="color: #8A4B00; margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></sc-if>
+<div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1">
+<span class="fw6">{{hintTitle}}</span>
+<span class="sm" style="color: #4A463F">{{hintBody}}</span>
+<sc-if value="{{steady}}" hint-placeholder-val="{{ false }}"><span style="display: block; height: 4px; background: #E2DFD9; border-radius: 2px; margin-top: 8px; overflow: hidden"><span style="display: block; width: 70%; height: 100%; background: #1D6B3A"></span></span></sc-if>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; align-items: center; justify-content: center">
+<svg viewBox="0 0 390 480" width="390" height="480" aria-label="Camera view with an outline to line up your ID" role="img">
+<rect x="0" y="0" width="390" height="480" fill="#3A3833"></rect>
+<g transform="{{cardTransform}}">
+<rect x="0" y="0" width="300" height="189" rx="10" fill="#CFC8B9"></rect>
+<rect x="0" y="0" width="300" height="30" rx="10" fill="#B3AB9B"></rect>
+<rect x="0" y="20" width="300" height="10" fill="#B3AB9B"></rect>
+<rect x="16" y="44" width="72" height="92" rx="3" fill="#8F887B"></rect>
+<rect x="104" y="48" width="150" height="8" rx="2" fill="#7C766B"></rect>
+<rect x="104" y="68" width="116" height="8" rx="2" fill="#7C766B"></rect>
+<rect x="104" y="88" width="170" height="8" rx="2" fill="#7C766B"></rect>
+<rect x="104" y="108" width="92" height="8" rx="2" fill="#7C766B"></rect>
+<rect x="16" y="154" width="206" height="12" rx="2" fill="#5E594F"></rect>
+<ellipse cx="248" cy="86" rx="66" ry="48" fill="#FFFFFF" opacity="{{glareOpacity}}"></ellipse>
+</g>
+<rect x="0" y="0" width="390" height="480" fill="#000000" opacity="{{darkOpacity}}"></rect>
+<path d="M0 0h390v480H0z M35 139v202h320V139z" fill="#000000" opacity="0.5" fill-rule="evenodd"></path>
+<path d="M35 171V139h32 M323 139h32v32 M355 309v32h-32 M67 341H35v-32" fill="none" stroke="{{guide}}" stroke-width="3" stroke-linecap="round"></path>
+</svg>
+</div>
+
+<div style="padding: 0 16px 24px; display: flex; flex-direction: column; gap: 16px; align-items: center; flex: none">
+<p class="sm" style="color: #B8B3AA; text-align: center">The photo is taken by itself when your ID is steady and inside the outline.</p>
+<div style="display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; width: 100%">
+<button class="icon-btn" aria-label="Turn on torch" style="color: #F4F2EE; justify-self: start"><svg class="ic ic24" viewBox="0 0 24 24"><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12z"></path><line x1="6" x2="18" y1="6" y2="6"></line><line x1="12" x2="12" y1="12" y2="12"></line></svg></button>
+<button aria-label="Take photo now" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid #F4F2EE; background: none; padding: 5px; cursor: pointer"><span style="display: block; width: 100%; height: 100%; border-radius: 50%; background: #F4F2EE"></span></button>
+<span></span>
+</div>
+<a href="#" class="tlink" style="color: #A9CBF2">Type the details in instead</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"hint":{"editor":"enum","options":["glare","dark","closer","steady","cycle"],"default":"glare"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this._t = setInterval(() => {
+      if ((this.props.hint ?? 'glare') !== 'cycle') return;
+      this.setState({ i: ((this.state && this.state.i) || 0) + 1 });
+    }, 1800);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+  renderVals() {
+    const order = ['dark', 'closer', 'glare', 'steady'];
+    let h = this.props.hint ?? 'glare';
+    if (h === 'cycle') h = order[((this.state && this.state.i) || 0) % order.length];
+    const hints = {
+      dark: ['Too dark', 'Move somewhere brighter, or turn on the torch.'],
+      closer: ['Move closer', 'Fill the outline with your ID.'],
+      glare: ['Glare on the right side', 'Tilt the ID slightly away from the light.'],
+      steady: ['Hold still', 'Taking the photo…']
+    };
+    const t = h === 'closer' ? 'translate(105 188) scale(0.6)' : 'translate(45 146) rotate(-1.5)';
+    return {
+      hintTitle: hints[h][0], hintBody: hints[h][1],
+      steady: h === 'steady', notSteady: h !== 'steady',
+      glareOpacity: h === 'glare' ? 0.62 : 0, darkOpacity: h === 'dark' ? 0.6 : 0,
+      cardTransform: t,
+      guide: h === 'steady' ? '#74C48F' : '#F4F2EE'
+    };
+  }
+}
+</script>
+</body>
+</html>

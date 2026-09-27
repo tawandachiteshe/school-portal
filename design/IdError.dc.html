@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error: check your ID number</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1000px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+<span class="sm muted" style="display: inline-flex; align-items: center; gap: 6px"><svg class="ic ic16" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>Linked · <span class="mono">K7Q2</span></span>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div class="alert alert-danger" role="alert" tabindex="-1" style="flex-direction: column; gap: 8px">
+<h2 class="h3">There's a problem</h2>
+<a class="link danger fw5" href="#letter">Check the letter after the digits</a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">Check your ID number</h1>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<figure role="img" aria-label="The ID number as it appears in your photo" style="height: 56px; border-radius: 4px; background: #D6D0C3; border: 1px solid var(--border); display: flex; align-items: center; padding: 0 12px; gap: 0">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; letter-spacing: 0.04em; color: #3F3B34">63-2047823 </span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: #3F3B34; padding: 2px 4px; outline: 2px solid #B42318; border-radius: 2px; margin: 0 4px">P</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; letter-spacing: 0.04em; color: #3F3B34"> 29</span>
+</figure>
+<p class="xs muted">From your photo, taken 09:41</p>
+</div>
+
+<p>We read your ID as <span class="mono" style="white-space: nowrap">63-2047823 <mark style="background: var(--destructive-soft); color: var(--destructive); font-weight: 600; padding: 0 3px; border-radius: 2px; box-shadow: inset 0 -2px 0 var(--destructive)">P</mark> 29</span>, but that number isn't valid. Please check the letter after the digits.</p>
+
+<div id="letter" style="display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 4px solid var(--destructive)">
+<label class="label" for="ltr">Letter after the digits</label>
+<span class="hint">Letters like P, Q and R can look alike on worn IDs.</span>
+<span class="field-error" id="ltr-err">Enter the letter shown on your ID</span>
+<div style="display: flex; align-items: center; gap: 8px">
+<span class="mono muted" style="font-size: 18px">63-2047823</span>
+<input class="input input-error mono" id="ltr" value="P" maxlength="1" aria-describedby="ltr-err" aria-invalid="true" style="width: 56px; text-align: center; font-size: 18px; text-transform: uppercase">
+<span class="mono muted" style="font-size: 18px">29</span>
+</div>
+</div>
+
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+<button class="btn btn-primary btn-block">Check again</button>
+<button class="btn btn-secondary btn-block">Retake photo</button>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

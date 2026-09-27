@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overdue loans</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 900px; display: flex">
+<aside class="side" aria-label="Staff">
+<div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px 12px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span><span class="badge" style="margin-left: auto">Staff</span></div>
+<nav style="display: flex; flex-direction: column; gap: 2px">
+<div class="sgroup">Library</div>
+<a class="sn" href="LibraryDesk.dc.html"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>Issue and return</a>
+<a class="sn" href="#" aria-current="page"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Overdue<span class="cnt">23</span></a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M12 17v5"></path><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path></svg>Reservations<span class="cnt">8</span></a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>Catalogue</a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Reading lists</a>
+</nav>
+<div style="margin-top: auto; border-top: 1px solid var(--border); padding: 12px 10px 0; display: flex; gap: 10px; align-items: center"><span class="avatar">SC</span><div style="display: flex; flex-direction: column"><span class="sm fw5">S. Chinembiri</span><span class="xs muted">Librarian · Block A desk</span></div></div>
+</aside>
+
+<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; padding: 0 32px; flex: none"><span class="sm muted">Thursday 11 March</span></header>
+<main style="padding: 24px 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div><h1 class="h1">Overdue loans</h1><p class="sm muted">23 books with 19 students · longest overdue 17 days</p></div>
+<button class="btn btn-secondary btn-sm"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Export CSV</button>
+</div>
+
+<div style="display: flex; gap: 16px; align-items: center; padding: 8px 12px; border-radius: 6px; background: var(--primary-soft)" role="region" aria-label="Selection">
+<span class="sm fw5">4 selected</span>
+<button class="btn btn-primary btn-sm"><svg class="ic ic16" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>Send SMS reminder</button>
+<span class="sm muted">“Your library book [title] was due [date]. Please return it to the Block A desk.”</span>
+<button class="btn btn-ghost btn-sm" style="margin-left: auto">Clear</button>
+</div>
+
+<table class="tbl dense">
+<thead><tr><th style="width: 36px"><span class="check" aria-label="Select all"></span></th><th>Student</th><th>Student no.</th><th>Class</th><th>Book</th><th>Due</th><th style="text-align: right">Days late</th><th>Last reminder</th></tr></thead>
+<tbody>
+<tr><td><span class="check" style="background: var(--primary); border-color: var(--primary)"></span></td><td class="fw5">Tapiwa Gumbo</td><td class="mono">TCFL/2026/0388</td><td class="mono">DTE-2A</td><td>Digital Electronics · Floyd</td><td>Mon 22 Feb</td><td class="mono danger fw6" style="text-align: right">17</td><td>Mon 1 Mar, SMS</td></tr>
+<tr><td><span class="check" style="background: var(--primary); border-color: var(--primary)"></span></td><td class="fw5">Blessing Chikwanha</td><td class="mono">TCFL/2026/0214</td><td class="mono">DIT-2B</td><td>Database Systems · Connolly</td><td>Thu 25 Feb</td><td class="mono danger fw6" style="text-align: right">14</td><td>Mon 1 Mar, SMS</td></tr>
+<tr><td><span class="check"></span></td><td class="fw5">Ropafadzo Chigumba</td><td class="mono">TCFL/2027/0111</td><td class="mono">DIT-1A</td><td>Programming in C · Kochan</td><td>Wed 3 Mar</td><td class="mono danger fw6" style="text-align: right">8</td><td class="muted">None</td></tr>
+<tr><td><span class="check" style="background: var(--primary); border-color: var(--primary)"></span></td><td class="fw5">Simbarashe Hove</td><td class="mono">TCFL/2027/0126</td><td class="mono">DIT-1A</td><td>Computer Networks · Tanenbaum</td><td>Fri 5 Mar</td><td class="mono danger fw6" style="text-align: right">6</td><td class="muted">None</td></tr>
+<tr><td><span class="check" style="background: var(--primary); border-color: var(--primary)"></span></td><td class="fw5">Tariro Moyo</td><td class="mono">TCFL/2027/0142</td><td class="mono">DIT-1A</td><td>Engineering Mathematics · Stroud</td><td>Mon 8 Mar</td><td class="mono danger fw6" style="text-align: right">3</td><td class="muted">None</td></tr>
+<tr><td><span class="check"></span></td><td class="fw5">Chiedza Jambwa</td><td class="mono">TCFL/2027/0130</td><td class="mono">DIT-1A</td><td>Engineering Mathematics · Stroud</td><td>Tue 9 Mar</td><td class="mono danger fw6" style="text-align: right">2</td><td class="muted">None</td></tr>
+<tr><td><span class="check"></span></td><td class="fw5">Thandeka Mpofu</td><td class="mono">TCFL/2027/0147</td><td class="mono">DIT-1A</td><td>Data Communications and Networking · Forouzan</td><td>Wed 10 Mar</td><td class="mono danger fw6" style="text-align: right">1</td><td class="muted">None</td></tr>
+</tbody>
+</table>
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="sm muted">1–7 of 23 · most overdue first</span><div style="display: flex; gap: 8px"><button class="btn btn-secondary btn-sm" disabled="">Previous</button><button class="btn btn-secondary btn-sm">Next</button></div></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

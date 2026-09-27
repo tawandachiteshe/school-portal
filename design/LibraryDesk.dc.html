@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Library desk</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 900px; display: flex">
+<aside class="side" aria-label="Staff">
+<div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px 12px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span><span class="badge" style="margin-left: auto">Staff</span></div>
+<nav style="display: flex; flex-direction: column; gap: 2px">
+<div class="sgroup">Library</div>
+<a class="sn" href="#" aria-current="page"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>Issue and return</a>
+<a class="sn" href="LibraryOverdue.dc.html"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Overdue<span class="cnt">23</span></a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M12 17v5"></path><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path></svg>Reservations<span class="cnt">8</span></a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>Catalogue</a>
+<a class="sn" href="#"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Reading lists</a>
+</nav>
+<div style="margin-top: auto; border-top: 1px solid var(--border); padding: 12px 10px 0; display: flex; gap: 10px; align-items: center"><span class="avatar">SC</span><div style="display: flex; flex-direction: column"><span class="sm fw5">S. Chinembiri</span><span class="xs muted">Librarian · Block A desk</span></div></div>
+</aside>
+
+<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex: none">
+<span class="sm muted">Thursday 11 March · desk open until 20:00</span>
+<span class="sm muted">Issued today <span class="mono fg">31</span> · Returned today <span class="mono fg">18</span></span>
+</header>
+<main style="padding: 24px 32px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<h1 class="h1">Issue and return</h1>
+<div class="seg-tabs" role="tablist" style="width: 240px"><button class="seg-tab" role="tab" aria-selected="true">Issue</button><button class="seg-tab" role="tab" aria-selected="false">Return</button></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px; max-width: 560px">
+<label class="label" for="stu">Student card or student number</label>
+<input class="input mono" id="stu" value="TCFL/2027/0142" style="font-size: 18px; height: 48px">
+<span class="hint">Scan the barcode on the card, or type the number</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 32px; align-items: start">
+<section aria-labelledby="h-stu" style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 12px; align-items: center">
+<span class="avatar" style="width: 44px; height: 44px; font-size: 15px">TM</span>
+<div><h2 class="h2" id="h-stu">Tariro Moyo</h2><p class="sm muted"><span class="mono">TCFL/2027/0142</span> · Diploma in Information Technology · <span class="mono">DIT-1A</span></p></div>
+</div>
+<div class="alert alert-danger" role="alert">
+<svg class="ic danger" viewBox="0 0 24 24" style="margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+<p><span class="fw6">1 overdue book.</span> Engineering Mathematics was due Mon 8 Mar. Ask for it back before issuing more.</p>
+</div>
+<table class="tbl dense">
+<thead><tr><th>On loan</th><th>Barcode</th><th>Due</th><th></th></tr></thead>
+<tbody>
+<tr><td><div class="fw5">Engineering Mathematics</div><div class="xs muted">Stroud</div></td><td class="mono">TCFL-B-001873</td><td class="danger fw5">Mon 8 Mar · 3 days late</td><td style="text-align: right"><button class="btn btn-secondary btn-sm">Return</button></td></tr>
+<tr><td><div class="fw5">Data Communications and Networking</div><div class="xs muted">Forouzan</div></td><td class="mono">TCFL-B-003390</td><td>Tue 16 Mar</td><td style="text-align: right"><button class="btn btn-secondary btn-sm">Renew</button></td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card" aria-labelledby="h-book" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<h2 class="h3" id="h-book">Book to issue</h2>
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="bk">Book barcode</label><input class="input mono" id="bk" value="TCFL-B-004512"></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<div class="fw6">Computer Networks</div>
+<div class="sm muted">A. S. Tanenbaum · 5th edition · shelf <span class="mono">004.6 TAN</span></div>
+<div style="margin-top: 6px"><span class="badge badge-success">Reserved for this student</span></div>
+</div>
+<dl style="display: grid; grid-template-columns: 96px minmax(0, 1fr); row-gap: 6px" class="sm">
+<dt class="muted">Loan period</dt><dd>2 weeks</dd>
+<dt class="muted">Due back</dt><dd class="fw5">Thu 25 March</dd>
+</dl>
+<button class="btn btn-primary btn-block">Issue book</button>
+<p class="xs muted">The student gets an SMS with the due date.</p>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

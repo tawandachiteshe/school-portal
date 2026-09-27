@@ -1,0 +1,843 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "AnnouncementCompose.dc.html": {
+   "h": 1000,
+   "page": "staff",
+   "title": "Write an announcement",
+   "w": 1280,
+   "x": 2720,
+   "y": 1640
+  },
+  "AnnouncementDetail.dc.html": {
+   "h": 900,
+   "page": "student",
+   "title": "Announcement",
+   "w": 390,
+   "x": 470,
+   "y": 1960
+  },
+  "AskChat.dc.html": {
+   "h": 1300,
+   "page": "ask",
+   "title": "Ask TCFL · answers with sources",
+   "w": 390,
+   "x": 470,
+   "y": 0
+  },
+  "AskHandoff.dc.html": {
+   "h": 1000,
+   "page": "ask",
+   "title": "Ask TCFL · can't answer, hand to staff",
+   "w": 390,
+   "x": 940,
+   "y": 0
+  },
+  "AskInfo.dc.html": {
+   "h": 1240,
+   "page": "staff",
+   "title": "Ask for information",
+   "w": 1280,
+   "x": 1360,
+   "y": 1640
+  },
+  "AskStart.dc.html": {
+   "h": 844,
+   "page": "ask",
+   "title": "Ask TCFL · start",
+   "w": 390,
+   "x": 0,
+   "y": 0
+  },
+  "CameraBlocked.dc.html": {
+   "h": 900,
+   "page": "states",
+   "title": "Camera access blocked",
+   "w": 390,
+   "x": 1880,
+   "y": 1640
+  },
+  "CodesMismatch.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "D · Codes don't match",
+   "w": 390,
+   "x": 3760,
+   "y": 2600
+  },
+  "Deadlines.dc.html": {
+   "h": 1300,
+   "page": "student",
+   "title": "Deadlines",
+   "w": 390,
+   "x": 940,
+   "y": 0
+  },
+  "DownloadSheet.dc.html": {
+   "h": 844,
+   "page": "states",
+   "title": "Large download warning",
+   "w": 390,
+   "x": 1410,
+   "y": 1640
+  },
+  "Fees.dc.html": {
+   "h": 1100,
+   "page": "student",
+   "title": "Fees statement",
+   "w": 390,
+   "x": 1410,
+   "y": 1960
+  },
+  "ForgotPassword.dc.html": {
+   "h": 844,
+   "page": "signin",
+   "title": "Forgot password",
+   "w": 390,
+   "x": 1880,
+   "y": 0
+  },
+  "Foundations.dc.html": {
+   "h": 1720,
+   "page": "dashboard",
+   "title": "Foundations · tokens and primitives",
+   "w": 1280,
+   "x": 940,
+   "y": 0
+  },
+  "Handoff.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "C · Continue on phone · link ready",
+   "w": 1280,
+   "x": 2720,
+   "y": 0
+  },
+  "HandoffExpired.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "C · Link expired",
+   "w": 1280,
+   "x": 2720,
+   "y": 1300
+  },
+  "HandoffReading.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "C · Phone connected · reading",
+   "w": 1280,
+   "x": 0,
+   "y": 1300
+  },
+  "HandoffWaiting.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "C · Phone connected · ID read",
+   "w": 1280,
+   "x": 1360,
+   "y": 1300
+  },
+  "IdDesktop.dc.html": {
+   "h": 860,
+   "page": "onboarding",
+   "title": "B · National ID · desktop",
+   "w": 1280,
+   "x": 1360,
+   "y": 0
+  },
+  "IdError.dc.html": {
+   "h": 1000,
+   "page": "onboarding",
+   "title": "F · Invalid check letter",
+   "w": 390,
+   "x": 470,
+   "y": 4000
+  },
+  "LecturerHome.dc.html": {
+   "h": 900,
+   "page": "lecturer",
+   "title": "Lecturer · today",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "LecturerMarks.dc.html": {
+   "h": 1040,
+   "page": "lecturer",
+   "title": "Lecturer · enter marks",
+   "w": 1280,
+   "x": 1360,
+   "y": 0
+  },
+  "LecturerUpload.dc.html": {
+   "h": 900,
+   "page": "lecturer",
+   "title": "Lecturer · upload notes dialog",
+   "w": 1280,
+   "x": 2720,
+   "y": 0
+  },
+  "Library.dc.html": {
+   "h": 1240,
+   "page": "student",
+   "title": "Library",
+   "w": 390,
+   "x": 1410,
+   "y": 0
+  },
+  "LibraryDesk.dc.html": {
+   "h": 900,
+   "page": "library",
+   "title": "Library · issue and return desk",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "LibraryOverdue.dc.html": {
+   "h": 900,
+   "page": "library",
+   "title": "Library · overdue loans",
+   "w": 1280,
+   "x": 1360,
+   "y": 0
+  },
+  "Main.dc.html": {
+   "h": 2240,
+   "page": "dashboard",
+   "title": "Dashboard · light",
+   "w": 390,
+   "x": 0,
+   "y": 0
+  },
+  "MainDark.dc.html": {
+   "h": 2240,
+   "page": "dashboard",
+   "title": "Dashboard · dark",
+   "w": 390,
+   "x": 470,
+   "y": 0
+  },
+  "ModuleDetail.dc.html": {
+   "h": 1560,
+   "page": "student",
+   "title": "Module · DCN201",
+   "w": 390,
+   "x": 470,
+   "y": 0
+  },
+  "Modules.dc.html": {
+   "h": 1000,
+   "page": "student",
+   "title": "Modules",
+   "w": 390,
+   "x": 0,
+   "y": 0
+  },
+  "More.dc.html": {
+   "h": 1240,
+   "page": "student",
+   "title": "More · profile and settings",
+   "w": 390,
+   "x": 1880,
+   "y": 0
+  },
+  "OfferDialog.dc.html": {
+   "h": 1240,
+   "page": "staff",
+   "title": "Offer a place · confirm",
+   "w": 1280,
+   "x": 0,
+   "y": 1640
+  },
+  "OfferReceived.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "H · Offer received",
+   "w": 390,
+   "x": 5640,
+   "y": 4000
+  },
+  "PhoneCamera.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "D · Camera capture",
+   "w": 390,
+   "x": 940,
+   "y": 2600
+  },
+  "PhoneCheck.dc.html": {
+   "h": 1080,
+   "page": "onboarding",
+   "title": "D · ID read, check details",
+   "w": 390,
+   "x": 1410,
+   "y": 2600
+  },
+  "PhoneDisconnected.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "D · Session ended",
+   "w": 390,
+   "x": 2350,
+   "y": 2600
+  },
+  "PhoneDone.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "D · ID added",
+   "w": 390,
+   "x": 1880,
+   "y": 2600
+  },
+  "PhoneLanding.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "D · Phone landing",
+   "w": 390,
+   "x": 470,
+   "y": 2600
+  },
+  "ProgrammeDesktop.dc.html": {
+   "h": 860,
+   "page": "onboarding",
+   "title": "A · Programme · desktop",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "ProgrammeMobile.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "A · Programme · phone",
+   "w": 390,
+   "x": 0,
+   "y": 2600
+  },
+  "Register.dc.html": {
+   "h": 1160,
+   "page": "lecturer",
+   "title": "Take the register · phone",
+   "w": 390,
+   "x": 4080,
+   "y": 0
+  },
+  "Results.dc.html": {
+   "h": 1100,
+   "page": "student",
+   "title": "Results · published",
+   "w": 390,
+   "x": 940,
+   "y": 1960
+  },
+  "ReviewEligible.dc.html": {
+   "h": 1600,
+   "page": "onboarding",
+   "title": "G · Review · eligible",
+   "w": 390,
+   "x": 940,
+   "y": 4000
+  },
+  "ReviewNotEligible.dc.html": {
+   "h": 1140,
+   "page": "onboarding",
+   "title": "G · Review · not eligible",
+   "w": 390,
+   "x": 1410,
+   "y": 4000
+  },
+  "SignIn.dc.html": {
+   "h": 844,
+   "page": "signin",
+   "title": "Sign in · phone",
+   "w": 390,
+   "x": 0,
+   "y": 0
+  },
+  "StaffQueue.dc.html": {
+   "h": 900,
+   "page": "staff",
+   "title": "Applications queue",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "StaffReview.dc.html": {
+   "h": 1240,
+   "page": "staff",
+   "title": "Application review · APP-27-08813",
+   "w": 1280,
+   "x": 1360,
+   "y": 0
+  },
+  "StaffSignIn.dc.html": {
+   "h": 800,
+   "page": "signin",
+   "title": "Sign in · desktop",
+   "w": 1280,
+   "x": 2350,
+   "y": 0
+  },
+  "StateEmpty.dc.html": {
+   "h": 1100,
+   "page": "states",
+   "title": "Dashboard · empty (new student, first weekend)",
+   "w": 390,
+   "x": 940,
+   "y": 0
+  },
+  "StateLoading.dc.html": {
+   "h": 844,
+   "page": "states",
+   "title": "Dashboard · loading",
+   "w": 390,
+   "x": 0,
+   "y": 0
+  },
+  "StateOffline.dc.html": {
+   "h": 1240,
+   "page": "states",
+   "title": "Dashboard · offline",
+   "w": 390,
+   "x": 470,
+   "y": 0
+  },
+  "StateSession.dc.html": {
+   "h": 844,
+   "page": "states",
+   "title": "Signed out · session expired",
+   "w": 390,
+   "x": 1410,
+   "y": 0
+  },
+  "Status.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "H · After submission",
+   "w": 390,
+   "x": 1880,
+   "y": 4000
+  },
+  "StudentCard.dc.html": {
+   "h": 844,
+   "page": "student",
+   "title": "Student card",
+   "w": 390,
+   "x": 1880,
+   "y": 1960
+  },
+  "Submit.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "Step 5 · Submit",
+   "w": 390,
+   "x": 2350,
+   "y": 4000
+  },
+  "SubmitError.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "Step 5 · Declaration not ticked",
+   "w": 390,
+   "x": 2820,
+   "y": 4000
+  },
+  "SubmitFailed.dc.html": {
+   "h": 900,
+   "page": "states",
+   "title": "Submit work · upload failed",
+   "w": 390,
+   "x": 940,
+   "y": 1640
+  },
+  "SubmitQueued.dc.html": {
+   "h": 900,
+   "page": "states",
+   "title": "Submit work · waiting for signal",
+   "w": 390,
+   "x": 470,
+   "y": 1640
+  },
+  "SubmitWork.dc.html": {
+   "h": 900,
+   "page": "states",
+   "title": "Submit work · uploading on 3G",
+   "w": 390,
+   "x": 0,
+   "y": 1640
+  },
+  "Submitted.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "Step 5 · Submitted",
+   "w": 390,
+   "x": 5170,
+   "y": 4000
+  },
+  "Timetable.dc.html": {
+   "h": 1000,
+   "page": "student",
+   "title": "Timetable · week",
+   "w": 390,
+   "x": 0,
+   "y": 1960
+  },
+  "VerifyPhone.dc.html": {
+   "h": 844,
+   "page": "signin",
+   "title": "Verify phone · code sent",
+   "w": 390,
+   "x": 940,
+   "y": 0
+  },
+  "VerifyPhoneError.dc.html": {
+   "h": 844,
+   "page": "signin",
+   "title": "Verify phone · wrong code",
+   "w": 390,
+   "x": 1410,
+   "y": 0
+  },
+  "Zimsec.dc.html": {
+   "h": 1500,
+   "page": "onboarding",
+   "title": "E · ZIMSEC results",
+   "w": 390,
+   "x": 0,
+   "y": 4000
+  },
+  "ZimsecCamera.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "E · Scan result slip",
+   "w": 390,
+   "x": 2820,
+   "y": 2600
+  },
+  "ZimsecPages.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "E · Check scanned pages",
+   "w": 390,
+   "x": 3290,
+   "y": 2600
+  },
+  "ZimsecDesktop.dc.html": {
+   "x": 0,
+   "y": 6000,
+   "w": 1280,
+   "h": 1000,
+   "title": "E · ZIMSEC results · desktop",
+   "page": "onboarding"
+  },
+  "ReviewDesktop.dc.html": {
+   "x": 1360,
+   "y": 6000,
+   "w": 1280,
+   "h": 1100,
+   "title": "G · Review · desktop",
+   "page": "onboarding"
+  },
+  "SubmitDesktop.dc.html": {
+   "x": 2720,
+   "y": 6000,
+   "w": 1280,
+   "h": 900,
+   "title": "Step 5 · Submit · desktop",
+   "page": "onboarding"
+  },
+  "StatusDesktop.dc.html": {
+   "x": 4080,
+   "y": 6000,
+   "w": 1280,
+   "h": 900,
+   "title": "H · After submission · desktop",
+   "page": "onboarding"
+  },
+  "Payment.dc.html": {
+   "x": 3290,
+   "y": 4000,
+   "w": 390,
+   "h": 1100,
+   "title": "Step 5 · Pay the fee",
+   "page": "onboarding"
+  },
+  "PayWaiting.dc.html": {
+   "x": 3760,
+   "y": 4000,
+   "w": 390,
+   "h": 844,
+   "title": "Step 5 · Approve EcoCash on phone",
+   "page": "onboarding"
+  },
+  "PayFailed.dc.html": {
+   "x": 4230,
+   "y": 4000,
+   "w": 390,
+   "h": 900,
+   "title": "Step 5 · Payment failed",
+   "page": "onboarding"
+  },
+  "PayOffice.dc.html": {
+   "x": 4700,
+   "y": 4000,
+   "w": 390,
+   "h": 1040,
+   "title": "Step 5 · Pay by bank transfer",
+   "page": "onboarding"
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-26T23:28:00Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "page": "signin",
+  "view": "canvas"
+ },
+ "notes": {
+  "t-ask": {
+   "kind": "title1",
+   "maxW": 1330,
+   "page": "ask",
+   "text": "Ask TCFL assistant",
+   "x": 0,
+   "y": -300
+  },
+  "t-dash": {
+   "kind": "title1",
+   "maxW": 2220,
+   "page": "dashboard",
+   "text": "Student dashboard and foundations",
+   "x": 0,
+   "y": -300
+  },
+  "t-desk1": {
+   "kind": "title1",
+   "maxW": 4000,
+   "page": "onboarding",
+   "text": "Onboarding on a computer",
+   "x": 0,
+   "y": -300
+  },
+  "t-desk2": {
+   "kind": "title1",
+   "maxW": 4000,
+   "page": "onboarding",
+   "text": "Continue on your phone: computer states",
+   "x": 0,
+   "y": 1000
+  },
+  "t-lect": {
+   "kind": "title1",
+   "maxW": 4470,
+   "page": "lecturer",
+   "text": "Lecturer · desktop",
+   "x": 0,
+   "y": -300
+  },
+  "t-lib": {
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "library",
+   "text": "Librarian · desktop",
+   "x": 0,
+   "y": -300
+  },
+  "t-phone": {
+   "kind": "title1",
+   "maxW": 4150,
+   "page": "onboarding",
+   "text": "Onboarding on a phone",
+   "x": 0,
+   "y": 2300
+  },
+  "t-rest": {
+   "kind": "title1",
+   "maxW": 6030,
+   "page": "onboarding",
+   "text": "Results, review, payment, submit and status",
+   "x": 0,
+   "y": 3700
+  },
+  "t-signin": {
+   "kind": "title1",
+   "maxW": 3630,
+   "page": "signin",
+   "text": "Sign in and phone verification",
+   "x": 0,
+   "y": -300
+  },
+  "t-st1": {
+   "kind": "title1",
+   "maxW": 1800,
+   "page": "states",
+   "text": "Loading, offline, empty, signed out",
+   "x": 0,
+   "y": -300
+  },
+  "t-st2": {
+   "kind": "title1",
+   "maxW": 2270,
+   "page": "states",
+   "text": "Uploads, downloads and camera",
+   "x": 0,
+   "y": 1340
+  },
+  "t-staff": {
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "staff",
+   "text": "Admissions officer · desktop",
+   "x": 0,
+   "y": -300
+  },
+  "t-staff2": {
+   "kind": "title1",
+   "maxW": 4000,
+   "page": "staff",
+   "text": "Decisions, requests and announcements",
+   "x": 0,
+   "y": 1340
+  },
+  "t-student": {
+   "kind": "title1",
+   "maxW": 2270,
+   "page": "student",
+   "text": "Student app: the other four tabs",
+   "x": 0,
+   "y": -300
+  },
+  "t-student2": {
+   "kind": "title1",
+   "maxW": 2270,
+   "page": "student",
+   "text": "Screens linked from the student app",
+   "x": 0,
+   "y": 1660
+  },
+  "t-desk3": {
+   "x": 0,
+   "y": 5700,
+   "text": "Results, review, submit and status on a computer",
+   "kind": "title1",
+   "maxW": 5360,
+   "page": "onboarding"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "MainDark.dc.html",
+  "Foundations.dc.html",
+  "ProgrammeDesktop.dc.html",
+  "IdDesktop.dc.html",
+  "Handoff.dc.html",
+  "HandoffReading.dc.html",
+  "HandoffWaiting.dc.html",
+  "HandoffExpired.dc.html",
+  "ProgrammeMobile.dc.html",
+  "PhoneLanding.dc.html",
+  "PhoneCamera.dc.html",
+  "PhoneCheck.dc.html",
+  "PhoneDone.dc.html",
+  "PhoneDisconnected.dc.html",
+  "Zimsec.dc.html",
+  "IdError.dc.html",
+  "ReviewEligible.dc.html",
+  "ReviewNotEligible.dc.html",
+  "Status.dc.html",
+  "Modules.dc.html",
+  "ModuleDetail.dc.html",
+  "Deadlines.dc.html",
+  "Library.dc.html",
+  "More.dc.html",
+  "StaffQueue.dc.html",
+  "StaffReview.dc.html",
+  "LecturerHome.dc.html",
+  "LecturerMarks.dc.html",
+  "LecturerUpload.dc.html",
+  "LibraryDesk.dc.html",
+  "LibraryOverdue.dc.html",
+  "AskStart.dc.html",
+  "AskChat.dc.html",
+  "AskHandoff.dc.html",
+  "SignIn.dc.html",
+  "Register.dc.html",
+  "VerifyPhone.dc.html",
+  "VerifyPhoneError.dc.html",
+  "ForgotPassword.dc.html",
+  "StaffSignIn.dc.html",
+  "ZimsecCamera.dc.html",
+  "ZimsecPages.dc.html",
+  "Submit.dc.html",
+  "SubmitError.dc.html",
+  "Submitted.dc.html",
+  "StateLoading.dc.html",
+  "StateOffline.dc.html",
+  "StateEmpty.dc.html",
+  "StateSession.dc.html",
+  "SubmitWork.dc.html",
+  "SubmitQueued.dc.html",
+  "SubmitFailed.dc.html",
+  "DownloadSheet.dc.html",
+  "CameraBlocked.dc.html",
+  "Timetable.dc.html",
+  "AnnouncementDetail.dc.html",
+  "Results.dc.html",
+  "Fees.dc.html",
+  "StudentCard.dc.html",
+  "OfferDialog.dc.html",
+  "AskInfo.dc.html",
+  "AnnouncementCompose.dc.html",
+  "CodesMismatch.dc.html",
+  "OfferReceived.dc.html",
+  "ZimsecDesktop.dc.html",
+  "ReviewDesktop.dc.html",
+  "SubmitDesktop.dc.html",
+  "StatusDesktop.dc.html",
+  "Payment.dc.html",
+  "PayWaiting.dc.html",
+  "PayFailed.dc.html",
+  "PayOffice.dc.html"
+ ],
+ "pages": [
+  {
+   "id": "signin",
+   "name": "Sign in"
+  },
+  {
+   "id": "dashboard",
+   "name": "Student dashboard"
+  },
+  {
+   "id": "states",
+   "name": "States: loading, offline, empty, errors"
+  },
+  {
+   "id": "onboarding",
+   "name": "Applicant onboarding"
+  },
+  {
+   "id": "ask",
+   "name": "Ask TCFL"
+  },
+  {
+   "id": "student",
+   "name": "Student app"
+  },
+  {
+   "id": "staff",
+   "name": "Staff · admissions"
+  },
+  {
+   "id": "lecturer",
+   "name": "Staff · lecturer"
+  },
+  {
+   "id": "library",
+   "name": "Staff · library"
+  }
+ ],
+ "title": "TCFL Portal"
+}

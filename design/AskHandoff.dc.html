@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask TCFL · send to Student Affairs</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1000px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 8px 0 4px; flex: none">
+<a class="icon-btn" href="AskStart.dc.html" aria-label="Back" style="color: var(--foreground)"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></a>
+<span class="fw6" style="flex-grow: 1">Ask TCFL</span>
+<button class="btn btn-ghost">New question</button>
+</header>
+
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div style="align-self: flex-end; max-width: 300px; padding: 10px 14px; border-radius: 6px; background: var(--muted)">Can I move from DIT-1A to the Software Engineering diploma next semester?</div>
+
+<article style="display: flex; flex-direction: column; gap: 16px">
+<p>I couldn't find a rule about changing programmes in TCFL's documents, so I won't guess. Student Affairs decides this.</p>
+
+<section class="card" aria-labelledby="h-send" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 class="h3" id="h-send">Send your question to Student Affairs</h2>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="msg">Your question</label>
+<textarea class="input" id="msg" rows="3">Can I move from DIT-1A to the Software Engineering diploma next semester?</textarea>
+</div>
+<p class="sm muted">They'll see your name, <span class="mono">TCFL/2027/0142</span> and your class. Replies come by SMS to <span class="mono">+263 77 ••• 4521</span> and appear under Announcements.</p>
+<button class="btn btn-primary btn-block">Send to Student Affairs</button>
+</section>
+
+<p class="sm muted">Or visit Student Affairs in Block A, [OPENING HOURS].</p>
+</article>
+
+<div role="status" class="alert alert-success">
+<svg class="ic success" viewBox="0 0 24 24" style="margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px"><p class="fw6">Sent to Student Affairs</p><p class="sm">Reference <span class="mono">SA-0311-027</span>. We'll text you when they reply.</p></div>
+</div>
+</main>
+
+<div style="padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 8px; flex: none">
+<div style="border: 1px solid var(--primary); border-radius: 16px; background: var(--card); padding: 12px 8px 8px 16px; display: flex; flex-direction: column; gap: 4px">
+<label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Your question</label>
+<textarea id="q" rows="1" style="border: 0; outline: 0; background: transparent; resize: none; font: inherit; font-size: 16px; line-height: 24px; color: var(--foreground); padding: 0 8px 0 0; min-height: 24px">How long does a programme change take?</textarea>
+<div style="display: flex; justify-content: space-between; align-items: center">
+<button class="icon-btn" aria-label="Add a photo or file" style="width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 12px"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<button aria-label="Send question" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--primary); color: var(--primary-foreground); display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg class="ic" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
+</div>
+</div>
+<p class="xs muted" style="text-align: center">Reads your timetable, deadlines and loans. Can't change anything. Check the source link on each answer.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

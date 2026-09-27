@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Take the register</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1160px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<a class="icon-btn" href="LecturerHome.dc.html" aria-label="Back" style="color: var(--foreground)"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></a>
+<span class="fw6" style="flex-grow: 1">Register</span>
+<span class="sm muted" role="status">Saved</span>
+</header>
+<main style="padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 class="h2"><span class="mono">DCN201</span> Test 1 · <span class="mono">DIT-1A</span></h1>
+<p class="sm muted">Thu 11 March, 10:00 · Lab 3</p>
+</div>
+<div class="sm" style="display: flex; gap: 16px; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<span>Present <span class="mono fw6">29</span></span><span>Late <span class="mono fw6">1</span></span><span>Absent <span class="mono fw6">2</span></span><span class="muted">Not marked <span class="mono fw6 fg">6</span></span>
+</div>
+<button class="btn btn-secondary btn-block">Mark the other 6 present</button>
+
+<ul class="list">
+<sc-for list="{{students}}" as="s" hint-placeholder-count="8">
+<li style="display: flex; flex-direction: column; gap: 8px; padding: 12px 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span class="fw5">{{s.name}}</span><span class="mono xs muted">{{s.no}}</span></div>
+<div role="radiogroup" aria-label="{{s.aria}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+<button role="radio" aria-checked="{{s.p}}" style="{{s.pStyle}}">Present</button>
+<button role="radio" aria-checked="{{s.l}}" style="{{s.lStyle}}">Late</button>
+<button role="radio" aria-checked="{{s.a}}" style="{{s.aStyle}}">Absent</button>
+</div>
+</li>
+</sc-for>
+</ul>
+<p class="sm muted">Showing 8 of 38. Students marked absent get a message asking them to see you.</p>
+</main>
+<div class="bar" style="border-top: 1px solid var(--border); border-bottom: 0; padding: 12px 16px 16px; flex: none">
+<button class="btn btn-primary btn-block">Finish register</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1160}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'height: 44px; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; ';
+    const off = base + 'border: 1px solid var(--border); background: var(--card); color: var(--muted-foreground)';
+    const on = {
+      p: base + 'border: 1px solid var(--success); background: var(--success-soft); color: var(--success); font-weight: 600',
+      l: base + 'border: 1px solid var(--accent-line); background: var(--accent-soft); color: var(--accent); font-weight: 600',
+      a: base + 'border: 1px solid var(--destructive); background: var(--destructive-soft); color: var(--destructive); font-weight: 600'
+    };
+    const rows = [
+      ['Banda, Takudzwa', '0107', 'p'], ['Chigumba, Ropafadzo', '0111', 'p'], ['Chikomo, Anesu', '0114', 'a'],
+      ['Dzvova, Munyaradzi', '0119', 'l'], ['Gova, Tanatswa', '0123', 'p'], ['Hove, Simbarashe', '0126', ''],
+      ['Jambwa, Chiedza', '0130', ''], ['Moyo, Tariro', '0142', 'p']
+    ];
+    const students = rows.map(([name, n, st]) => ({
+      name, no: 'TCFL/2027/' + n, aria: 'Attendance for ' + name,
+      p: String(st === 'p'), l: String(st === 'l'), a: String(st === 'a'),
+      pStyle: st === 'p' ? on.p : off, lStyle: st === 'l' ? on.l : off, aStyle: st === 'a' ? on.a : off
+    }));
+    return { theme: this.props.theme ?? 'light', students };
+  }
+}
+</script>
+</body>
+</html>

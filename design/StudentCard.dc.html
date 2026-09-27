@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Student card</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<a class="icon-btn" href="More.dc.html" aria-label="Back" style="color: var(--foreground)"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></a>
+<span class="fw6">Student card</span>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1">
+<section class="card" aria-label="Student card for Tariro Moyo" style="padding: 0; overflow: hidden; background: #FFFFFF; color: #1B1A18; border-color: #E2DFD9">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #0B4A8B; color: #FFFFFF">
+<span style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span style="opacity: 0.85">TelOne Centre for Learning</span></span>
+<span class="xs fw6" style="letter-spacing: 0.06em">STUDENT</span>
+</div>
+<div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 16px">
+<div role="img" aria-label="Photo of Tariro Moyo" style="width: 96px; height: 120px; border-radius: 4px; background: #E7E3DC; border: 1px solid #D6D1C8; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+<svg viewBox="0 0 96 120" width="96" height="120" aria-hidden="true"><circle cx="48" cy="46" r="20" fill="#C9C3B8"></circle><path d="M12 120c2-26 18-38 36-38s34 12 36 38z" fill="#C9C3B8"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<div><div class="xs" style="color: #5E5A53">Name</div><div class="fw6" style="font-size: 18px">Tariro Moyo</div></div>
+<div><div class="xs" style="color: #5E5A53">Student number</div><div class="mono fw5">TCFL/2027/0142</div></div>
+<div><div class="xs" style="color: #5E5A53">Programme</div><div class="sm">Diploma in Information Technology · <span class="mono">DIT-1A</span></div></div>
+</div>
+</div>
+<div style="padding: 0 16px 16px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<svg viewBox="0 0 {{barW}} 60" width="100%" height="64" preserveAspectRatio="none" role="img" aria-label="Barcode for TCFL/2027/0142" shape-rendering="crispEdges"><path d="{{barPath}}" fill="#111111"></path></svg>
+<span class="mono xs" style="color: #5E5A53">TCFL20270142</span>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 10px 16px; border-top: 1px solid #E2DFD9" class="sm">
+<span style="color: #5E5A53">Valid until</span><span class="fw6">31 December 2027</span>
+</div>
+</section>
+
+<p class="sm muted" style="display: flex; gap: 8px; align-items: center"><svg class="ic ic16 success" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>Saved on this phone. Works without data.</p>
+<p class="sm muted">Show it at the library desk and exam rooms. Turn your screen brightness up if the scanner can't read it.</p>
+<a class="tlink" href="#">Lost your plastic card?</a>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  bars() {
+    if (this._b) return this._b;
+    let s = 142, x = 0, d = '';
+    const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    const put = (w) => { d += 'M' + x + ' 0h' + w + 'v60h-' + w + 'z'; };
+    put(2); x += 3; put(1); x += 2; put(2); x += 3;
+    for (let i = 0; i < 64; i++) {
+      const w = 1 + Math.floor(rnd() * 3);
+      if (i % 2 === 0) put(w);
+      x += w;
+    }
+    x += 1; put(2); x += 3; put(1); x += 2; put(2); x += 2;
+    this._b = { d, w: x };
+    return this._b;
+  }
+  renderVals() {
+    const b = this.bars();
+    return { theme: this.props.theme ?? 'light', barPath: b.d, barW: b.w };
+  }
+}
+</script>
+</body>
+</html>

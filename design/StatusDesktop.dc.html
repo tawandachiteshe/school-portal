@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Your application</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 900px; display: flex; flex-direction: column">
+<header class="bar" style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex: none">
+<div style="display: flex; align-items: center; gap: 16px"><div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div><span style="width: 1px; height: 20px; background: var(--border)"></span><span class="sm muted">Application · 2027 intake</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span class="sm">Tariro Moyo</span><span class="avatar">TM</span><button class="btn btn-ghost btn-sm">Sign out</button></div>
+</header>
+<main style="padding: 40px 80px; display: grid; grid-template-columns: minmax(0, 560px) 360px; gap: 80px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1d">Your application</h1>
+<p>Diploma in Information Technology · 2027 intake</p>
+<p class="sm muted">Reference <span class="mono fg">APP-27-08813</span></p>
+</div>
+<ol>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center"><span style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); display: flex; align-items: center; justify-content: center; flex: none"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="width: 2px; flex-grow: 1; background: var(--primary)"></span></div>
+<div style="padding: 0 0 24px; display: flex; flex-direction: column; gap: 2px"><span class="fw6">Submitted</span><span class="sm muted">Mon 12 October 2026, 14:05</span><span class="sm">A copy was sent to <span class="mono">+263 77 ••• 4521</span>.</span></div>
+</li>
+<li aria-current="step" style="display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center"><span style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--primary); background: var(--card); display: flex; align-items: center; justify-content: center; flex: none"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary)"></span></span><span style="width: 2px; flex-grow: 1; background: var(--border)"></span></div>
+<div style="padding: 0 0 24px; display: flex; flex-direction: column; gap: 2px"><span style="display: flex; gap: 8px; align-items: center"><span class="fw6">In review</span><span class="badge badge-info">Now</span></span><span class="sm muted">Since Wed 14 October 2026</span><span class="sm">An admissions officer is checking your ID and your results against ZIMSEC records.</span></div>
+</li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 16px">
+<div><span style="display: block; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--input); background: var(--card)"></span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span class="fw5">Decision</span><span class="sm muted">Expected by Fri 30 October 2026</span></div>
+</li>
+</ol>
+<div class="hair" style="padding-top: 16px; display: flex; gap: 24px; align-items: center">
+<a class="tlink" href="#">View what you submitted</a>
+<button class="btn btn-ghost" style="color: var(--destructive); padding: 0">Withdraw application</button>
+</div>
+</div>
+
+<aside style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px">
+<h2 class="h2">What happens next</h2>
+<ul class="list" style="border-top: 1px solid var(--border)">
+<li style="padding: 12px 0">If anything is missing, we'll send an SMS and list it on this page. You won't need to start again.</li>
+<li style="padding: 12px 0">If you're offered a place, you'll get an offer letter, your first fees invoice and a date to register.</li>
+<li style="padding: 12px 0">Bring your original National ID and ZIMSEC certificate to registration.</li>
+</ul>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

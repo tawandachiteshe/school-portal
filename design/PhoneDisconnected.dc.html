@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Session ended</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 844px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; padding: 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+</header>
+<main style="padding: 32px 16px 24px; display: flex; flex-direction: column; gap: 24px; flex-grow: 1">
+<div role="alert" style="display: flex; flex-direction: column; gap: 12px">
+<svg class="ic muted" viewBox="0 0 24 24" style="width: 32px; height: 32px"><rect width="20" height="14" x="2" y="3" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+<h1 class="h1">Your computer ended this session</h1>
+<p>Continue on your computer. Anything you added on this phone has been saved to your application.</p>
+</div>
+<div class="alert alert-info">
+<svg class="ic primary" viewBox="0 0 24 24" style="margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+<p class="sm">This link no longer works. To use your phone again, choose “Continue on your phone” on the computer and scan the new code.</p>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

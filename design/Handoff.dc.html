@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continue on your phone</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 900px; display: flex; flex-direction: column">
+<header class="bar" style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex: none">
+<div style="display: flex; align-items: center; gap: 16px"><div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div><span style="width: 1px; height: 20px; background: var(--border)"></span><span class="sm muted">Application · 2027 intake</span></div>
+<div style="display: flex; align-items: center; gap: 16px"><span class="sm muted">Reference <span class="mono fg">APP-27-08813</span></span><button class="btn btn-secondary btn-sm">Save and exit</button></div>
+</header>
+<nav aria-label="Application steps" class="bar" style="padding: 0 32px; flex: none">
+<ol class="steps">
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>Programme</li>
+<li class="st cur" aria-current="step"><span class="stn">2</span>National ID</li>
+<li class="st"><span class="stn">3</span>ZIMSEC results</li>
+<li class="st"><span class="stn">4</span>Review</li>
+<li class="st"><span class="stn">5</span>Submit</li>
+</ol>
+</nav>
+<main style="padding: 40px 80px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 720px">
+<a class="tlink" href="IdDesktop.dc.html" style="min-height: 24px; gap: 4px"><svg class="ic ic16" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>National ID options</a>
+<h1 class="h1d">Continue on your phone</h1>
+<p class="muted">Open the link on your phone, take a photo of your ID, and this page updates by itself. Keep this page open.</p>
+</div>
+
+<section class="card" style="display: grid; grid-template-columns: 248px minmax(0, 1fr) 300px; max-width: 1120px">
+<div style="padding: 24px; display: flex; flex-direction: column; gap: 12px; border-right: 1px solid var(--border)">
+<div style="width: 200px; height: 200px; padding: 8px; background: #ffffff; border: 1px solid var(--border); border-radius: 4px">
+<svg viewBox="-1 -1 31 31" width="182" height="182" role="img" aria-label="QR code for portal.tcfl.ac.zw/h/K7Q2-9MXD" shape-rendering="crispEdges"><path d="{{qrPath}}" fill="#111111" fill-rule="evenodd"></path></svg>
+</div>
+<p class="sm muted">Point your phone camera at the code.</p>
+</div>
+
+<div style="padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="label">Or type this link on your phone</span>
+<div style="display: flex; gap: 8px; align-items: center">
+<span class="mono" style="font-size: 18px; line-height: 24px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--background); flex-grow: 1">portal.tcfl.ac.zw/h/K7Q2-9MXD</span>
+<button class="btn btn-secondary">Copy</button>
+</div>
+</div>
+<div class="hair"></div>
+<div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
+<span class="label">Or get the link by SMS</span>
+<button class="btn btn-secondary"><svg class="ic" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>Send the link to my phone</button>
+<span class="sm muted">To your verified number <span class="mono fg">+263 77 ••• 4521</span></span>
+<a class="tlink" href="#">Send by email instead</a>
+</div>
+</div>
+
+<div style="padding: 24px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid var(--border); background: var(--background); border-radius: 0 6px 6px 0">
+<span class="label">Match code</span>
+<span class="mono" style="font-size: 48px; line-height: 56px; font-weight: 600; letter-spacing: 0.12em">K7Q2</span>
+<p class="sm">Check your phone shows the same code. If it doesn't, don't continue on that phone.</p>
+<div style="margin-top: auto; display: flex; align-items: center; gap: 8px" class="sm muted"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><span>Link expires in <span class="mono fg fw5" role="timer">14:32</span></span></div>
+</div>
+</section>
+
+<div style="display: flex; gap: 24px; align-items: center">
+<a class="tlink" href="#">Upload a file from this computer instead</a>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  qr() {
+    if (this._qr) return this._qr;
+    const n = 29; let s = 91;
+    const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    const inFinder = (x, y) => (x < 8 && y < 8) || (x >= n - 8 && y < 8) || (x < 8 && y >= n - 8);
+    let d = '';
+    [[0, 0], [n - 7, 0], [0, n - 7]].forEach(([fx, fy]) => {
+      d += 'M' + fx + ' ' + fy + 'h7v7h-7z';
+      d += 'M' + (fx + 1) + ' ' + (fy + 1) + 'v5h5v-5z';
+      d += 'M' + (fx + 2) + ' ' + (fy + 2) + 'h3v3h-3z';
+    });
+    for (let y = 0; y < n; y++) {
+      for (let x = 0; x < n; x++) {
+        if (inFinder(x, y)) continue;
+        let on;
+        if (y === 6) on = x % 2 === 0;
+        else if (x === 6) on = y % 2 === 0;
+        else if (x >= 20 && x <= 24 && y >= 20 && y <= 24) on = (x === 20 || x === 24 || y === 20 || y === 24 || (x === 22 && y === 22));
+        else on = rnd() < 0.47;
+        if (on) d += 'M' + x + ' ' + y + 'h1v1h-1z';
+      }
+    }
+    this._qr = d;
+    return d;
+  }
+  renderVals() {
+    return { theme: this.props.theme ?? 'light', qrPath: this.qr() };
+  }
+}
+</script>
+</body>
+</html>

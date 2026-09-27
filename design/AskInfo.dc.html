@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask for information</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 1240px; position: relative">
+<div aria-hidden="true" style="position: absolute; inset: 0"><dc-import name="StaffReview" theme="{{theme}}" hint-size="1280px,1240px"></dc-import></div>
+<div style="position: absolute; inset: 0; background: rgba(20, 19, 17, 0.48)"></div>
+
+<aside role="dialog" aria-modal="true" aria-labelledby="ai-t" style="position: absolute; top: 0; right: 0; bottom: 0; width: 480px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 12px 16px 24px; border-bottom: 1px solid var(--border)">
+<div><h2 class="h2" id="ai-t">Ask Tariro for information</h2><p class="sm muted"><span class="mono">APP-27-08813</span> moves to “Waiting for applicant”</p></div>
+<button class="icon-btn" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1">
+<fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px">
+<legend class="label" style="padding: 0; margin-bottom: 8px">What do you need?</legend>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 40px"><span class="check"></span>A clearer photo of the National ID</label>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 40px"><span class="check" style="background: var(--primary); border-color: var(--primary)"></span>A photo of the ZIMSEC certificate, not the slip</label>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 40px"><span class="check"></span>Proof of a name change</label>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 40px"><span class="check"></span>Something else</label>
+</fieldset>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="nt">Message to the applicant <span class="muted fw5">(optional)</span></label>
+<textarea class="input" id="nt" rows="3" style="font-size: 14px">The slip is hard to read for Physical Science. A photo of the certificate is enough.</textarea>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; width: 200px">
+<label class="label" for="rb">Reply by</label>
+<input class="input" id="rb" value="Fri 23 Oct 2026">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="label">SMS preview</span>
+<p class="sm" style="padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--background)">TCFL Admissions: please add a photo of your ZIMSEC certificate to application APP-27-08813 at portal.tcfl.ac.zw by Fri 23 Oct.</p>
+<span class="xs muted"><span class="mono">126</span>/160 characters · 1 SMS</span>
+</div>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border)">
+<button class="btn btn-secondary">Cancel</button>
+<button class="btn btn-primary">Send request</button>
+</div>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

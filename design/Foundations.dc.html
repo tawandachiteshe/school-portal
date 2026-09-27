@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Foundations</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 1720px; padding: 64px 80px; display: flex; flex-direction: column; gap: 48px">
+
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 760px">
+<p class="eyebrow">TCFL Portal</p>
+<h1 class="h1d">Foundations</h1>
+<p class="muted">Tokens use shadcn/ui variable names so they drop into Tailwind v4 as-is. Primary is a stand-in deep telecom blue until the official TelOne colours arrive. Amber means one thing: act within 48 hours, or check this field.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px">
+
+<!-- Colour -->
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2">Colour tokens</h2>
+<table class="tbl">
+<thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td class="mono">background</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #0000001f; background: #FAF9F7"></span><span class="mono xs">#FAF9F7</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #ffffff26; background: #141311"></span><span class="mono xs">#141311</span></span></td><td class="muted">Page</td></tr>
+<tr><td class="mono">card</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #0000001f; background: #FFFFFF"></span><span class="mono xs">#FFFFFF</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #ffffff26; background: #1B1A17"></span><span class="mono xs">#1B1A17</span></span></td><td class="muted">Bars, dialogs, real objects</td></tr>
+<tr><td class="mono">foreground</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #1B1A18"></span><span class="mono xs">#1B1A18</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #ECEAE5"></span><span class="mono xs">#ECEAE5</span></span></td><td class="muted">Text</td></tr>
+<tr><td class="mono">muted</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #F1EFEB; border: 1px solid #0000001f"></span><span class="mono xs">#F1EFEB</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #252320"></span><span class="mono xs">#252320</span></span></td><td class="muted">Skeletons, quiet fills</td></tr>
+<tr><td class="mono">muted-foreground</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #5E5A53"></span><span class="mono xs">#5E5A53</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #A6A197"></span><span class="mono xs">#A6A197</span></span></td><td class="muted">Secondary text, 6.5:1</td></tr>
+<tr><td class="mono">border</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #E2DFD9"></span><span class="mono xs">#E2DFD9</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #34312C"></span><span class="mono xs">#34312C</span></span></td><td class="muted">1px hairlines</td></tr>
+<tr><td class="mono">input</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #8C867C"></span><span class="mono xs">#8C867C</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #77726A"></span><span class="mono xs">#77726A</span></span></td><td class="muted">Field outlines, 3:1</td></tr>
+<tr><td class="mono">primary · ring</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #0B4A8B"></span><span class="mono xs">#0B4A8B</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #86B6EE"></span><span class="mono xs">#86B6EE</span></span></td><td class="muted">Primary action, links, current state, focus</td></tr>
+<tr><td class="mono">accent</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #8A4B00"></span><span class="mono xs">#8A4B00</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #F2B55C"></span><span class="mono xs">#F2B55C</span></span></td><td class="muted">Due within 48 h, low-confidence fields</td></tr>
+<tr><td class="mono">destructive</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #B42318"></span><span class="mono xs">#B42318</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #F28B80"></span><span class="mono xs">#F28B80</span></span></td><td class="muted">Errors, overdue</td></tr>
+<tr><td class="mono">success</td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #1D6B3A"></span><span class="mono xs">#1D6B3A</span></span></td><td><span style="display: flex; gap: 8px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 4px; background: #74C48F"></span><span class="mono xs">#74C48F</span></span></td><td class="muted">Submitted, valid, eligible</td></tr>
+</tbody>
+</table>
+<p class="sm muted">Each status colour has a <span class="mono">-soft</span> fill for badges and alerts. Info uses primary. No shadows anywhere: surfaces separate with <span class="mono">border</span> only.</p>
+</section>
+
+<!-- Type, spacing, radius -->
+<section style="display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2">Type</h2>
+<ul class="list">
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span class="h1d">Choose a programme</span><span class="mono xs muted">28/36 · 600 · desktop</span></li>
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span class="h1">Good morning, Tariro</span><span class="mono xs muted">24/32 · 600</span></li>
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span class="h2">Due in the next 7 days</span><span class="mono xs muted">18/24 · 600</span></li>
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span>Lab sheet 4: Loops and arrays</span><span class="mono xs muted">16/24 · 400/500</span></li>
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span class="sm muted">Fri 12 Mar, 17:00 · Lab 3</span><span class="mono xs muted">14/20 · meta</span></li>
+<li style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px"><span class="mono">TCFL/2027/0142 · DCN201</span><span class="mono xs muted">Plex Mono · IDs</span></li>
+</ul>
+<p class="sm muted">All figures tabular. Body never below 16px on phones; 12px only for badges and nav labels.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 class="h2">Spacing · 4px grid</h2>
+<div style="display: flex; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 4px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">4</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 8px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">8</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 12px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">12</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 16px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">16</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 24px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">24</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 32px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">32</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 48px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">48</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start"><span style="width: 64px; height: 24px; background: var(--primary)"></span><span class="mono xs muted">64</span></div>
+</div>
+<p class="sm muted">Radius 6px for surfaces and buttons, 4px for inputs and badges. Touch targets 44px minimum.</p>
+</div>
+</section>
+</div>
+
+<div class="hair"></div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px">
+
+<section style="display: flex; flex-direction: column; gap: 24px">
+<h2 class="h2">Controls</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<button class="btn btn-primary">Continue</button>
+<button class="btn btn-secondary">Renew</button>
+<button class="btn btn-ghost">Edit</button>
+<button class="btn btn-destructive">Withdraw application</button>
+<button class="btn" disabled="">Submit</button>
+<button class="btn btn-primary focus">Focused</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<span class="badge">Test</span>
+<span class="badge badge-amber"><svg class="ic ic16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>tomorrow</span>
+<span class="badge badge-success"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>Check letter valid</span>
+<span class="badge badge-danger">Overdue</span>
+<span class="badge badge-info">In review</span>
+<span class="badge mono">PDF</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="f1">Surname</label><input class="input" id="f1" value="MOYO"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="f2">First names</label><input class="input focus" id="f2" value="TARIRO"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="f3">Letter after the digits</label><span class="field-error">Check this letter</span><input class="input input-error mono" id="f3" value="P"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="f4">Grade · Physical Science</label><span class="sm amber fw5">We weren't sure. Check your slip.</span><input class="input input-low mono" id="f4" value="B"></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div role="tablist" style="display: flex; gap: 24px; border-bottom: 1px solid var(--border)">
+<button role="tab" aria-selected="true" style="height: 44px; border: 0; background: none; font: inherit; font-weight: 600; color: var(--foreground); box-shadow: inset 0 -2px 0 var(--primary); padding: 0">Overview</button>
+<button role="tab" aria-selected="false" style="height: 44px; border: 0; background: none; font: inherit; color: var(--muted-foreground); padding: 0">Notes</button>
+<button role="tab" aria-selected="false" style="height: 44px; border: 0; background: none; font: inherit; color: var(--muted-foreground); padding: 0">Assessments</button>
+</div>
+<div style="display: flex; gap: 16px; align-items: center">
+<span class="avatar">TM</span>
+<div class="progress" style="width: 160px" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="5" aria-label="Step 2 of 5"><span style="width: 40%"></span></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="skel" style="width: 160px; height: 12px"></span><span class="skel" style="width: 104px; height: 12px"></span></div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 class="h2">Feedback</h2>
+<div class="alert alert-info"><svg class="ic primary" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg><p>Lab 3 is closed on Friday 12 March for network maintenance.</p></div>
+<div class="alert alert-success"><svg class="ic success" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><p>You meet the entry requirements for the Diploma in Information Technology.</p></div>
+<div class="alert alert-amber"><svg class="ic amber" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><p>2 grades need checking against your result slip.</p></div>
+<div class="alert alert-danger"><svg class="ic danger" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><p>That ID number isn't valid. Check the letter after the digits.</p></div>
+<div style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 6px; background: var(--foreground); color: var(--background); width: 360px">
+<span style="flex-grow: 1" class="sm">Lab sheet 4 submitted</span><button class="btn btn-sm" style="color: var(--background); text-decoration: underline; padding: 0 4px">Undo</button>
+</div>
+<p class="sm muted">Toast: bottom of screen on phones, bottom-right on desktop. 150ms fade. Never used for errors that need action.</p>
+</section>
+</div>
+
+<div class="hair"></div>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><h2 class="h2">Staff density · applications queue</h2><span class="sm muted">36px rows on desktop, sortable headers, IDs in mono</span></div>
+<table class="tbl">
+<thead><tr><th>Reference</th><th>Applicant</th><th>National ID</th><th>Programme</th><th>Submitted</th><th>Eligibility</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="mono">APP-27-08813</td><td>Tariro Moyo</td><td class="mono">63-2047823 Q 29</td><td>Diploma in Information Technology</td><td>Mon 12 Oct, 14:05</td><td><span class="success" style="display: inline-flex; gap: 4px; align-items: center"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>Meets requirements</span></td><td><span class="badge badge-info">In review</span></td></tr>
+<tr><td class="mono">APP-27-08790</td><td>Tinashe Chirwa</td><td class="mono">08-1187432 K 08</td><td>Diploma in Telecommunications Engineering</td><td>Mon 12 Oct, 09:41</td><td><span class="amber fw5">Physical Science to check</span></td><td><span class="badge">Submitted</span></td></tr>
+<tr><td class="mono">APP-27-08772</td><td>Rudo Mhlanga</td><td class="mono">42-0936115 T 42</td><td>Certificate in Computer Networking</td><td>Sun 11 Oct, 20:17</td><td><span class="danger fw5">Mathematics below C</span></td><td><span class="badge">Submitted</span></td></tr>
+</tbody>
+</table>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

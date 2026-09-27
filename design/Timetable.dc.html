@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Timetable</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1000px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px 0 4px; flex: none">
+<a class="icon-btn" href="Modules.dc.html" aria-label="Back" style="color: var(--foreground)"><svg class="ic" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></a>
+<span class="fw6">Timetable</span>
+</header>
+<main style="padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button class="icon-btn" aria-label="Previous week"><svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg></button>
+<div style="text-align: center"><h1 class="h2">Week 6 · 8–12 March</h1><p class="sm muted"><span class="mono">DIT-1A</span> · Semester 1 2027</p></div>
+<button class="icon-btn" aria-label="Next week"><svg class="ic" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+
+<div role="tablist" aria-label="Day" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px">
+<button role="tab" aria-selected="false" style="height: 56px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); font: inherit; color: var(--muted-foreground); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="xs">Mon</span><span class="mono fw5">8</span></button>
+<button role="tab" aria-selected="false" style="height: 56px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); font: inherit; color: var(--muted-foreground); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="xs">Tue</span><span class="mono fw5">9</span></button>
+<button role="tab" aria-selected="false" style="height: 56px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); font: inherit; color: var(--muted-foreground); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="xs">Wed</span><span class="mono fw5">10</span></button>
+<button role="tab" aria-selected="true" style="height: 56px; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); font: inherit; color: var(--primary-foreground); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="xs">Today</span><span class="mono fw6">11</span></button>
+<button role="tab" aria-selected="false" style="height: 56px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); font: inherit; color: var(--muted-foreground); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="xs">Fri</span><span class="mono fw5">12</span></button>
+</div>
+
+<ul class="list" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 0" class="muted"><span class="mono sm">08:00<br>09:30</span><span><span style="display: block"><span class="mono">MTH110</span> Engineering Mathematics</span><span class="sm">Lecture Room B2 · Dr S. Ncube</span></span></li>
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 8px; margin: 0 -8px; background: var(--primary-soft); border-radius: 6px"><span class="mono sm primary fw5">10:00<br><span class="muted" style="font-weight: 400">11:30</span></span><span><span class="fw5" style="display: block"><span class="mono">DCN201</span> Test 1</span><span class="sm muted">Lab 3 · Eng. F. Chikore</span></span></li>
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 0"><span class="mono sm">12:00<br><span class="muted">13:30</span></span><span><span class="fw5" style="display: block"><span class="mono">NET202</span> Computer Networks</span><span class="sm muted">Lab 3 · Mrs R. Ndlovu</span></span></li>
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 0"><span class="mono sm">14:30<br><span class="muted">16:00</span></span><span><span class="fw5" style="display: block"><span class="mono">PRG101</span> Programming Fundamentals</span><span class="sm muted">Block C · Mr T. Mutasa</span></span></li>
+</ul>
+
+<div class="alert alert-info">
+<svg class="ic primary" viewBox="0 0 24 24" style="margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+<p class="sm"><span class="fw6">Friday:</span> Lab 3 is closed for maintenance. None of your classes are affected.</p>
+</div>
+
+<a class="tlink" href="#" style="gap: 6px"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Add this timetable to my phone calendar</a>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Submit your application</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 900px; display: flex; flex-direction: column">
+<header class="bar" style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex: none">
+<div style="display: flex; align-items: center; gap: 16px"><div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div><span style="width: 1px; height: 20px; background: var(--border)"></span><span class="sm muted">Application · 2027 intake</span></div>
+<div style="display: flex; align-items: center; gap: 16px"><span class="sm muted">Reference <span class="mono fg">APP-27-08813</span></span><button class="btn btn-secondary btn-sm">Save and exit</button></div>
+</header>
+<nav aria-label="Application steps" class="bar" style="padding: 0 32px; flex: none">
+<ol class="steps">
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>Programme</li>
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>National ID</li>
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>ZIMSEC results</li>
+<li class="st done"><span class="stn"><svg class="ic ic16" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></span>Review</li>
+<li class="st cur" aria-current="step"><span class="stn">5</span>Submit</li>
+</ol>
+</nav>
+<main style="padding: 40px 80px; display: flex; flex-direction: column; gap: 28px; max-width: 880px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h1d">Submit your application</h1>
+<p class="muted">After you submit, you can't change your answers. Admissions can reopen it if something needs fixing.</p>
+</div>
+<dl class="list" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; align-items: center; padding: 8px 0"><dt class="muted">Programme</dt><dd>Diploma in Information Technology</dd><a class="tlink" href="ReviewDesktop.dc.html" aria-label="Change programme">Change</a></div>
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; align-items: center; padding: 8px 0"><dt class="muted">National ID</dt><dd class="mono">63-2047823 Q 29</dd><a class="tlink" href="ReviewDesktop.dc.html" aria-label="Change National ID">Change</a></div>
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; align-items: center; padding: 8px 0"><dt class="muted">ZIMSEC results</dt><dd>6 subjects · November 2022</dd><a class="tlink" href="ReviewDesktop.dc.html" aria-label="Change ZIMSEC results">Change</a></div>
+</dl>
+<fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+<legend class="h2" style="padding: 0; margin-bottom: 12px">Declaration</legend>
+<label style="display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; cursor: pointer; max-width: 720px">
+<span style="width: 28px; height: 28px; border-radius: 4px; border: 2px solid var(--primary); background: var(--primary); display: inline-flex; align-items: center; justify-content: center; color: var(--primary-foreground)"><svg class="ic" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke-width: 2.5"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<span>I confirm that the information and documents in this application are true and are mine. I understand TCFL may check my results with ZIMSEC and cancel an offer if anything is false.</span>
+</label>
+</fieldset>
+<div style="display: flex; gap: 24px; align-items: center">
+<a class="btn btn-primary" href="Payment.dc.html">Continue to payment · US$ 20.00</a>
+<span class="sm muted">Your application is sent when the fee is paid. EcoCash, OneMoney, bank transfer or cash.</span>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

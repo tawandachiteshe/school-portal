@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard with nothing on</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 390px; height: 1100px; display: flex; flex-direction: column">
+<header class="bar" style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 16px; flex: none">
+<div style="display: flex; align-items: baseline; gap: 6px"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></div>
+<div style="display: flex; align-items: center"><a class="btn btn-ghost" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Ask TCFL</a><button class="icon-btn" aria-label="Account: Rudo Chari"><span class="avatar">RC</span></button></div>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 28px; flex-grow: 1">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">Good afternoon, Rudo</h1>
+<p class="muted">Saturday 6 February · Week 1 of 16</p>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">Today</h2>
+<p class="muted">No classes today. Your next class is <span class="fg fw5"><span class="mono">PRG101</span> on Monday at 08:00</span> in Block C.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">Due in the next 7 days</h2>
+<p class="muted">Nothing due. Tests and assignments appear here once lecturers add them.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">Announcements</h2>
+<ul class="list" style="margin-top: 4px">
+<li><a href="#" style="display: grid; grid-template-columns: 16px minmax(0, 1fr); column-gap: 8px; padding: 12px 0; color: inherit; text-decoration: none"><span style="padding-top: 8px; padding-left: 4px"><span class="dot" style="display: block" aria-label="Unread"></span></span><div><div class="fw6">Welcome week timetable and campus tour</div><div class="sm muted">Student Affairs · Fri 5 Feb</div></div></a></li>
+</ul>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">New notes</h2>
+<p class="muted">No notes yet. You'll see them here as soon as a lecturer uploads one.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">Library loans</h2>
+<p class="muted">No books on loan. Show your student card at the desk in Block A to borrow.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="h2">Results</h2>
+<p class="muted">Semester 1 results not yet published</p>
+</section>
+
+<section class="hair" style="padding-top: 20px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+<h2 class="h3">Before classes start</h2>
+<ul class="list" style="width: 100%; border-bottom: 1px solid var(--border)">
+<li style="display: flex; gap: 12px; align-items: center; min-height: 52px"><svg class="ic success" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><span class="muted" style="flex-grow: 1; text-decoration: line-through">Pay first fees instalment</span></li>
+<li><a href="#" style="display: flex; gap: 12px; align-items: center; min-height: 52px; color: inherit; text-decoration: none"><svg class="ic muted" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg><span style="flex-grow: 1">Collect your student card</span><svg class="ic muted" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+<li><a href="#" style="display: flex; gap: 12px; align-items: center; min-height: 52px; color: inherit; text-decoration: none"><svg class="ic muted" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg><span style="flex-grow: 1">Turn on SMS reminders</span><svg class="ic muted" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+</ul>
+</section>
+</main>
+<nav aria-label="Main" class="bnav">
+<a class="bn" href="#" aria-current="page"><svg class="ic" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>Modules</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Deadlines</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>Library</a>
+<a class="bn" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12h16"></path><path d="M4 6h16"></path><path d="M4 18h16"></path></svg>More</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>
