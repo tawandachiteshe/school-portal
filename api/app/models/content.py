@@ -1,7 +1,18 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Identity, Integer, SmallInteger, Text, func
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Date,
+    DateTime,
+    ForeignKey,
+    Identity,
+    Integer,
+    SmallInteger,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.academic import ModuleOffering
@@ -39,6 +50,10 @@ class Announcement(Base):
     requires_ack: Mapped[bool] = mapped_column(Boolean, server_default="false")
     publish_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    from_label: Mapped[str | None] = mapped_column(Text)  # 'ICT Services', 'Accounts Office'
+    contact_line: Mapped[str | None] = mapped_column(Text)  # 'Questions: ICT Services, Block C'
+    affects_venue_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("venues.id", ondelete="SET NULL"))
+    affects_on: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = created_at()
 
     targets: Mapped[list["AnnouncementTarget"]] = relationship(lazy="selectin", cascade="all, delete-orphan")

@@ -8,6 +8,7 @@ import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
 import Home from '@/pages/student/Home'
 import More from '@/pages/student/More'
+import { AnnouncementDetail, AnnouncementsList } from '@/pages/student/Announcements'
 
 // Route map follows docs/design-handoff.md. Screens are added as they are built.
 export const router = createBrowserRouter([
@@ -22,6 +23,8 @@ export const router = createBrowserRouter([
     children: [
       { element: <StudentShell />, children: [{ index: true, element: <Home /> }] },
       { element: <StudentShell avatar={false} />, children: [{ path: '/more', element: <More /> }] },
+      { path: '/announcements', element: <AnnouncementsList /> },
+      { path: '/announcements/:id', element: <AnnouncementDetail /> },
     ],
   },
   {

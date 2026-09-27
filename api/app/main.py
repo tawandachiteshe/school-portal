@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import me
+from app.api import library, me, student
 from app.auth import routes as auth_routes
 from app.auth.csrf import CSRFMiddleware
 from app.config import get_settings
@@ -23,6 +23,8 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_routes.router)
     app.include_router(me.router)
+    app.include_router(student.router)
+    app.include_router(library.router)
     return app
 
 

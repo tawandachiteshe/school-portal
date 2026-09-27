@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     # Sign in as a seeded user without Authentik. Never enabled in production.
     dev_login: bool = True
 
+    timezone: str = "Africa/Harare"
+    # Library policy (design/LibraryDesk, Library). Confirm with the librarian.
+    library_loan_days: int = 14
+    library_max_renewals: int = 2
+
     ocr_llm_mode: str = "fallback"  # off | fallback | always
     claude_model: str = "claude-opus-5"
     assistant_enabled: bool = True

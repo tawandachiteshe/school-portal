@@ -50,3 +50,4 @@ class LibraryLoan(Base):
     fine_paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     copy: Mapped[LibraryCopy] = relationship(lazy="joined")
+    person: Mapped["Person"] = relationship()  # noqa: F821

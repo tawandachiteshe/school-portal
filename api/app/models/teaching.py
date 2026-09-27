@@ -110,6 +110,8 @@ class Submission(Base):
     marked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     files: Mapped[list["SubmissionFile"]] = relationship(lazy="selectin")
+    assessment: Mapped[Assessment] = relationship()
+    student: Mapped["Student"] = relationship()  # noqa: F821
 
 
 class SubmissionFile(Base):
