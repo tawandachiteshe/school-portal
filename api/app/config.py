@@ -60,6 +60,17 @@ class Settings(BaseSettings):
     registration_time: str = "08:00"  # "Register on Monday 1 February, 08:00"
     registration_location: str = "Block A"
     application_fee_usd: str = "20.00"
+    # Mobile money (design/Payment "[PAYMENT PROVIDER]"): "" means none in production and the
+    # development simulator elsewhere; "dev" forces the simulator. A real gateway plugs in here.
+    payment_provider: str = ""
+    payment_prompt_seconds: int = 60  # design/PayWaiting "Prompt expires in 0:48"
+    # design/PayOffice: unknowns until Accounts confirm them; bank transfer is offered once set.
+    bank_account_name: str = "TelOne Centre for Learning"
+    bank_name: str = ""
+    bank_account_number: str = ""
+    bank_branch: str = ""
+    accounts_office: str = "Block A, weekdays"  # design/Payment "Cash at the Accounts Office"
+    bank_confirm_working_days: int = 2
     admissions_contact: str = (
         ""  # design/ReviewNotEligible "Contact the Admissions Office": phone or email, once confirmed
     )

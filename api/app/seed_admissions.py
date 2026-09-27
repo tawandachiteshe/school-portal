@@ -8,6 +8,7 @@ slips are drawn as SVG and marked SAMPLE.
 import hashlib
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from xml.sax.saxutils import escape
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,7 @@ from app.models import (
     Application,
     ApplicationEvent,
     ApplicationFlag,
+    ApplicationPayment,
     DistrictCode,
     Document,
     DocumentField,
@@ -532,6 +534,23 @@ class AdmissionsSeed:
                 DocumentField(document_id=birth.id, field="full_name", confirmed_value=name.upper()),
                 DocumentField(document_id=birth.id, field="date_of_birth", confirmed_value=a.dob.isoformat()),
             ]
+        )
+        # Paid by EcoCash just before submitting (design/Submitted "receipt EC-8841027" for Tariro).
+        app.declared_at = submitted - timedelta(minutes=2)
+        self.db.add(
+            ApplicationPayment(
+                application_id=app.id,
+                method="ecocash",
+                status="paid",
+                amount=Decimal(get_settings().application_fee_usd),
+                phone=person.user.phone if person.user and person.user.phone else "+263770000001",
+                provider="dev",
+                receipt="EC-8841027"
+                if a.ref == "APP-27-08813"
+                else f"EC-{8840000 + len(a.ref) * 97 + int(a.ref[-3:]):07d}",
+                paid_at=submitted,
+                created_at=submitted - timedelta(minutes=1),
+            )
         )
         for code, severity, text in a.flags:
             self.db.add(

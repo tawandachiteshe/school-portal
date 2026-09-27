@@ -1,4 +1,5 @@
 import {
+  Banknote,
   Bell,
   BookOpen,
   CalendarDays,
@@ -17,7 +18,7 @@ import type { ReactNode } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { useOverview } from '@/api/generated/teaching/teaching'
-import { useQueueSummary } from '@/api/generated/admissions/admissions'
+import { usePaymentsToConfirm, useQueueSummary } from '@/api/generated/admissions/admissions'
 import { useDeskToday } from '@/api/generated/library-desk/library-desk'
 import { homeFor, useMe, useSignOut, type Role } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -37,6 +38,7 @@ const NAV: Partial<Record<Role, Group[]>> = {
       items: [
         { to: '/staff/admissions', label: 'Applications', icon: Inbox, end: true },
         { to: '/staff/admissions/decided', label: 'Decisions sent', icon: Check },
+        { to: '/staff/admissions/payments', label: 'Payments to confirm', icon: Banknote },
         { to: '/staff/admissions/places', label: 'Intake places', icon: CalendarDays },
       ],
     },
@@ -111,7 +113,11 @@ function useLibrarianCounts(enabled: boolean): Record<string, number> {
 // Admissions: open applications and decisions sent (design/StaffQueue "Applications 52").
 function useAdmissionsCounts(enabled: boolean): Record<string, number> {
   const { data } = useQueueSummary({ query: { enabled, staleTime: 60_000 } })
-  return data ? { '/staff/admissions': data.open, '/staff/admissions/decided': data.decided } : {}
+  const { data: pay } = usePaymentsToConfirm({ query: { enabled, staleTime: 60_000 } })
+  return {
+    ...(data ? { '/staff/admissions': data.open, '/staff/admissions/decided': data.decided } : {}),
+    ...(pay ? { '/staff/admissions/payments': pay.length } : {}),
+  }
 }
 
 export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {

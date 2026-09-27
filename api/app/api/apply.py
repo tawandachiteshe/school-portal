@@ -15,7 +15,7 @@ from app.api.admissions import ApplicationStatus
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
 from app.db import get_db
-from app.models import Application, ApplicationEvent, Intake, Person, Programme
+from app.models import Application, ApplicationEvent, ApplicationPayment, Intake, Person, Programme
 from app.pdf import make_pdf
 from app.services import clock
 
@@ -175,6 +175,13 @@ class Offer(BaseModel):
     declined_at: datetime | None
 
 
+class FeePaid(BaseModel):
+    amount: str
+    method: str  # "EcoCash"
+    receipt: str | None
+    paid_at: datetime | None
+
+
 class MyApplication(BaseModel):
     id: uuid.UUID
     reference: str
@@ -195,6 +202,8 @@ class MyApplication(BaseModel):
     next_step: ApplyStep | None
     phone_masked: str | None
     offer: Offer | None
+    fee: FeePaid | None  # design/Submitted "Fee paid US$ 20.00 · EcoCash · receipt EC-8841027"
+    payment_waiting: bool  # bank or cash, waiting for Accounts to confirm
 
 
 async def _out(db: AsyncSession, a: Application) -> MyApplication:
@@ -249,6 +258,27 @@ async def _out(db: AsyncSession, a: Application) -> MyApplication:
             accepted_at=a.offer_accepted_at,
             declined_at=a.offer_declined_at,
         )
+    pay = (
+        (
+            await db.execute(
+                select(ApplicationPayment)
+                .where(ApplicationPayment.application_id == a.id)
+                .order_by(ApplicationPayment.created_at.desc())
+            )
+        )
+        .scalars()
+        .first()
+    )
+    labels = {"ecocash": "EcoCash", "onemoney": "OneMoney", "bank": "Bank transfer", "cash": "Cash"}
+    fee = (
+        FeePaid(
+            amount=f"{pay.amount:.2f}", method=labels[pay.method], receipt=pay.receipt, paid_at=pay.paid_at
+        )
+        if pay and pay.status == "paid"
+        else None
+    )
+    if next_step == "review" and a.declared_at:
+        next_step = "submit"
     p = a.person
     user = p.user
     return MyApplication(
@@ -275,6 +305,8 @@ async def _out(db: AsyncSession, a: Application) -> MyApplication:
         next_step=ApplyStep(next_step) if next_step else None,
         phone_masked=_mask_phone(user.phone) if user and user.phone else None,
         offer=offer,
+        fee=fee,
+        payment_waiting=bool(pay and pay.status == "awaiting_confirmation"),
     )
 
 

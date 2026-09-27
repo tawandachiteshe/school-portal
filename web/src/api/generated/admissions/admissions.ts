@@ -24,14 +24,17 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ConfirmPaymentIn,
   DecisionIn,
   HTTPValidationError,
   MessageIn,
   NoteIn,
+  PaymentToConfirm,
   QueueCsvParams,
   QueueParams,
   QueueRow,
   QueueSummary,
+  RejectPaymentIn,
   ResolveIn,
   Review,
   Sent
@@ -1149,3 +1152,279 @@ export function useDocumentFile<TData = Awaited<ReturnType<typeof documentFile>>
 
 
 
+export const getPaymentsToConfirmUrl = () => {
+
+
+
+
+  return `/staff/admissions/payments`
+}
+
+/**
+ * @summary Payments To Confirm
+ */
+export const paymentsToConfirm = async ( options?: Parameters<typeof apiFetch>[1]): Promise<PaymentToConfirm[]> => {
+
+  return apiFetch<PaymentToConfirm[]>(getPaymentsToConfirmUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPaymentsToConfirmQueryKey = () => {
+    return [
+    `/staff/admissions/payments`
+    ] as const;
+    }
+
+
+export const getPaymentsToConfirmQueryOptions = <TData = Awaited<ReturnType<typeof paymentsToConfirm>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentsToConfirmQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentsToConfirm>>> = ({ signal }) => paymentsToConfirm({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentsToConfirmQueryResult = NonNullable<Awaited<ReturnType<typeof paymentsToConfirm>>>
+export type PaymentsToConfirmQueryError = unknown
+
+
+export function usePaymentsToConfirm<TData = Awaited<ReturnType<typeof paymentsToConfirm>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentsToConfirm>>,
+          TError,
+          Awaited<ReturnType<typeof paymentsToConfirm>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentsToConfirm<TData = Awaited<ReturnType<typeof paymentsToConfirm>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentsToConfirm>>,
+          TError,
+          Awaited<ReturnType<typeof paymentsToConfirm>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentsToConfirm<TData = Awaited<ReturnType<typeof paymentsToConfirm>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Payments To Confirm
+ */
+
+export function usePaymentsToConfirm<TData = Awaited<ReturnType<typeof paymentsToConfirm>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentsToConfirm>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentsToConfirmQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getConfirmPaymentUrl = (paymentId: string,) => {
+
+
+
+
+  return `/staff/admissions/payments/${paymentId}/confirm`
+}
+
+/**
+ * @summary Confirm Payment
+ */
+export const confirmPayment = async (paymentId: string,
+    confirmPaymentIn: ConfirmPaymentIn, options?: Parameters<typeof apiFetch>[1]): Promise<PaymentToConfirm[]> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<PaymentToConfirm[]>(getConfirmPaymentUrl(paymentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(confirmPaymentIn)
+  }
+);}
+
+
+
+
+
+export const getConfirmPaymentMutationKey = () => ['confirmPayment'] as const;
+
+export const getConfirmPaymentMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPayment>>, TError,ConfirmPaymentMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmPayment>>, TError,ConfirmPaymentMutationVariables, TContext> => {
+
+const mutationKey = getConfirmPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmPayment>>, ConfirmPaymentMutationVariables> = (props) => {
+          const {paymentId,data} = props ?? {};
+
+          return  confirmPayment(paymentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof confirmPayment>>>
+    export type ConfirmPaymentMutationBody = ConfirmPaymentIn
+    export type ConfirmPaymentMutationError = HTTPValidationError
+    export type ConfirmPaymentMutationVariables = {paymentId: string;data: ConfirmPaymentIn}
+
+    /**
+ * @summary Confirm Payment
+ */
+export const useConfirmPayment = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPayment>>, TError,ConfirmPaymentMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmPayment>>,
+        TError,
+        ConfirmPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmPaymentMutationOptions(options), queryClient);
+    }
+    export const getRejectPaymentUrl = (paymentId: string,) => {
+
+
+
+
+  return `/staff/admissions/payments/${paymentId}/reject`
+}
+
+/**
+ * @summary Reject Payment
+ */
+export const rejectPayment = async (paymentId: string,
+    rejectPaymentIn: RejectPaymentIn, options?: Parameters<typeof apiFetch>[1]): Promise<PaymentToConfirm[]> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<PaymentToConfirm[]>(getRejectPaymentUrl(paymentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectPaymentIn)
+  }
+);}
+
+
+
+
+
+export const getRejectPaymentMutationKey = () => ['rejectPayment'] as const;
+
+export const getRejectPaymentMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectPayment>>, TError,RejectPaymentMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectPayment>>, TError,RejectPaymentMutationVariables, TContext> => {
+
+const mutationKey = getRejectPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectPayment>>, RejectPaymentMutationVariables> = (props) => {
+          const {paymentId,data} = props ?? {};
+
+          return  rejectPayment(paymentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof rejectPayment>>>
+    export type RejectPaymentMutationBody = RejectPaymentIn
+    export type RejectPaymentMutationError = HTTPValidationError
+    export type RejectPaymentMutationVariables = {paymentId: string;data: RejectPaymentIn}
+
+    /**
+ * @summary Reject Payment
+ */
+export const useRejectPayment = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectPayment>>, TError,RejectPaymentMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof rejectPayment>>,
+        TError,
+        RejectPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRejectPaymentMutationOptions(options), queryClient);
+    }

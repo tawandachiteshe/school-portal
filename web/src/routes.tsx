@@ -11,11 +11,12 @@ import ApplyOffer from '@/pages/apply/Offer'
 import ApplyProgramme from '@/pages/apply/Programme'
 import ApplyReview from '@/pages/apply/Review'
 import ApplyStatus from '@/pages/apply/Status'
-import StepPending from '@/pages/apply/StepPending'
+import { Pay as ApplyPay, Submit as ApplySubmit, Submitted as ApplySubmitted } from '@/pages/apply/Submit'
 import BirthCertificate from '@/pages/apply/birth/BirthCertificate'
 import { HandoffBirth, HandoffId, HandoffLanding, HandoffMismatch, HandoffResults } from '@/pages/apply/id/Handoff'
 import ApplyResults from '@/pages/apply/results/Results'
 import NationalId from '@/pages/apply/id/NationalId'
+import AdmissionsPayments from '@/pages/staff/admissions/Payments'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
 import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
@@ -100,7 +101,9 @@ export const router = createBrowserRouter([
       { path: 'birth-certificate', element: <BirthCertificate /> },
       { path: 'results', element: <ApplyResults /> },
       { path: 'review', element: <ApplyReview /> },
-      { path: 'submit', element: <StepPending step={6} /> },
+      { path: 'submit', element: <ApplySubmit /> },
+      { path: 'pay', element: <ApplyPay /> },
+      { path: 'submitted', element: <ApplySubmitted /> },
       { path: 'status', element: <ApplyStatus /> },
       { path: 'offer', element: <ApplyOffer /> },
     ],
@@ -125,6 +128,7 @@ export const router = createBrowserRouter([
       { index: true, element: <StaffIndex /> },
       { path: 'admissions', element: <AdmissionsQueue /> },
       { path: 'admissions/decided', element: <AdmissionsQueue decided /> },
+      { path: 'admissions/payments', element: <AdmissionsPayments /> },
       { path: 'admissions/places', element: <StaffPlaceholder context="Admissions" title="Intake places" /> },
       { path: 'admissions/:reference', element: <AdmissionsReview /> },
       { path: 'teaching', element: <LecturerToday /> },

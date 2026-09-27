@@ -6,6 +6,7 @@
  */
 import type { ApplicationStatus } from './applicationStatus';
 import type { ApplyStep } from './applyStep';
+import type { FeePaid } from './feePaid';
 import type { InfoRequest } from './infoRequest';
 import type { Offer } from './offer';
 import type { Steps } from './steps';
@@ -30,4 +31,6 @@ export interface MyApplication {
   next_step: ApplyStep | null;
   phone_masked: string | null;
   offer: Offer | null;
+  fee: FeePaid | null;
+  payment_waiting: boolean;
 }

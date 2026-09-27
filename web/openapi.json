@@ -4088,6 +4088,327 @@
           }
         }
       }
+    },
+    "/apply/submit": {
+      "get": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Submit State",
+        "operationId": "submit_state",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/declaration": {
+      "post": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Declare",
+        "operationId": "declare",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclarationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/payments": {
+      "post": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Start Payment",
+        "description": "Mobile money: send the prompt. Bank or cash: \"I've paid\", for Accounts to confirm.",
+        "operationId": "start_payment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/payments/current/cancel": {
+      "post": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Cancel Payment",
+        "description": "\"Pay another way\": stop waiting for this prompt.",
+        "operationId": "cancel_payment",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/payments/current/proof": {
+      "post": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Upload Proof",
+        "operationId": "upload_proof",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_proof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/application.pdf": {
+      "get": {
+        "tags": [
+          "apply submit"
+        ],
+        "summary": "Application Copy",
+        "description": "design/Submitted \"Download a copy\".",
+        "operationId": "application_copy",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/staff/admissions/payments": {
+      "get": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Payments To Confirm",
+        "operationId": "payments_to_confirm",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentToConfirm"
+                  },
+                  "type": "array",
+                  "title": "Response Payments To Confirm"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/payments/{payment_id}/confirm": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Confirm Payment",
+        "operationId": "confirm_payment",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Payment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPaymentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentToConfirm"
+                  },
+                  "title": "Response Confirm Payment"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/admissions/payments/{payment_id}/reject": {
+      "post": {
+        "tags": [
+          "admissions"
+        ],
+        "summary": "Reject Payment",
+        "operationId": "reject_payment",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Payment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectPaymentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentToConfirm"
+                  },
+                  "title": "Response Reject Payment"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4854,6 +5175,41 @@
         ],
         "title": "AudienceKind"
       },
+      "BankDetails": {
+        "properties": {
+          "account_name": {
+            "type": "string",
+            "title": "Account Name"
+          },
+          "bank": {
+            "type": "string",
+            "title": "Bank"
+          },
+          "account_number": {
+            "type": "string",
+            "title": "Account Number"
+          },
+          "branch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_name",
+          "bank",
+          "account_number",
+          "branch"
+        ],
+        "title": "BankDetails"
+      },
       "BirthCertificateState": {
         "properties": {
           "status": {
@@ -5120,6 +5476,20 @@
           "offering_ids"
         ],
         "title": "Body_upload_notes"
+      },
+      "Body_upload_proof": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_proof"
       },
       "Book": {
         "properties": {
@@ -5692,6 +6062,21 @@
         ],
         "title": "ConfirmIdIn"
       },
+      "ConfirmPaymentIn": {
+        "properties": {
+          "receipt": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Receipt"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt"
+        ],
+        "title": "ConfirmPaymentIn"
+      },
       "Contact": {
         "properties": {
           "phone_masked": {
@@ -6077,6 +6462,19 @@
         ],
         "title": "DecisionIn"
       },
+      "DeclarationIn": {
+        "properties": {
+          "agree": {
+            "type": "boolean",
+            "title": "Agree"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agree"
+        ],
+        "title": "DeclarationIn"
+      },
       "Deleted": {
         "properties": {
           "deleted": {
@@ -6460,6 +6858,49 @@
           "submitted"
         ],
         "title": "DueItem"
+      },
+      "FeePaid": {
+        "properties": {
+          "amount": {
+            "type": "string",
+            "title": "Amount"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "receipt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount",
+          "method",
+          "receipt",
+          "paid_at"
+        ],
+        "title": "FeePaid"
       },
       "Fees": {
         "properties": {
@@ -7835,6 +8276,28 @@
         ],
         "title": "MessageIn"
       },
+      "MethodOption": {
+        "properties": {
+          "method": {
+            "$ref": "#/components/schemas/PayMethod"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "method",
+          "available",
+          "note"
+        ],
+        "title": "MethodOption"
+      },
       "ModuleAssessment": {
         "properties": {
           "id": {
@@ -8293,6 +8756,20 @@
                 "type": "null"
               }
             ]
+          },
+          "fee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeePaid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "payment_waiting": {
+            "type": "boolean",
+            "title": "Payment Waiting"
           }
         },
         "type": "object",
@@ -8315,7 +8792,9 @@
           "steps",
           "next_step",
           "phone_masked",
-          "offer"
+          "offer",
+          "fee",
+          "payment_waiting"
         ],
         "title": "MyApplication"
       },
@@ -9133,6 +9612,210 @@
         ],
         "title": "PageQuality"
       },
+      "PayIn": {
+        "properties": {
+          "method": {
+            "$ref": "#/components/schemas/PayMethod"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "method"
+        ],
+        "title": "PayIn"
+      },
+      "PayMethod": {
+        "type": "string",
+        "enum": [
+          "ecocash",
+          "onemoney",
+          "bank",
+          "cash"
+        ],
+        "title": "PayMethod"
+      },
+      "PayStatus": {
+        "type": "string",
+        "enum": [
+          "awaiting_approval",
+          "paid",
+          "failed",
+          "expired",
+          "awaiting_confirmation",
+          "cancelled"
+        ],
+        "title": "PayStatus"
+      },
+      "PaymentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "method": {
+            "$ref": "#/components/schemas/PayMethod"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PayStatus"
+          },
+          "amount": {
+            "type": "string",
+            "title": "Amount"
+          },
+          "phone_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Masked"
+          },
+          "receipt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          },
+          "has_proof": {
+            "type": "boolean",
+            "title": "Has Proof"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "method",
+          "status",
+          "amount",
+          "phone_masked",
+          "receipt",
+          "failure",
+          "expires_at",
+          "paid_at",
+          "has_proof",
+          "created_at"
+        ],
+        "title": "PaymentOut"
+      },
+      "PaymentToConfirm": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "method": {
+            "$ref": "#/components/schemas/PayMethod"
+          },
+          "amount": {
+            "type": "string",
+            "title": "Amount"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "proof_document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proof Document Id"
+          },
+          "expected_by": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expected By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "name",
+          "method",
+          "amount",
+          "created_at",
+          "proof_document_id",
+          "expected_by"
+        ],
+        "title": "PaymentToConfirm"
+      },
       "PendingUpload": {
         "properties": {
           "id": {
@@ -9709,6 +10392,21 @@
           "status"
         ],
         "title": "RegisterRow"
+      },
+      "RejectPaymentIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "RejectPaymentIn"
       },
       "RemarkIn": {
         "properties": {
@@ -11604,6 +12302,139 @@
           "returned"
         ],
         "title": "SubmissionStatus"
+      },
+      "SubmitState": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "summary": {
+            "items": {
+              "$ref": "#/components/schemas/SummaryRow"
+            },
+            "type": "array",
+            "title": "Summary"
+          },
+          "ready": {
+            "type": "boolean",
+            "title": "Ready"
+          },
+          "declared": {
+            "type": "boolean",
+            "title": "Declared"
+          },
+          "fee": {
+            "type": "string",
+            "title": "Fee"
+          },
+          "methods": {
+            "items": {
+              "$ref": "#/components/schemas/MethodOption"
+            },
+            "type": "array",
+            "title": "Methods"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "bank": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accounts_office": {
+            "type": "string",
+            "title": "Accounts Office"
+          },
+          "confirm_days": {
+            "type": "integer",
+            "title": "Confirm Days"
+          },
+          "payment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "status",
+          "summary",
+          "ready",
+          "declared",
+          "fee",
+          "methods",
+          "provider",
+          "phone",
+          "bank",
+          "accounts_office",
+          "confirm_days",
+          "payment"
+        ],
+        "title": "SubmitState"
+      },
+      "SummaryRow": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "mono": {
+            "type": "boolean",
+            "title": "Mono"
+          },
+          "step": {
+            "type": "string",
+            "title": "Step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "value",
+          "mono",
+          "step"
+        ],
+        "title": "SummaryRow"
       },
       "TeachingClass": {
         "properties": {

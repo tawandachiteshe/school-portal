@@ -35,6 +35,7 @@ DOCUMENT_KIND = pg_enum(
     "zimsec_a_cert",
     "birth_certificate",
     "other",
+    "payment_proof",
 )
 
 
@@ -77,6 +78,7 @@ class Application(Base):
     consent_processing_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     consent_ai_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    declared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     offer_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     offer_declined_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
@@ -238,3 +240,29 @@ class DeviceHandoff(Base):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     application: Mapped[Application] = relationship(lazy="joined")
+
+
+class ApplicationPayment(Base):
+    """The application fee (design/Payment): mobile money through a provider, or bank/cash that
+    staff confirm."""
+
+    __tablename__ = "application_payments"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id", ondelete="CASCADE"))
+    method: Mapped[str] = mapped_column(Text)  # ecocash | onemoney | bank | cash
+    status: Mapped[str] = mapped_column(Text)
+    amount: Mapped[float] = mapped_column(Numeric(10, 2))
+    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    phone: Mapped[str | None] = mapped_column(Text)
+    provider: Mapped[str | None] = mapped_column(Text)
+    provider_ref: Mapped[str | None] = mapped_column(Text)
+    receipt: Mapped[str | None] = mapped_column(Text)
+    failure: Mapped[str | None] = mapped_column(Text)
+    proof_document_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("documents.id", ondelete="SET NULL")
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    confirmed_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = created_at()

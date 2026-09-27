@@ -4,6 +4,7 @@ export * from './apply-birth-certificate/apply-birth-certificate';
 export * from './apply-id/apply-id';
 export * from './apply-results/apply-results';
 export * from './apply-review/apply-review';
+export * from './apply-submit/apply-submit';
 export * from './auth/auth';
 export * from './deadlines/deadlines';
 export * from './library/library';
