@@ -21,7 +21,7 @@ from app.models.content import (
 )
 from app.models.finance import FeeDueDate, FeeTransaction, RemarkRequest
 from app.models.identity import NotificationPreference, Person, User, UserRole, WebSession
-from app.models.library import LibraryCopy, LibraryItem, LibraryLoan
+from app.models.library import LibraryCopy, LibraryItem, LibraryLoan, LibraryReservation, ReadingListItem
 from app.models.people import Staff, Student
 from app.models.teaching import (
     Assessment,
@@ -50,6 +50,7 @@ __all__ = [
     "LibraryCopy",
     "LibraryItem",
     "LibraryLoan",
+    "LibraryReservation",
     "MaterialDownload",
     "Module",
     "ModuleOffering",
@@ -59,6 +60,7 @@ __all__ = [
     "Person",
     "Programme",
     "ProgrammeModule",
+    "ReadingListItem",
     "RemarkRequest",
     "Staff",
     "Student",

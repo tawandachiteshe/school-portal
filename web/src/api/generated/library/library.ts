@@ -5,18 +5,32 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
   HTTPValidationError,
-  RenewOut
+  LibraryHome,
+  ReadingList,
+  RenewOut,
+  ReservationOut,
+  SearchCatalogueParams,
+  SearchResults
 } from '../model';
 
 import { apiFetch } from '../../fetcher';
@@ -26,7 +40,475 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export const getRenewLoanUrl = (loanId: string,) => {
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === 'queryKey') continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
+
+export const getLibraryHomeUrl = () => {
+
+
+
+
+  return `/library/home`
+}
+
+/**
+ * @summary Library Home
+ */
+export const libraryHome = async ( options?: Parameters<typeof apiFetch>[1]): Promise<LibraryHome> => {
+
+  return apiFetch<LibraryHome>(getLibraryHomeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getLibraryHomeQueryKey = () => {
+    return [
+    `/library/home`
+    ] as const;
+    }
+
+
+export const getLibraryHomeQueryOptions = <TData = Awaited<ReturnType<typeof libraryHome>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLibraryHomeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof libraryHome>>> = ({ signal }) => libraryHome({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LibraryHomeQueryResult = NonNullable<Awaited<ReturnType<typeof libraryHome>>>
+export type LibraryHomeQueryError = unknown
+
+
+export function useLibraryHome<TData = Awaited<ReturnType<typeof libraryHome>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof libraryHome>>,
+          TError,
+          Awaited<ReturnType<typeof libraryHome>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLibraryHome<TData = Awaited<ReturnType<typeof libraryHome>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof libraryHome>>,
+          TError,
+          Awaited<ReturnType<typeof libraryHome>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLibraryHome<TData = Awaited<ReturnType<typeof libraryHome>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Library Home
+ */
+
+export function useLibraryHome<TData = Awaited<ReturnType<typeof libraryHome>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof libraryHome>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLibraryHomeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getReadingListUrl = (code: string,) => {
+
+
+
+
+  return `/library/reading-lists/${code}`
+}
+
+/**
+ * @summary Reading List
+ */
+export const readingList = async (code: string, options?: Parameters<typeof apiFetch>[1]): Promise<ReadingList> => {
+
+  return apiFetch<ReadingList>(getReadingListUrl(code),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getReadingListQueryKey = (code: string,) => {
+    return [
+    `/library/reading-lists/${code}`
+    ] as const;
+    }
+
+
+export const getReadingListQueryOptions = <TData = Awaited<ReturnType<typeof readingList>>, TError = HTTPValidationError>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadingListQueryKey(code);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readingList>>> = ({ signal }) => readingList(code, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: code !== null && code !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadingListQueryResult = NonNullable<Awaited<ReturnType<typeof readingList>>>
+export type ReadingListQueryError = HTTPValidationError
+
+
+export function useReadingList<TData = Awaited<ReturnType<typeof readingList>>, TError = HTTPValidationError>(
+ code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readingList>>,
+          TError,
+          Awaited<ReturnType<typeof readingList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadingList<TData = Awaited<ReturnType<typeof readingList>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readingList>>,
+          TError,
+          Awaited<ReturnType<typeof readingList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadingList<TData = Awaited<ReturnType<typeof readingList>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Reading List
+ */
+
+export function useReadingList<TData = Awaited<ReturnType<typeof readingList>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readingList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadingListQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getSearchCatalogueUrl = (params: SearchCatalogueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/library/search?${stringifiedParams}` : `/library/search`
+}
+
+/**
+ * @summary Search Catalogue
+ */
+export const searchCatalogue = async (params: SearchCatalogueParams, options?: Parameters<typeof apiFetch>[1]): Promise<SearchResults> => {
+
+  return apiFetch<SearchResults>(getSearchCatalogueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSearchCatalogueQueryKey = (params?: SearchCatalogueParams,) => {
+    return [
+    `/library/search`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getSearchCatalogueQueryOptions = <TData = Awaited<ReturnType<typeof searchCatalogue>>, TError = HTTPValidationError>(params: SearchCatalogueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchCatalogueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchCatalogue>>> = ({ signal }) => searchCatalogue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchCatalogueQueryResult = NonNullable<Awaited<ReturnType<typeof searchCatalogue>>>
+export type SearchCatalogueQueryError = HTTPValidationError
+
+
+export function useSearchCatalogue<TData = Awaited<ReturnType<typeof searchCatalogue>>, TError = HTTPValidationError>(
+ params: SearchCatalogueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchCatalogue>>,
+          TError,
+          Awaited<ReturnType<typeof searchCatalogue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchCatalogue<TData = Awaited<ReturnType<typeof searchCatalogue>>, TError = HTTPValidationError>(
+ params: SearchCatalogueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchCatalogue>>,
+          TError,
+          Awaited<ReturnType<typeof searchCatalogue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchCatalogue<TData = Awaited<ReturnType<typeof searchCatalogue>>, TError = HTTPValidationError>(
+ params: SearchCatalogueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Search Catalogue
+ */
+
+export function useSearchCatalogue<TData = Awaited<ReturnType<typeof searchCatalogue>>, TError = HTTPValidationError>(
+ params: SearchCatalogueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchCatalogue>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchCatalogueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getReserveBookUrl = (itemId: string,) => {
+
+
+
+
+  return `/library/items/${itemId}/reservations`
+}
+
+/**
+ * @summary Reserve Book
+ */
+export const reserveBook = async (itemId: string, options?: Parameters<typeof apiFetch>[1]): Promise<ReservationOut> => {
+
+  return apiFetch<ReservationOut>(getReserveBookUrl(itemId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getReserveBookMutationKey = () => ['reserveBook'] as const;
+
+export const getReserveBookMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reserveBook>>, TError,ReserveBookMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reserveBook>>, TError,ReserveBookMutationVariables, TContext> => {
+
+const mutationKey = getReserveBookMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reserveBook>>, ReserveBookMutationVariables> = (props) => {
+          const {itemId} = props ?? {};
+
+          return  reserveBook(itemId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReserveBookMutationResult = NonNullable<Awaited<ReturnType<typeof reserveBook>>>
+
+    export type ReserveBookMutationError = HTTPValidationError
+    export type ReserveBookMutationVariables = {itemId: string}
+
+    /**
+ * @summary Reserve Book
+ */
+export const useReserveBook = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reserveBook>>, TError,ReserveBookMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reserveBook>>,
+        TError,
+        ReserveBookMutationVariables,
+        TContext
+      > => {
+      return useMutation(getReserveBookMutationOptions(options), queryClient);
+    }
+    export const getCancelReservationUrl = (reservationId: string,) => {
+
+
+
+
+  return `/library/reservations/${reservationId}`
+}
+
+/**
+ * @summary Cancel Reservation
+ */
+export const cancelReservation = async (reservationId: string, options?: Parameters<typeof apiFetch>[1]): Promise<void> => {
+
+  return apiFetch<void>(getCancelReservationUrl(reservationId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getCancelReservationMutationKey = () => ['cancelReservation'] as const;
+
+export const getCancelReservationMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,CancelReservationMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,CancelReservationMutationVariables, TContext> => {
+
+const mutationKey = getCancelReservationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelReservation>>, CancelReservationMutationVariables> = (props) => {
+          const {reservationId} = props ?? {};
+
+          return  cancelReservation(reservationId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelReservationMutationResult = NonNullable<Awaited<ReturnType<typeof cancelReservation>>>
+
+    export type CancelReservationMutationError = HTTPValidationError
+    export type CancelReservationMutationVariables = {reservationId: string}
+
+    /**
+ * @summary Cancel Reservation
+ */
+export const useCancelReservation = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,CancelReservationMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelReservation>>,
+        TError,
+        CancelReservationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCancelReservationMutationOptions(options), queryClient);
+    }
+    export const getRenewLoanUrl = (loanId: string,) => {
 
 
 

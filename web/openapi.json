@@ -287,6 +287,192 @@
         }
       }
     },
+    "/library/home": {
+      "get": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Library Home",
+        "operationId": "library_home",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryHome"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/library/reading-lists/{code}": {
+      "get": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Reading List",
+        "operationId": "reading_list",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/library/search": {
+      "get": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Search Catalogue",
+        "operationId": "search_catalogue",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/library/items/{item_id}/reservations": {
+      "post": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Reserve Book",
+        "operationId": "reserve_book",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/library/reservations/{reservation_id}": {
+      "delete": {
+        "tags": [
+          "library"
+        ],
+        "summary": "Cancel Reservation",
+        "operationId": "cancel_reservation",
+        "parameters": [
+          {
+            "name": "reservation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Reservation Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/library/loans/{loan_id}/renew": {
       "post": {
         "tags": [
@@ -1285,6 +1471,118 @@
         ],
         "title": "AssessmentOut"
       },
+      "Book": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
+          },
+          "e_resource_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "E Resource Url"
+          },
+          "copies": {
+            "type": "integer",
+            "title": "Copies"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "on_loan_to_you": {
+            "type": "boolean",
+            "title": "On Loan To You"
+          },
+          "reservation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReservationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "authors",
+          "edition",
+          "year",
+          "call_number",
+          "e_resource_url",
+          "copies",
+          "available",
+          "on_loan_to_you",
+          "reservation"
+        ],
+        "title": "Book"
+      },
       "Card": {
         "properties": {
           "name": {
@@ -1821,6 +2119,24 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "Hours": {
+        "properties": {
+          "opens": {
+            "type": "string",
+            "title": "Opens"
+          },
+          "closes": {
+            "type": "string",
+            "title": "Closes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opens",
+          "closes"
+        ],
+        "title": "Hours"
+      },
       "Lecturer": {
         "properties": {
           "name": {
@@ -1869,6 +2185,54 @@
           "email"
         ],
         "title": "Lecturer"
+      },
+      "LibraryHome": {
+        "properties": {
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/LoanOut"
+            },
+            "type": "array",
+            "title": "Loans"
+          },
+          "reservations": {
+            "items": {
+              "$ref": "#/components/schemas/ReservationOut"
+            },
+            "type": "array",
+            "title": "Reservations"
+          },
+          "reading_lists": {
+            "items": {
+              "$ref": "#/components/schemas/ReadingListSummary"
+            },
+            "type": "array",
+            "title": "Reading Lists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location",
+          "today",
+          "loans",
+          "reservations",
+          "reading_lists"
+        ],
+        "title": "LibraryHome"
       },
       "Line": {
         "properties": {
@@ -1954,6 +2318,66 @@
           "overdue"
         ],
         "title": "LoanItem"
+      },
+      "LoanOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "renewals_left": {
+            "type": "integer",
+            "title": "Renewals Left"
+          },
+          "renewals_max": {
+            "type": "integer",
+            "title": "Renewals Max"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "authors",
+          "edition",
+          "due_at",
+          "renewals_left",
+          "renewals_max",
+          "overdue"
+        ],
+        "title": "LoanOut"
       },
       "LogoutOut": {
         "properties": {
@@ -2577,6 +3001,60 @@
         ],
         "title": "PendingUpload"
       },
+      "ReadingList": {
+        "properties": {
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "books": {
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            },
+            "type": "array",
+            "title": "Books"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module_code",
+          "module_name",
+          "books"
+        ],
+        "title": "ReadingList"
+      },
+      "ReadingListSummary": {
+        "properties": {
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "books": {
+            "type": "integer",
+            "title": "Books"
+          },
+          "on_shelf": {
+            "type": "integer",
+            "title": "On Shelf"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module_code",
+          "module_name",
+          "books",
+          "on_shelf"
+        ],
+        "title": "ReadingListSummary"
+      },
       "ReceiptFile": {
         "properties": {
           "filename": {
@@ -2651,6 +3129,69 @@
           "renewals_left"
         ],
         "title": "RenewOut"
+      },
+      "ReservationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "collect_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collect By"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "title",
+          "authors",
+          "status",
+          "collect_by",
+          "position"
+        ],
+        "title": "ReservationOut"
       },
       "ResultRow": {
         "properties": {
@@ -2831,6 +3372,27 @@
           "student_affairs"
         ],
         "title": "Role"
+      },
+      "SearchResults": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "books": {
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            },
+            "type": "array",
+            "title": "Books"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "books"
+        ],
+        "title": "SearchResults"
       },
       "SettingsIn": {
         "properties": {

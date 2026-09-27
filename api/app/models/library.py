@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, SmallInteger, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Numeric, SmallInteger, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,6 +19,7 @@ class LibraryItem(Base):
     year: Mapped[int | None] = mapped_column(SmallInteger)
     subjects: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
     call_number: Mapped[str | None] = mapped_column(Text)
+    edition: Mapped[str | None] = mapped_column(Text)
     e_resource_url: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at()
 
@@ -51,3 +52,37 @@ class LibraryLoan(Base):
 
     copy: Mapped[LibraryCopy] = relationship(lazy="joined")
     person: Mapped["Person"] = relationship()  # noqa: F821
+
+
+class LibraryReservation(Base):
+    __tablename__ = "library_reservations"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    item_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("library_items.id", ondelete="CASCADE"))
+    person_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"))
+    status: Mapped[str] = mapped_column(Text, server_default="waiting")
+    copy_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("library_copies.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    ready_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    collect_by: Mapped[date | None] = mapped_column(Date)
+
+    item: Mapped[LibraryItem] = relationship(lazy="joined")
+    person: Mapped["Person"] = relationship()  # noqa: F821
+    copy: Mapped[LibraryCopy | None] = relationship()
+
+
+class ReadingListItem(Base):
+    __tablename__ = "reading_list_items"
+
+    offering_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("module_offerings.id", ondelete="CASCADE"), primary_key=True
+    )
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("library_items.id", ondelete="CASCADE"), primary_key=True
+    )
+    note: Mapped[str | None] = mapped_column(Text)
+    is_core: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    sort_order: Mapped[int] = mapped_column(SmallInteger, server_default="0")
+
+    item: Mapped[LibraryItem] = relationship(lazy="joined")
+    offering: Mapped["ModuleOffering"] = relationship()  # noqa: F821

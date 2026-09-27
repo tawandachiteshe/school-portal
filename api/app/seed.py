@@ -33,6 +33,7 @@ from app.models import (
     LibraryCopy,
     LibraryItem,
     LibraryLoan,
+    LibraryReservation,
     Module,
     ModuleOffering,
     ModuleResult,
@@ -40,6 +41,7 @@ from app.models import (
     Person,
     Programme,
     ProgrammeModule,
+    ReadingListItem,
     Staff,
     Student,
     Submission,
@@ -309,7 +311,7 @@ class Seeder:
         self.assessments(offerings, venues, student, lecturers)
         self.materials(offerings, lecturers)
         self.announcements(author_staff=mushonga, lab3=lab3, start=start)
-        self.library(tariro)
+        self.library(tariro, offerings, [lec.person for lec in lecturers.values()])
         self.fees(student, term, start)
         self.results(student, offerings, lecturers)
         await self.db.flush()
@@ -669,38 +671,191 @@ class Seeder:
             if self.results_published:
                 offerings[code].results_published_at = clock.now() - timedelta(days=1)
 
-    def library(self, tariro: Person) -> None:
+    # (key, title, authors, edition, year, call number, copies: list of barcode → holder)
+    # holder: None = on the shelf, "tariro" = on loan to Tariro, "other" = on loan to staff,
+    # "held" = kept at the desk for Tariro's reservation. Availability matches design/Library.
+    BOOKS = [
+        (
+            "stroud",
+            "Engineering Mathematics",
+            ["K. A. Stroud", "D. J. Booth"],
+            "7th edition",
+            2013,
+            "510 STR",
+            {"TCFL-B-001873": "tariro"},
+        ),
+        (
+            "forouzan",
+            "Data Communications and Networking",
+            ["B. A. Forouzan"],
+            "5th edition",
+            2012,
+            "004.6 FOR",
+            {"TCFL-B-003390": "tariro", "TCFL-B-003391": "other"},
+        ),
+        (
+            "tanenbaum",
+            "Computer Networks",
+            ["A. S. Tanenbaum", "D. J. Wetherall"],
+            "5th edition",
+            2011,
+            "004.6 TAN",
+            {"TCFL-B-002214": "held", "TCFL-B-002215": "other"},
+        ),
+        (
+            "stallings",
+            "Data and Computer Communications",
+            ["W. Stallings"],
+            "10th edition",
+            2013,
+            "004.6 STA",
+            {"TCFL-B-003512": None, "TCFL-B-003513": "other"},
+        ),
+        (
+            "tomasi",
+            "Electronic Communications Systems",
+            ["W. Tomasi"],
+            "5th edition",
+            2003,
+            "621.382 TOM",
+            {"TCFL-B-002877": None},
+        ),
+        (
+            "frenzel",
+            "Principles of Electronic Communication Systems",
+            ["L. E. Frenzel"],
+            "4th edition",
+            2015,
+            "621.382 FRE",
+            {"TCFL-B-003104": "other"},
+        ),
+        (
+            "kurose",
+            "Computer Networking: A Top-Down Approach",
+            ["J. F. Kurose", "K. W. Ross"],
+            "7th edition",
+            2016,
+            "004.6 KUR",
+            {"TCFL-B-003655": "other", "TCFL-B-003656": "other"},
+        ),
+        (
+            "odom",
+            "CCNA 200-301 Official Cert Guide, Volume 1",
+            ["W. Odom"],
+            None,
+            2019,
+            "004.6 ODO",
+            {"TCFL-B-003801": "other"},
+        ),
+        (
+            "kr",
+            "The C Programming Language",
+            ["B. W. Kernighan", "D. M. Ritchie"],
+            "2nd edition",
+            1988,
+            "005.133 KER",
+            {"TCFL-B-001220": None, "TCFL-B-001221": None},
+        ),
+        (
+            "king",
+            "C Programming: A Modern Approach",
+            ["K. N. King"],
+            "2nd edition",
+            2008,
+            "005.133 KIN",
+            {"TCFL-B-001340": None},
+        ),
+        (
+            "bird",
+            "Higher Engineering Mathematics",
+            ["J. Bird"],
+            "8th edition",
+            2017,
+            "510 BIR",
+            {"TCFL-B-001902": None, "TCFL-B-001903": "other"},
+        ),
+        (
+            "stroud-adv",
+            "Advanced Engineering Mathematics",
+            ["K. A. Stroud", "D. J. Booth"],
+            "5th edition",
+            2011,
+            "510 STR",
+            {"TCFL-B-001880": "other"},
+        ),
+    ]
+    READING_LISTS = {
+        "DCN201": [
+            ("forouzan", "Core text. Chapters 1 to 5 this semester."),
+            ("stallings", None),
+            ("tomasi", None),
+            ("frenzel", None),
+        ],
+        "NET202": [("tanenbaum", "Core text."), ("kurose", None), ("odom", "For the CCNA practicals.")],
+        "PRG101": [("kr", "Core text."), ("king", "Easier to follow if you're new to C.")],
+        "MTH110": [("stroud", "Core text."), ("bird", None), ("stroud-adv", "For the later topics.")],
+    }
+
+    def library(self, tariro: Person, offerings, borrowers: list[Person]) -> None:
         now = clock.now()
-        books = [
-            ("Engineering Mathematics", ["K. A. Stroud"], "510 STR", "TCFL-B-001873"),
-            ("Data Communications and Networking", ["B. A. Forouzan"], "004.6 FOR", "TCFL-B-003390"),
-            ("Computer Networks", ["A. S. Tanenbaum"], "004.6 TAN", "TCFL-B-002214"),
-        ]
-        copies = {}
-        for title, authors, call, barcode in books:
-            item = LibraryItem(title=title, authors=authors, call_number=call)
-            copy = LibraryCopy(item=item, barcode=barcode, location=f"Block A · shelf {call}")
-            self.db.add_all([item, copy])
-            copies[title] = copy
-        copies["Engineering Mathematics"].status = "on_loan"
-        copies["Data Communications and Networking"].status = "on_loan"
-        self.db.add_all(
-            [
-                LibraryLoan(
-                    copy=copies["Engineering Mathematics"],
-                    person=tariro,
-                    borrowed_at=now - timedelta(days=17),
-                    due_at=now - timedelta(days=3),
-                ),
-                LibraryLoan(
-                    copy=copies["Data Communications and Networking"],
-                    person=tariro,
-                    borrowed_at=now - timedelta(days=23),
-                    due_at=now + timedelta(days=5),
-                    renewals=1,
-                ),
-            ]
-        )
+        items: dict[str, LibraryItem] = {}
+        others = iter(borrowers * 4)
+        for key, title, authors, edition, year, call, copies in self.BOOKS:
+            item = LibraryItem(title=title, authors=authors, edition=edition, year=year, call_number=call)
+            items[key] = item
+            self.db.add(item)
+            for barcode, holder in copies.items():
+                copy = LibraryCopy(item=item, barcode=barcode, location=f"Block A · shelf {call}")
+                self.db.add(copy)
+                if holder in ("tariro", "other"):
+                    copy.status = "on_loan"
+                if holder == "tariro" and key == "stroud":  # overdue (design: "Overdue since Mon 8 Mar")
+                    self.db.add(
+                        LibraryLoan(
+                            copy=copy,
+                            person=tariro,
+                            borrowed_at=now - timedelta(days=17),
+                            due_at=now - timedelta(days=3),
+                        )
+                    )
+                elif holder == "tariro":  # "Due Tue 16 Mar · 1 of 2 renewals left"
+                    self.db.add(
+                        LibraryLoan(
+                            copy=copy,
+                            person=tariro,
+                            borrowed_at=now - timedelta(days=23),
+                            due_at=now + timedelta(days=5),
+                            renewals=1,
+                        )
+                    )
+                elif holder == "other":
+                    self.db.add(
+                        LibraryLoan(
+                            copy=copy,
+                            person=next(others),
+                            borrowed_at=now - timedelta(days=4),
+                            due_at=now + timedelta(days=10),
+                        )
+                    )
+                elif holder == "held":  # "Reserved · Collect from the desk by Sat 13 Mar · Ready"
+                    self.db.add(
+                        LibraryReservation(
+                            item=item,
+                            person=tariro,
+                            status="ready",
+                            copy=copy,
+                            created_at=now - timedelta(days=6),
+                            ready_at=now - timedelta(days=1),
+                            collect_by=now.date() + timedelta(days=2),
+                        )
+                    )
+        for code, rows in self.READING_LISTS.items():
+            for i, (key, note) in enumerate(rows):
+                self.db.add(
+                    ReadingListItem(
+                        offering=offerings[code], item=items[key], note=note, is_core=i == 0, sort_order=i
+                    )
+                )
 
 
 async def main() -> None:

@@ -38,6 +38,16 @@ class Settings(BaseSettings):
     # Library policy (design/LibraryDesk, Library). Confirm with the librarian.
     library_loan_days: int = 14
     library_max_renewals: int = 2
+    library_location: str = "Block A"
+    # ISO weekday → "HH:MM-HH:MM". design/Library and LibraryDesk: open until 20:00 on weekdays.
+    library_hours: dict[int, str] = {
+        1: "08:00-20:00",
+        2: "08:00-20:00",
+        3: "08:00-20:00",
+        4: "08:00-20:00",
+        5: "08:00-20:00",
+    }
+    library_hold_days: int = 3  # a ready reservation is kept this long at the desk
 
     # Unknowns in the designs ([LIKE THIS]); shown only once the college confirms them.
     fees_payment_options: str = ""  # design/Fees "How to pay"
