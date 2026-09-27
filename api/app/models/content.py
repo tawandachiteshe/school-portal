@@ -54,7 +54,12 @@ class Announcement(Base):
     contact_line: Mapped[str | None] = mapped_column(Text)  # 'Questions: ICT Services, Block C'
     affects_venue_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("venues.id", ondelete="SET NULL"))
     affects_on: Mapped[date | None] = mapped_column(Date)
+    is_draft: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    pinned_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sms_text: Mapped[str | None] = mapped_column(Text)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     targets: Mapped[list["AnnouncementTarget"]] = relationship(lazy="selectin", cascade="all, delete-orphan")
 

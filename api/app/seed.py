@@ -863,7 +863,12 @@ class Seeder:
             term_number = r.pop("term_number", None)
             read = r.pop("read", False)
             venue = r.pop("affects_venue", None)
-            a = Announcement(author_id=author, affects_venue_id=venue.id if venue else None, **r)
+            a = Announcement(
+                author_id=author,
+                affects_venue_id=venue.id if venue else None,
+                dispatched_at=r["publish_at"],
+                **r,
+            )
             a.targets = [AnnouncementTarget(role=role, term_number=term_number) for role in roles]
             self.db.add(a)
             if read:

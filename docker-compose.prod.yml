@@ -44,6 +44,16 @@ services:
       redis: { condition: service_started }
     restart: unless-stopped
 
+  # Background jobs: scheduled announcements, SMS (app/worker.py). One instance: it also runs beat.
+  worker:
+    build: { context: ./api, target: prod }
+    env_file: .env
+    command: celery -A app.worker worker -B --loglevel=info
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    restart: unless-stopped
+
   web:
     build: { context: ./web, target: prod }
     restart: unless-stopped

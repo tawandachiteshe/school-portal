@@ -39,6 +39,16 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }
 
+  # Background jobs: scheduled announcements, SMS (app/worker.py). One instance: it also runs beat.
+  worker:
+    build: { context: ./api, target: dev }
+    env_file: .env
+    command: celery -A app.worker worker -B --loglevel=info
+    volumes: ["./api/app:/app/app"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+
   web:
     build: { context: ./web, target: dev }
     environment:

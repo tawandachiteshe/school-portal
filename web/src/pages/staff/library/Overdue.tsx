@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Download, Send } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -51,7 +51,7 @@ export default function Overdue() {
   })
 
   const loans = data?.loans ?? []
-  const classes = useMemo(() => [...new Set(loans.map((l) => l.class_group).filter(Boolean) as string[])].sort(), [loans])
+  const classes = [...new Set(loans.map((l) => l.class_group).filter(Boolean) as string[])].sort()
   const shown = loans.filter((l) => {
     const needle = q.trim().toLowerCase()
     if (needle && ![l.name, l.number ?? '', l.title, l.author ?? ''].some((s) => s.toLowerCase().includes(needle))) return false

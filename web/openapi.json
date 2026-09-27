@@ -1996,6 +1996,268 @@
           }
         }
       }
+    },
+    "/staff/announcements": {
+      "get": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "List Staff Announcements",
+        "description": "Newest first. Drafts only for the people who can write announcements.",
+        "operationId": "list_staff_announcements",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffAnnouncement"
+                  },
+                  "type": "array",
+                  "title": "Response List Staff Announcements"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Create Announcement",
+        "operationId": "create_announcement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementForm"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/announcements/options": {
+      "get": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Compose Options",
+        "operationId": "compose_options",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComposeOptions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/announcements/reach": {
+      "post": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Audience Reach",
+        "operationId": "audience_reach",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Audience"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reach"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/announcements/{announcement_id}": {
+      "get": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Get Staff Announcement",
+        "operationId": "get_staff_announcement",
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementForm"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Update Announcement",
+        "operationId": "update_announcement",
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementForm"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "staff announcements"
+        ],
+        "summary": "Delete Announcement",
+        "operationId": "delete_announcement",
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2088,6 +2350,80 @@
         ],
         "title": "AnnouncementDetail"
       },
+      "AnnouncementForm": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          },
+          "pinned": {
+            "type": "boolean",
+            "title": "Pinned"
+          },
+          "pinned_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pinned Until"
+          },
+          "sms_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Text"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AnnouncementStatus"
+          },
+          "publish_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "body",
+          "audience",
+          "pinned",
+          "pinned_until",
+          "sms_text",
+          "status",
+          "publish_at",
+          "updated_at"
+        ],
+        "title": "AnnouncementForm"
+      },
       "AnnouncementHit": {
         "properties": {
           "id": {
@@ -2124,6 +2460,75 @@
           "publish_at"
         ],
         "title": "AnnouncementHit"
+      },
+      "AnnouncementIn": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 10000,
+            "title": "Body"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          },
+          "pinned": {
+            "type": "boolean",
+            "title": "Pinned",
+            "default": false
+          },
+          "pinned_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pinned Until"
+          },
+          "sms_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Text"
+          },
+          "action": {
+            "$ref": "#/components/schemas/PublishAction"
+          },
+          "publish_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "body",
+          "audience",
+          "action"
+        ],
+        "title": "AnnouncementIn"
       },
       "AnnouncementItem": {
         "properties": {
@@ -2171,6 +2576,16 @@
           "read"
         ],
         "title": "AnnouncementItem"
+      },
+      "AnnouncementStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "scheduled",
+          "published",
+          "expired"
+        ],
+        "title": "AnnouncementStatus"
       },
       "Announcements": {
         "properties": {
@@ -2347,6 +2762,67 @@
           "pending_upload"
         ],
         "title": "AssessmentOut"
+      },
+      "Audience": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/AudienceKind"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/AudienceGroup"
+            },
+            "type": "array",
+            "title": "Groups",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "Audience"
+      },
+      "AudienceGroup": {
+        "properties": {
+          "programme_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Programme Id"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "type": "object",
+        "title": "AudienceGroup",
+        "description": "Students of one programme (or all), in one year (or all). 'Year 1 · all programmes'."
+      },
+      "AudienceKind": {
+        "type": "string",
+        "enum": [
+          "everyone",
+          "students",
+          "groups"
+        ],
+        "title": "AudienceKind"
       },
       "Body_upload_notes": {
         "properties": {
@@ -2863,6 +3339,37 @@
         "type": "object",
         "title": "CompleteIn"
       },
+      "ComposeOptions": {
+        "properties": {
+          "from_label": {
+            "type": "string",
+            "title": "From Label"
+          },
+          "programmes": {
+            "items": {
+              "$ref": "#/components/schemas/ProgrammeOption"
+            },
+            "type": "array",
+            "title": "Programmes"
+          },
+          "title_fits": {
+            "type": "integer",
+            "title": "Title Fits"
+          },
+          "sms_max": {
+            "type": "integer",
+            "title": "Sms Max"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_label",
+          "programmes",
+          "title_fits",
+          "sms_max"
+        ],
+        "title": "ComposeOptions"
+      },
       "Dashboard": {
         "properties": {
           "today": {
@@ -3145,6 +3652,19 @@
           "items"
         ],
         "title": "Deadlines"
+      },
+      "Deleted": {
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "title": "Deleted"
       },
       "DeskCopy": {
         "properties": {
@@ -5210,6 +5730,67 @@
         ],
         "title": "PendingUpload"
       },
+      "ProgrammeOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "years": {
+            "type": "integer",
+            "title": "Years"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "years"
+        ],
+        "title": "ProgrammeOption"
+      },
+      "PublishAction": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "publish",
+          "schedule"
+        ],
+        "title": "PublishAction"
+      },
+      "Reach": {
+        "properties": {
+          "students": {
+            "type": "integer",
+            "title": "Students"
+          },
+          "staff": {
+            "type": "integer",
+            "title": "Staff"
+          },
+          "phones": {
+            "type": "integer",
+            "title": "Phones"
+          }
+        },
+        "type": "object",
+        "required": [
+          "students",
+          "staff",
+          "phones"
+        ],
+        "title": "Reach"
+      },
       "ReadingList": {
         "properties": {
           "module_code": {
@@ -6012,6 +6593,73 @@
           "assessment_title"
         ],
         "title": "Slot"
+      },
+      "StaffAnnouncement": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "from_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Label"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AnnouncementStatus"
+          },
+          "publish_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "pinned": {
+            "type": "boolean",
+            "title": "Pinned"
+          },
+          "sms": {
+            "type": "boolean",
+            "title": "Sms"
+          },
+          "reads": {
+            "type": "integer",
+            "title": "Reads"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "from_label",
+          "status",
+          "publish_at",
+          "updated_at",
+          "audience",
+          "pinned",
+          "sms",
+          "reads"
+        ],
+        "title": "StaffAnnouncement"
       },
       "StaffInfo": {
         "properties": {

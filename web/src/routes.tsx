@@ -6,6 +6,8 @@ import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
+import AnnouncementCompose from '@/pages/staff/announcements/Compose'
+import AnnouncementsStaff from '@/pages/staff/announcements/List'
 import LibraryDesk from '@/pages/staff/library/Desk'
 import LibraryOverdue from '@/pages/staff/library/Overdue'
 import LibraryReservations from '@/pages/staff/library/Reservations'
@@ -95,7 +97,9 @@ export const router = createBrowserRouter([
       { path: 'library/reservations', element: <LibraryReservations /> },
       { path: 'library/catalogue', element: <StaffPlaceholder context="Library" title="Catalogue" /> },
       { path: 'library/reading-lists', element: <StaffPlaceholder context="Library" title="Reading lists" /> },
-      { path: 'announcements', element: <StaffPlaceholder context="College" title="Announcements" /> },
+      { path: 'announcements', element: <AnnouncementsStaff /> },
+      { path: 'announcements/new', element: <AnnouncementCompose /> },
+      { path: 'announcements/:id', element: <AnnouncementCompose /> },
       { path: 'ask-questions', element: <StaffPlaceholder context="Student Affairs" title="Questions from Ask TCFL" /> },
       { path: 'students', element: <StaffPlaceholder context="College" title="Find a student" /> },
     ],

@@ -117,7 +117,7 @@ async def _announcements(db: AsyncSession, user_id: uuid.UUID, limit: int | None
             title=a.title,
             from_label=a.from_label,
             publish_at=a.publish_at,
-            is_pinned=a.is_pinned,
+            is_pinned=ann.pinned_now(a),
             read=a.id in read,
         )
         for a in rows
@@ -342,7 +342,7 @@ async def announcement_detail(
         body_md=a.body_md,
         from_label=a.from_label,
         publish_at=a.publish_at,
-        is_pinned=a.is_pinned,
+        is_pinned=ann.pinned_now(a),
         audience=await ann.describe_audience(db, a.targets),
         contact_line=a.contact_line,
         affects=affects,
