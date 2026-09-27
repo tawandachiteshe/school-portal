@@ -8,9 +8,9 @@ services:
   postgres:
     image: pgvector/pgvector:pg16
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is missing - paste .env.production into Dokploy's Environment tab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is missing - paste .env.production into Dokploy's Environment tab}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is missing - paste .env.production into Dokploy's Environment tab}
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck: { test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"], interval: 5s }
     restart: unless-stopped
@@ -30,8 +30,8 @@ services:
         "$$S3_ACCESS_KEY" "$$S3_SECRET_KEY" > /etc/s3.json &&
         exec weed server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/s3.json -master.volumeSizeLimitMB=1024 -volume.max=0
     environment:
-      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
-      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?S3_ACCESS_KEY is missing - paste .env.production into Dokploy's Environment tab}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?S3_SECRET_KEY is missing - paste .env.production into Dokploy's Environment tab}
     volumes: [s3data:/data]
     restart: unless-stopped
 
@@ -69,20 +69,20 @@ services:
     environment:
       POSTGRES_DB: authentik
       POSTGRES_USER: authentik
-      POSTGRES_PASSWORD: ${AUTHENTIK_PG_PASS}
+      POSTGRES_PASSWORD: ${AUTHENTIK_PG_PASS:?AUTHENTIK_PG_PASS is missing - paste .env.production into Dokploy's Environment tab}
     volumes: [authentik-db:/var/lib/postgresql/data]
     healthcheck: { test: ["CMD-SHELL", "pg_isready -d authentik -U authentik"], interval: 10s }
     restart: unless-stopped
 
   authentik-server:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG}
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}
     command: server
     env_file: .env
     environment: &authentik-env
       AUTHENTIK_POSTGRESQL__HOST: authentik-db
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__USER: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS:?AUTHENTIK_PG_PASS is missing - paste .env.production into Dokploy's Environment tab}
       AUTHENTIK_WEB__PATH: /auth/
     volumes:
       - authentik-data:/data
@@ -93,7 +93,7 @@ services:
     restart: unless-stopped
 
   authentik-worker:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG}
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}
     command: worker
     env_file: .env
     environment: *authentik-env
