@@ -109,8 +109,6 @@ class Settings(BaseSettings):
     handoff_session_hours: int = 2
     document_max_mb: int = 5
     document_retention: str = ""  # design/IdDesktop "[RETENTION PERIOD]": shown once the college sets it
-    claude_model: str = "claude-opus-5"
-    assistant_enabled: bool = True
 
     @property
     def is_prod(self) -> bool:

@@ -133,3 +133,27 @@ TOOLS = [
 - Tools return compact JSON (only needed fields).
 - Retrieval top-k 8, chunk size capped.
 - Track `usage` per request in `chat_messages.tokens` and show a monthly cost dashboard to admins.
+
+## 4.6 As built
+
+What exists today, and how it differs from the design above.
+
+**Where it is.** Students open Ask TCFL at `/ask` (design/AskStart, AskChat, AskHandoff, DeskAsk). The API is `api/app/api/assistant.py` (`GET /assistant`, `POST /assistant/ask` as Server-Sent Events, feedback, hand-off), the loop is `api/app/assistant/chat.py`, the tools are `api/app/assistant/tools.py`. Student Affairs answers handed-off questions at `/staff/ask-questions` (`api/app/api/ask_questions_staff.py`).
+
+**Sandbox (enforced in code, with tests in `api/tests/test_assistant.py`).**
+1. Tools only read: they run on a database connection Postgres keeps read-only (`default_transaction_read_only`, `app/assistant/sandbox.py`), so a write fails even if a tool tried one.
+2. Tools only see the asker's records: the person comes from the session, never from the model, and no tool input can name a person (inputs are Pydantic models with `extra="forbid"`).
+3. No web search, no code execution: the model is offered the asker's tools and nothing else.
+4. Announcements reach the model as quoted data with a note that they aren't instructions; the system prompt says the same.
+5. Tools by role: applicants get their application and the programmes; students get deadlines, timetable, modules, library, catalogue, results and fees; both get announcement search.
+6. Limits: 30 questions an hour and 200 a day per person, 1,200 output tokens, 4 tool rounds (the last round has tools turned off), `ASSISTANT_ENABLED=false` hides it.
+7. The model can't send or change anything. `suggest_student_affairs` only shows the student a button; the question goes to Student Affairs when they press it.
+
+**Differences from the design above.**
+- **No retrieval index yet.** `kb_documents` and `kb_chunks` exist but are empty. College knowledge comes from `search_announcements` (keyword match over the announcements the asker can see) and the library rules in settings. Questions about policy (sick days, exam rules, deferments) are handed to Student Affairs until documents like the Student Handbook are indexed.
+- **Sources** are the tools' own: each result carries a number, the model cites `[[n]]`, and the page links to the portal page (Your deadlines, Library, an announcement).
+- **History** keeps only the questions and answers (not tool calls), last 8 messages.
+- **Replies from Student Affairs** show in Ask TCFL ("Your questions to Student Affairs") and are texted; the design has them under Announcements, which would need per-person announcements.
+- No photo or file attachments.
+
+**Settings** (`.env.example`): `ANTHROPIC_API_KEY`, `ASSISTANT_ENABLED`, `ASSISTANT_MODEL`, `ASSISTANT_MAX_TOKENS`, `ASSISTANT_MAX_TOOL_ROUNDS`, `ASSISTANT_PER_HOUR`, `ASSISTANT_PER_DAY`. Tests never call Claude: `tests/conftest.py` blanks the key and the chat tests use a fake client.
