@@ -164,3 +164,43 @@ export function useHasDeskLayout() {
   const matches = useMatches()
   return matches.some((m) => (m.handle as { desk?: boolean } | undefined)?.desk)
 }
+
+// A desktop page with a breadcrumb bar: "Library / Search".
+export function DeskPage({
+  crumbs,
+  right,
+  children,
+  wide = false,
+}: {
+  crumbs: { to?: string; label: ReactNode }[]
+  right?: ReactNode
+  children: ReactNode
+  wide?: boolean
+}) {
+  return (
+    <>
+      <DeskBar
+        left={
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
+            {crumbs.map((c, i) => (
+              <span key={i} className="flex items-center gap-2">
+                {i > 0 && <span aria-hidden>/</span>}
+                {c.to ? (
+                  <Link to={c.to} className="text-primary underline underline-offset-3">
+                    {c.label}
+                  </Link>
+                ) : (
+                  <span className="text-foreground">{c.label}</span>
+                )}
+              </span>
+            ))}
+          </nav>
+        }
+        right={right}
+      />
+      <main className={cn('flex flex-col gap-6 p-8', wide ? 'max-w-[1200px]' : 'max-w-[1040px]')}>{children}</main>
+    </>
+  )
+}
+
+export const deskH1 = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'

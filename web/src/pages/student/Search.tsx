@@ -6,6 +6,18 @@ import { Empty } from '@/components/student/section'
 import { useNoteDownload } from '@/components/student/use-note-download'
 import { useSearchStudent } from '@/api/generated/student/student'
 import { fileKind, fileSize, postedAt } from '@/lib/format'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { DeskPage, deskH1 } from '@/components/shell/student-desktop'
+
+function Frame({ desktop, q, children }: { desktop: boolean; q: string; children: React.ReactNode }) {
+  return desktop ? (
+    <DeskPage crumbs={[{ to: '/', label: 'Home' }, { label: 'Search' }]}>{children}</DeskPage>
+  ) : (
+    <SubPage title={`“${q}”`} back="/" backLabel="Back to home">
+      <main className="flex grow flex-col gap-6 px-4 py-6">{children}</main>
+    </SubPage>
+  )
+}
 
 // Results for the desktop top-bar search: modules, notes and announcements.
 export default function Search() {
@@ -15,10 +27,12 @@ export default function Search() {
   const download = useNoteDownload()
   const now = new Date()
   const none = data && !data.modules.length && !data.notes.length && !data.announcements.length
+  const desktop = useIsDesktop()
   return (
-    <SubPage title={`“${q}”`} back="/" backLabel="Back to home">
-      <main className="flex grow flex-col gap-6 py-6">
-        <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Search results</h1>
+    <Frame desktop={desktop} q={q}>
+        <h1 className={desktop ? deskH1 : 'text-2xl leading-8 font-semibold tracking-[-0.01em]'}>
+          Results for “{q}”
+        </h1>
         {q.length >= 2 && isPending && <Skeleton className="h-32" />}
         {isError && <Empty>Couldn't search. Check your connection.</Empty>}
         {none && <Empty>Nothing matches “{q}”. Try a module code such as DCN201, or fewer words.</Empty>}
@@ -87,8 +101,7 @@ export default function Search() {
             </ul>
           </section>
         )}
-      </main>
       {download.sheet}
-    </SubPage>
+    </Frame>
   )
 }

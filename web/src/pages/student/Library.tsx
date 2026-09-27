@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SubPage } from '@/components/shell/sub-page'
-import { BookRow, ReservationStatus, reservationText } from '@/components/student/book-row'
+import { BookRow, BookTable, ReservationStatus, reservationText } from '@/components/student/book-row'
 import { Empty } from '@/components/student/section'
 import { useLibraryHome, useReadingList, useRenewLoan, useSearchCatalogue } from '@/api/generated/library/library'
 import type { LibraryHome, LoanOut } from '@/api/generated/model'
@@ -16,7 +16,7 @@ import { shortDate } from '@/lib/format'
 import { onDay } from '@/lib/records'
 import { invalidateStudentData } from '@/lib/student'
 import { useIsDesktop } from '@/lib/use-desktop'
-import { DeskBar, DeskFallback } from '@/components/shell/student-desktop'
+import { DeskBar, DeskFallback, DeskPage, deskH1 } from '@/components/shell/student-desktop'
 
 const list = '[&>li+li]:border-t'
 
@@ -350,6 +350,31 @@ export function LibrarySearch() {
   const [params] = useSearchParams()
   const q = params.get('q') ?? ''
   const { data, isPending, isError } = useSearchCatalogue({ q }, { query: { enabled: q.length >= 2 } })
+  const desktop = useIsDesktop()
+  if (desktop)
+    return (
+      <DeskPage crumbs={[{ to: '/library', label: 'Library' }, { label: 'Search' }]}>
+        <div className="flex items-end justify-between gap-6">
+          <h1 className={deskH1}>Search the catalogue</h1>
+          <div className="w-[480px]">
+            <SearchBox key={q} initial={q} placeholder="Search by title, author or module code" />
+          </div>
+        </div>
+        {q.length >= 2 && isPending && <Skeleton className="h-32" />}
+        {isError && <Empty>Couldn't search. Check your connection.</Empty>}
+        {data &&
+          (data.books.length ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {data.books.length} {data.books.length === 1 ? 'result' : 'results'} for “{data.query}”
+              </p>
+              <BookTable books={data.books} />
+            </>
+          ) : (
+            <Empty>No books match “{data.query}”. Try the author's surname or a module code.</Empty>
+          ))}
+      </DeskPage>
+    )
   return (
     <SubPage title={<span className="font-semibold">Search the catalogue</span>} back="/library" backLabel="Back to library">
       <main className="flex grow flex-col gap-4 px-4 py-6">
@@ -379,6 +404,25 @@ export function LibrarySearch() {
 export function ReadingListPage() {
   const { code = '' } = useParams()
   const { data, isPending, error } = useReadingList(code)
+  const desktop = useIsDesktop()
+  if (desktop)
+    return (
+      <DeskPage
+        crumbs={[{ to: '/library', label: 'Library' }, { label: <span className="font-mono">{code.toUpperCase()}</span> }]}
+      >
+        {isPending && <Skeleton className="h-32" />}
+        {error && <Empty>{error instanceof ApiError ? error.message : "Couldn't load this reading list."}</Empty>}
+        {data && (
+          <>
+            <div className="flex flex-col gap-1">
+              <p className="font-mono text-sm text-muted-foreground">{data.module_code}</p>
+              <h1 className={deskH1}>Reading list · {data.module_name}</h1>
+            </div>
+            <BookTable books={data.books} />
+          </>
+        )}
+      </DeskPage>
+    )
   return (
     <SubPage title={code.toUpperCase()} mono back="/library" backLabel="Back to library">
       <main className="flex grow flex-col gap-4 px-4 py-6">

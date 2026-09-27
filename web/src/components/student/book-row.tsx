@@ -22,8 +22,13 @@ export function reservationText(r: ReservationOut) {
     : 'Waiting for a copy to come back'
 }
 
-// A catalogue or reading-list book with its shelf status and a Reserve action when every copy is out.
-export function BookRow({ b }: { b: Book }) {
+export function shelfText(b: Book) {
+  if (b.copies === 0) return b.e_resource_url ? 'Online only' : 'Not available to borrow'
+  return b.available > 0 ? `${b.available} on the shelf` : 'All copies on loan'
+}
+
+// Reserve / Cancel / status for one book; used by the phone row and the desktop table.
+export function BookActions({ b, compact = false }: { b: Book; compact?: boolean }) {
   const qc = useQueryClient()
   const onError = (e: unknown) => toast(e instanceof ApiError ? e.message : 'Something went wrong. Try again.')
   const reserve = useReserveBook({
@@ -44,14 +49,38 @@ export function BookRow({ b }: { b: Book }) {
       onError,
     },
   })
-  const shelf =
-    b.copies === 0
-      ? b.e_resource_url
-        ? 'Online only'
-        : 'Not available to borrow'
-      : b.available > 0
-        ? `${b.available} on the shelf`
-        : 'All copies on loan'
+  if (b.reservation)
+    return (
+      <div className="flex flex-col items-end gap-2">
+        <ReservationStatus r={b.reservation} />
+        {b.reservation.status === 'waiting' && (
+          <button
+            type="button"
+            disabled={cancel.isPending}
+            onClick={() => cancel.mutate({ reservationId: b.reservation!.id })}
+            className="inline-flex min-h-11 items-center text-sm font-medium text-destructive"
+          >
+            Cancel<span className="sr-only"> reservation of {b.title}</span>
+          </button>
+        )}
+      </div>
+    )
+  if (!b.on_loan_to_you && b.copies > 0 && b.available === 0)
+    return (
+      <Button
+        variant="outline"
+        size={compact ? 'sm' : 'default'}
+        disabled={reserve.isPending}
+        onClick={() => reserve.mutate({ itemId: b.id })}
+      >
+        Reserve<span className="sr-only"> {b.title}</span>
+      </Button>
+    )
+  return null
+}
+
+// A catalogue or reading-list book with its shelf status and a Reserve action when every copy is out.
+export function BookRow({ b }: { b: Book }) {
   return (
     <li className="flex items-start gap-3 py-3">
       <div className="flex min-w-0 grow flex-col gap-0.5">
@@ -64,8 +93,13 @@ export function BookRow({ b }: { b: Book }) {
             reservationText(b.reservation)
           ) : (
             <>
-              <span className={b.available > 0 ? 'text-success' : 'text-muted-foreground'}>{shelf}</span>
-              {b.call_number && <span className="text-muted-foreground"> · shelf <span className="font-mono">{b.call_number}</span></span>}
+              <span className={b.available > 0 ? 'text-success' : 'text-muted-foreground'}>{shelfText(b)}</span>
+              {b.call_number && (
+                <span className="text-muted-foreground">
+                  {' '}
+                  · shelf <span className="font-mono">{b.call_number}</span>
+                </span>
+              )}
             </>
           )}
         </div>
@@ -76,29 +110,52 @@ export function BookRow({ b }: { b: Book }) {
           </a>
         )}
       </div>
-      {b.reservation ? (
-        <div className="flex flex-col items-end gap-2">
-          <ReservationStatus r={b.reservation} />
-          {b.reservation.status === 'waiting' && (
-            <button
-              type="button"
-              disabled={cancel.isPending}
-              onClick={() => cancel.mutate({ reservationId: b.reservation!.id })}
-              className="inline-flex min-h-11 items-center text-sm font-medium text-destructive"
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      ) : (
-        !b.on_loan_to_you &&
-        b.copies > 0 &&
-        b.available === 0 && (
-          <Button variant="outline" disabled={reserve.isPending} onClick={() => reserve.mutate({ itemId: b.id })}>
-            Reserve
-          </Button>
-        )
-      )}
+      <BookActions b={b} />
     </li>
+  )
+}
+
+// Desktop: books as a table.
+export function BookTable({ books }: { books: Book[] }) {
+  const th = 'py-2 pr-3 text-left text-sm font-medium text-muted-foreground'
+  return (
+    <table className="w-full border-collapse text-[15px] leading-[22px]">
+      <thead>
+        <tr className="border-b">
+          <th className={th}>Book</th>
+          <th className={`${th} w-[130px]`}>Shelf</th>
+          <th className={`${th} w-[230px]`}>Availability</th>
+          <th className={`${th} w-[150px]`}>
+            <span className="sr-only">Action</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {books.map((b) => (
+          <tr key={b.id} className="border-b align-top">
+            <td className="py-3 pr-3">
+              <div className="font-medium">{b.title}</div>
+              <div className="text-sm text-muted-foreground">
+                {[b.authors.join(', '), b.edition, b.year].filter(Boolean).join(' · ')}
+              </div>
+              {b.note && <div className="mt-1 text-sm text-muted-foreground">{b.note}</div>}
+            </td>
+            <td className="py-3 pr-3 font-mono text-sm">{b.call_number ?? '–'}</td>
+            <td className="py-3 pr-3 text-sm">
+              {b.on_loan_to_you ? (
+                <span className="text-muted-foreground">On loan to you</span>
+              ) : b.reservation ? (
+                reservationText(b.reservation)
+              ) : (
+                <span className={b.available > 0 ? 'text-success' : 'text-muted-foreground'}>{shelfText(b)}</span>
+              )}
+            </td>
+            <td className="py-3 text-right">
+              <BookActions b={b} compact />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }

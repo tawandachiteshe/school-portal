@@ -8,6 +8,8 @@ import type { Card } from '@/api/generated/model'
 import { getStudentCardQueryKey, studentCard } from '@/api/generated/records/records'
 import { code128 } from '@/lib/code128'
 import { onDay } from '@/lib/records'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { DeskPage, deskH1 } from '@/components/shell/student-desktop'
 
 // The card must work with no data (design: "Saved on this phone. Works without data."), so the
 // last copy is kept in this browser and shown straight away.
@@ -43,10 +45,10 @@ export default function StudentCard() {
   })
   const bars = useMemo(() => (card ? code128(card.barcode) : null), [card])
   const saved = Boolean(initial || card)
+  const desktop = useIsDesktop()
 
-  return (
-    <SubPage title={<span className="font-semibold">Student card</span>} back="/more" backLabel="Back">
-      <main className="flex grow flex-col gap-5 px-4 py-6">
+  const cardView = (
+    <>
         {!card && !isError && <Skeleton className="h-[330px]" />}
         {!card && isError && <p className="text-muted-foreground">Connect once to save your card on this phone.</p>}
         {card && bars && (
@@ -117,16 +119,37 @@ export default function StudentCard() {
             </div>
           </section>
         )}
+    </>
+  )
+  const notes = (
+    <>
         {saved && (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="size-4 text-success" strokeWidth={1.5} aria-hidden />
-            Saved on this phone. Works without data.
+            {desktop ? 'Saved in this browser.' : 'Saved on this phone.'} Works without data.
           </p>
         )}
         <p className="text-sm text-muted-foreground">
           Show it at the library desk and exam rooms. Turn your screen brightness up if the scanner can't read it.
         </p>
         <TextLink to="/ask?about=lost-card">Lost your plastic card?</TextLink>
+    </>
+  )
+  if (desktop)
+    return (
+      <DeskPage crumbs={[{ to: '/more', label: 'Account' }, { label: 'Student card' }]}>
+        <h1 className={deskH1}>Student card</h1>
+        <div className="grid grid-cols-[420px_minmax(0,1fr)] items-start gap-12">
+          <div>{cardView}</div>
+          <div className="flex max-w-[48ch] flex-col gap-4">{notes}</div>
+        </div>
+      </DeskPage>
+    )
+  return (
+    <SubPage title={<span className="font-semibold">Student card</span>} back="/more" backLabel="Back">
+      <main className="flex grow flex-col gap-5 px-4 py-6">
+        {cardView}
+        {notes}
       </main>
     </SubPage>
   )

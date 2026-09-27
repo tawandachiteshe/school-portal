@@ -18,6 +18,8 @@ import { calendarDaysBetween, fileKind, fileSize, isUrgent, relativeDue, shortDa
 import { KIND_LABEL } from '@/lib/student'
 import { cancelUpload, retryUpload, startUpload, useUpload, type UploadState } from '@/lib/uploads'
 import { useNow } from '@/lib/use-now'
+import { useIsDesktop } from '@/lib/use-desktop'
+import { DeskPage } from '@/components/shell/student-desktop'
 
 const mb = (bytes: number) => (bytes / 1_000_000).toFixed(1)
 
@@ -140,6 +142,7 @@ export default function SubmitWork() {
   const [problem, setProblem] = useState<string | null>(null)
   const [starting, setStarting] = useState(false)
   const [replacing, setReplacing] = useState(false)
+  const desktop = useIsDesktop()
 
   const title = <span className="font-semibold">Submit work</span>
   if (isPending || error || !a)
@@ -190,9 +193,7 @@ export default function SubmitWork() {
     }
   }
 
-  return (
-    <SubPage title={title} back="/deadlines" backLabel="Back to deadlines">
-      <main className="flex grow flex-col gap-6 px-4 py-6">
+  const header = (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
             <Badge>{KIND_LABEL[a.kind]}</Badge>
@@ -205,7 +206,9 @@ export default function SubmitWork() {
           </p>
           {a.description && <p className="mt-2">{a.description}</p>}
         </div>
-
+  )
+  const panel = (
+    <>
         {submitted && <Receipt a={a} />}
 
         {!a.can_submit && !active && a.reason && (
@@ -238,8 +241,8 @@ export default function SubmitWork() {
                   Choose file
                 </Button>
                 <p className="text-sm text-muted-foreground">
-                  {accept ? `Upload ${accept}` : 'Any file type'}, up to {a.max_file_mb} MB. Under 2 MB is safest on mobile
-                  data.
+                  {accept ? `Upload ${accept}` : 'Any file type'}, up to {a.max_file_mb} MB.
+                  {!desktop && ' Under 2 MB is safest on mobile data.'}
                 </p>
                 {a.pending_upload && (
                   <p className="text-sm text-muted-foreground">
@@ -314,6 +317,58 @@ export default function SubmitWork() {
             )
           )}
         </div>
+    </>
+  )
+  if (desktop)
+    return (
+      <DeskPage crumbs={[{ to: '/deadlines', label: 'Deadlines' }, { label: a.title }]}>
+        {header}
+        <div className="grid grid-cols-[minmax(0,1fr)_300px] items-start gap-12">
+          <div className="flex max-w-[640px] flex-col gap-6">{panel}</div>
+          <aside className="flex flex-col gap-3 border-l pl-6 text-sm">
+            <h2 className="font-semibold">About this assessment</h2>
+            <dl className="flex flex-col gap-3">
+              <div>
+                <dt className="text-muted-foreground">Module</dt>
+                <dd className="font-mono">{a.module_code}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Due</dt>
+                <dd>{shortDateTime(due)}</dd>
+              </div>
+              {a.allow_late_until && (
+                <div>
+                  <dt className="text-muted-foreground">Late submissions until</dt>
+                  <dd>{shortDateTime(new Date(a.allow_late_until))}</dd>
+                </div>
+              )}
+              {a.submission_mode === 'online' && (
+                <div>
+                  <dt className="text-muted-foreground">Files</dt>
+                  <dd>
+                    {accept ? `${accept[0].toUpperCase()}${accept.slice(1)}` : 'Any file type'}, up to {a.max_file_mb} MB
+                  </dd>
+                </div>
+              )}
+              {a.lecturer && (
+                <div>
+                  <dt className="text-muted-foreground">Lecturer</dt>
+                  <dd>{a.lecturer}</dd>
+                </div>
+              )}
+            </dl>
+            <p className="border-t pt-3 text-muted-foreground">
+              It counts as submitted when the upload finishes. You get a receipt with the file's SHA-256 fingerprint.
+            </p>
+          </aside>
+        </div>
+      </DeskPage>
+    )
+  return (
+    <SubPage title={title} back="/deadlines" backLabel="Back to deadlines">
+      <main className="flex grow flex-col gap-6 px-4 py-6">
+        {header}
+        {panel}
       </main>
     </SubPage>
   )
