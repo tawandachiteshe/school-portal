@@ -11,3 +11,11 @@ def test_operation_ids_are_unique():
 
     ids = [op["operationId"] for path in app.openapi()["paths"].values() for op in path.values()]
     assert len(ids) == len(set(ids))
+
+
+def test_response_model_names_are_unique():
+    """Two models with one name make FastAPI emit "app__api__…" schemas and Orval renames the types."""
+    from app.main import app
+
+    clashes = [name for name in app.openapi()["components"]["schemas"] if "__" in name]
+    assert clashes == [], f"Rename these models: {clashes}"

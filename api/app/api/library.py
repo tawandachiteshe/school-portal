@@ -277,7 +277,7 @@ async def reading_list(
     return ReadingList(module_code=o.module.code, module_name=o.module.name, books=books)
 
 
-class SearchResults(BaseModel):
+class CatalogueResults(BaseModel):
     query: str
     books: list[Book]
 
@@ -287,7 +287,7 @@ async def search_catalogue(
     q: str = Query(min_length=2, max_length=100),
     student: Student = Depends(current_student),
     db: AsyncSession = Depends(get_db),
-) -> SearchResults:
+) -> CatalogueResults:
     term = q.strip()
     like = f"%{term}%"
     # A module code finds that module's reading list; otherwise title, author or subject.
@@ -316,7 +316,7 @@ async def search_catalogue(
         .scalars()
         .all()
     )
-    return SearchResults(query=term, books=await _books(db, student, list(rows)))
+    return CatalogueResults(query=term, books=await _books(db, student, list(rows)))
 
 
 @router.post("/items/{item_id}/reservations", status_code=201)

@@ -6,6 +6,11 @@ import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
+import ClassPage from '@/pages/staff/teaching/ClassPage'
+import Marking from '@/pages/staff/teaching/Marking'
+import Marks from '@/pages/staff/teaching/Marks'
+import Register from '@/pages/staff/teaching/Register'
+import LecturerToday from '@/pages/staff/teaching/Today'
 import Home from '@/pages/student/Home'
 import More from '@/pages/student/More'
 import ModuleDetail from '@/pages/student/ModuleDetail'
@@ -58,6 +63,15 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    // Taken on a phone in class (design/Register): no staff sidebar.
+    path: '/staff/teaching/register/:slotId/:date',
+    element: (
+      <RequireAuth roles={['lecturer']}>
+        <Register />
+      </RequireAuth>
+    ),
+  },
+  {
     path: '/staff',
     element: (
       <RequireAuth roles={['lecturer', 'admissions', 'registry', 'librarian', 'admin', 'student_affairs']}>
@@ -69,8 +83,10 @@ export const router = createBrowserRouter([
       { path: 'admissions', element: <StaffPlaceholder context="Admissions" title="Applications" /> },
       { path: 'admissions/decided', element: <StaffPlaceholder context="Admissions" title="Decisions sent" /> },
       { path: 'admissions/places', element: <StaffPlaceholder context="Admissions" title="Intake places" /> },
-      { path: 'teaching', element: <StaffPlaceholder context="Teaching" title="Today" /> },
-      { path: 'teaching/marking', element: <StaffPlaceholder context="Teaching" title="Marking" /> },
+      { path: 'teaching', element: <LecturerToday /> },
+      { path: 'teaching/marking', element: <Marking /> },
+      { path: 'teaching/assessments/:id/marks', element: <Marks /> },
+      { path: 'teaching/classes/:id', element: <ClassPage /> },
       { path: 'library', element: <StaffPlaceholder context="Library" title="Issue and return" /> },
       { path: 'library/overdue', element: <StaffPlaceholder context="Library" title="Overdue" /> },
       { path: 'library/reservations', element: <StaffPlaceholder context="Library" title="Reservations" /> },

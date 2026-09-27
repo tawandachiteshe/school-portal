@@ -22,6 +22,7 @@ dependencies = [
   "gunicorn>=26.2.0",
   "cryptography>=50.0.1",
   "boto3>=1.43.103",
+  "python-multipart>=0.0.32",
 ]
 
 [project.optional-dependencies]

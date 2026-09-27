@@ -6,7 +6,7 @@
  */
 import type { Book } from './book';
 
-export interface AppApiLibrarySearchResults {
+export interface CatalogueResults {
   query: string;
   books: Book[];
 }

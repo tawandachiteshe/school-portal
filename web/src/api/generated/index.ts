@@ -6,3 +6,4 @@ export * from './modules/modules';
 export * from './ops/ops';
 export * from './records/records';
 export * from './student/student';
+export * from './teaching/teaching';

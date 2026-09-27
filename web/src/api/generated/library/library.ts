@@ -24,7 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AppApiLibrarySearchResults,
+  CatalogueResults,
   HTTPValidationError,
   LibraryHome,
   ReadingList,
@@ -273,9 +273,9 @@ export const getSearchCatalogueUrl = (params: SearchCatalogueParams,) => {
 /**
  * @summary Search Catalogue
  */
-export const searchCatalogue = async (params: SearchCatalogueParams, options?: Parameters<typeof apiFetch>[1]): Promise<AppApiLibrarySearchResults> => {
+export const searchCatalogue = async (params: SearchCatalogueParams, options?: Parameters<typeof apiFetch>[1]): Promise<CatalogueResults> => {
 
-  return apiFetch<AppApiLibrarySearchResults>(getSearchCatalogueUrl(params),
+  return apiFetch<CatalogueResults>(getSearchCatalogueUrl(params),
   {
     ...options,
     method: 'GET'

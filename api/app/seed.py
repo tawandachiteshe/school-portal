@@ -34,6 +34,7 @@ from app.models import (
     LibraryItem,
     LibraryLoan,
     LibraryReservation,
+    MaterialDownload,
     Module,
     ModuleOffering,
     ModuleResult,
@@ -101,6 +102,7 @@ class Seeder:
         self.db = db
         self.today = today
         self._reads: list[Announcement] = []
+        self.materials_by: dict[tuple[str, str], CourseMaterial] = {}
 
     def user(self, username: str, *, surname: str, first_names: str, roles: list[str], **kw) -> Person:
         u = User(
@@ -280,6 +282,7 @@ class Seeder:
         dte_dcn = ModuleOffering(module=modules["DCN201"], term=term, class_group="DTE-1A")
         dte_dcn.lecturers = [OfferingLecturer(staff=chikore, role="lead")]
         self.db.add(dte_dcn)
+        self.dte_dcn = dte_dcn
 
         tariro = self.user(
             "TCFL/2027/0142",
@@ -301,6 +304,7 @@ class Seeder:
             status="active",
         )
         self.db.add(student)
+        self.tariro_user = tariro.user
         await self.db.flush()
         for o in offerings.values():
             self.db.add(Enrolment(student_id=student.id, offering_id=o.id))
@@ -315,9 +319,210 @@ class Seeder:
         self.fees(student, term, start)
         self.results(student, offerings, lecturers)
         await self.db.flush()
+        await self.classmates(dit, dte, intake, offerings, lecturers)
         for a in self._reads:
             self.db.add(AnnouncementRead(announcement_id=a.id, user_id=tariro.user.id))
         await self.db.commit()
+
+    # --- classmates: full classes for the lecturer screens --------------------------------------
+
+    # design/LecturerMarks and Register: the first students in DIT-1A (Tariro is 0142).
+    DIT_NAMES = [
+        ("0107", "Banda", "Takudzwa"),
+        ("0111", "Chigumba", "Ropafadzo"),
+        ("0114", "Chikomo", "Anesu"),
+        ("0119", "Dzvova", "Munyaradzi"),
+        ("0123", "Gova", "Tanatswa"),
+        ("0126", "Hove", "Simbarashe"),
+        ("0130", "Jambwa", "Chiedza"),
+        ("0135", "Madziva", "Rufaro"),
+        ("0138", "Mapfumo", "Kundai"),
+        ("0147", "Mpofu", "Thandeka"),
+        ("0151", "Mudzingwa", "Panashe"),
+        ("0154", "Mukwena", "Tafadzwa"),
+        ("0158", "Musonza", "Farai"),
+        ("0161", "Ncube", "Sibusiso"),
+        ("0165", "Ndoro", "Ruvimbo"),
+        ("0168", "Nyamande", "Tinotenda"),
+        ("0172", "Nyoni", "Busisiwe"),
+        ("0175", "Rusike", "Tapiwa"),
+        ("0179", "Shumba", "Tawanda"),
+        ("0182", "Sibanda", "Lindiwe"),
+        ("0186", "Takawira", "Kudakwashe"),
+        ("0189", "Tembo", "Rutendo"),
+        ("0193", "Zhou", "Tatenda"),
+        ("0196", "Zulu", "Nkosana"),
+        ("0101", "Chari", "Vimbai"),
+        ("0102", "Chinyama", "Blessing"),
+        ("0103", "Dube", "Mthokozisi"),
+        ("0104", "Gumbo", "Nyasha"),
+        ("0105", "Hlatshwayo", "Nomsa"),
+        ("0106", "Kamba", "Fadzai"),
+        ("0109", "Kufa", "Tonderai"),
+        ("0112", "Machingura", "Ashley"),
+        ("0116", "Makoni", "Tendai"),
+        ("0121", "Manyika", "Shingai"),
+        ("0128", "Mhlanga", "Chipo"),
+        ("0132", "Moyo", "Brian"),
+        ("0140", "Mpala", "Thabani"),
+    ]  # 37 + Tariro = 38 (design: "38 students")
+    DTE_SURNAMES = [
+        "Bhebhe",
+        "Chakanyuka",
+        "Chauke",
+        "Chidza",
+        "Chimombe",
+        "Chirwa",
+        "Chitsva",
+        "Dhliwayo",
+        "Gava",
+        "Gwatidzo",
+        "Jonga",
+        "Kadzere",
+        "Katsande",
+        "Mabhena",
+        "Madondo",
+        "Mafuta",
+        "Magaya",
+        "Mahachi",
+        "Makumbe",
+        "Mandaza",
+        "Marange",
+        "Masaka",
+        "Matanga",
+        "Mavhunga",
+        "Mhaka",
+        "Moyo",
+        "Mudarikwa",
+        "Mugabe",
+        "Mukanya",
+        "Mupfumi",
+        "Murwira",
+        "Mushore",
+        "Mutero",
+        "Nhari",
+        "Nyathi",
+        "Nzira",
+        "Rukweza",
+        "Sithole",
+        "Tshuma",
+        "Zengeni",
+        "Zinyama",
+    ]  # 41 (design: DTE-1A 41)
+    DTE_FIRST = [
+        "Tanaka",
+        "Rudo",
+        "Kuda",
+        "Mufaro",
+        "Tatenda",
+        "Chengetai",
+        "Tinashe",
+        "Rumbi",
+        "Tapfuma",
+        "Ngoni",
+    ]
+
+    def person_user(self, number: str, surname: str, first: str) -> Person:
+        # Classmates have portal records but no dev sign-in (no username).
+        u = User(idp_subject=f"seed:{number}", display_name=f"{first} {surname}", email_verified=True)
+        u.roles = [UserRole(role="student", idp_group=GROUPS["student"])]
+        p = Person(surname=surname, first_names=first, user=u)
+        self.db.add_all([u, p])
+        return p
+
+    async def classmates(self, dit, dte, intake, offerings, lecturers) -> None:
+        now = clock.now()
+        dit_students, dte_students = [], []
+        for n, surname, first in self.DIT_NAMES:
+            st = Student(
+                person=self.person_user(f"TCFL/2027/{n}", surname, first),
+                student_number=f"TCFL/2027/{n}",
+                programme=dit,
+                intake=intake,
+                class_group="DIT-1A",
+            )
+            self.db.add(st)
+            dit_students.append(st)
+        for i, surname in enumerate(self.DTE_SURNAMES):
+            n = f"TCFL/2027/{201 + i * 3:04d}"
+            st = Student(
+                person=self.person_user(n, surname, self.DTE_FIRST[i % len(self.DTE_FIRST)]),
+                student_number=n,
+                programme=dte,
+                intake=intake,
+                class_group="DTE-1A",
+            )
+            self.db.add(st)
+            dte_students.append(st)
+        await self.db.flush()
+        for st in dit_students:
+            for o in offerings.values():
+                self.db.add(Enrolment(student_id=st.id, offering_id=o.id))
+        for st in dte_students:
+            self.db.add(Enrolment(student_id=st.id, offering_id=self.dte_dcn.id))
+
+        # design/LecturerHome "Assignment 1 · DTE-1A · 35 of 41 marked · results due Fri 12 Mar · due tomorrow"
+        a = Assessment(
+            offering=self.dte_dcn,
+            kind="assignment",
+            title="Assignment 1: Signal types",
+            due_at=now - timedelta(days=9),
+            weight=10,
+            max_mark=20,
+            created_by=lecturers["DCN201"].person.user.id,
+            published_at=now - timedelta(days=30),
+            marks_due_on=now.date() + timedelta(days=1),
+        )
+        self.db.add(a)
+        await self.db.flush()
+        for i, st in enumerate(dte_students):
+            marked = i < 35
+            self.db.add(
+                Submission(
+                    assessment_id=a.id,
+                    student_id=st.id,
+                    status="marked" if marked else "submitted",
+                    submitted_at=now - timedelta(days=10, hours=i % 7),
+                    mark=(9 + (i * 7) % 12) if marked else None,
+                    marked_at=now - timedelta(days=1) if marked else None,
+                )
+            )
+
+        # The DIT-1A Assignment 1 is marked and published (Tariro has 16/20): mark her classmates too.
+        for i, st in enumerate(dit_students):
+            self.db.add(
+                Submission(
+                    assessment_id=self.a1_dit.id,
+                    student_id=st.id,
+                    status="marked",
+                    submitted_at=self.a1_dit.due_at - timedelta(hours=2 + i % 20),
+                    mark=8 + (i * 5) % 13,
+                    marked_at=now - timedelta(days=12),
+                )
+            )
+
+        # design/LecturerHome "Downloaded by": 24/79, 35/38, 71/79 (Tariro hasn't opened the first or last).
+        dit_users = [st.person.user for st in dit_students]
+        dte_users = [st.person.user for st in dte_students]
+        await self.db.flush()
+        for title, count in (
+            ("Amplitude and frequency modulation", 24),
+            ("Analogue and digital signals", 71),
+        ):
+            everyone = [(u, "DIT-1A") for u in dit_users] + [(u, "DTE-1A") for u in dte_users]
+            for u, cg in everyone[:count]:
+                m = self.materials_by[(title, cg)]
+                self.db.add(
+                    MaterialDownload(
+                        material_id=m.id,
+                        user_id=u.id,
+                        first_at=m.published_at + timedelta(hours=3),
+                        last_at=m.published_at + timedelta(hours=3),
+                    )
+                )
+        rev = self.materials_by[("Test 1 revision questions", "DIT-1A")]
+        for u in [self.tariro_user, *dit_users[:34]]:
+            self.db.add(MaterialDownload(material_id=rev.id, user_id=u.id))
 
     # --- teaching data, all relative to "now" in Harare ------------------------------------
 
@@ -386,7 +591,7 @@ class Seeder:
             self.db.add(a)
             return a
 
-        a1 = add(
+        a1 = self.a1_dit = add(
             "DCN201",
             "assignment",
             "Assignment 1: Signal types",
@@ -413,6 +618,8 @@ class Seeder:
             test1_at,
             15,
             venue=venues[test1_venue],
+            max_mark=50,
+            marks_due_on=test1_at.date() + timedelta(days=14),
             duration_minutes=90,
             submission_mode="none",
         )
@@ -502,7 +709,7 @@ class Seeder:
         ("PRG101", "Arrays in C: lecture notes", 5, 640_000, timedelta(days=8)),
         ("DCN201", "Test 1 revision questions", 5, 310_000, timedelta(days=7)),
         ("DCN201", "Analogue and digital signals", 4, 4_800_000, timedelta(days=14)),
-        ("DCN201", "Digital modulation: ASK, FSK and PSK", 5, 1_300_000, timedelta(days=10)),
+        ("DCN201", "Digital modulation: ASK, FSK and PSK", 5, 1_300_000, timedelta(days=16)),
         ("DCN201", "Transmission media", 3, 920_000, timedelta(days=21)),
         ("DCN201", "Assignment 1 brief: signal types", 2, 180_000, timedelta(days=30)),
         ("DCN201", "Signals, bandwidth and data rate", 2, 1_600_000, timedelta(days=30)),
@@ -512,6 +719,8 @@ class Seeder:
         ("PRG101", "Loops: while, do-while and for", 4, 520_000, timedelta(days=12)),
         ("MTH110", "Differentiation: rules and examples", 5, 880_000, timedelta(days=12)),
     ]
+
+    DIT_ONLY = {"Test 1 revision questions", "Assignment 1 brief: signal types"}
 
     def materials(self, offerings, lecturers) -> None:
         now = clock.now()
@@ -530,9 +739,13 @@ class Seeder:
                     title, [f"{code} · Week {week}", "Sample course note for the development seed."], size
                 )
                 storage.put(bucket, key, pdf, "application/pdf")
-            self.db.add(
-                CourseMaterial(
-                    offering=offerings[code],
+            targets = [offerings[code]]
+            # design/LecturerHome: Eng. Chikore shares most DCN201 notes with both classes.
+            if code == "DCN201" and title not in self.DIT_ONLY:
+                targets.append(self.dte_dcn)
+            for o in targets:
+                m = CourseMaterial(
+                    offering=o,
                     title=title,
                     week=week,
                     mime_type="application/pdf",
@@ -541,7 +754,8 @@ class Seeder:
                     uploaded_by=lecturers[code].person.user.id,
                     published_at=now - ago,
                 )
-            )
+                self.db.add(m)
+                self.materials_by[(title, o.class_group)] = m
 
     def announcements(self, author_staff, lab3, start: date) -> None:
         now = clock.now()

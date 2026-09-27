@@ -313,7 +313,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__api__student__SearchResults"
+                  "$ref": "#/components/schemas/StudentSearchResults"
                 }
               }
             }
@@ -420,7 +420,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__api__library__SearchResults"
+                  "$ref": "#/components/schemas/CatalogueResults"
                 }
               }
             }
@@ -1200,6 +1200,466 @@
           }
         }
       }
+    },
+    "/staff/teaching/overview": {
+      "get": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Overview",
+        "operationId": "overview",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/marking": {
+      "get": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Marking",
+        "operationId": "marking",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarkingItem"
+                  },
+                  "type": "array",
+                  "title": "Response Marking"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/assessments/{assessment_id}/marks": {
+      "get": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Get Marks",
+        "operationId": "get_marks",
+        "parameters": [
+          {
+            "name": "assessment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Assessment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarksSheet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Save Marks",
+        "description": "Save a draft (students see marks only after publishing). Rows not sent are left as they are.",
+        "operationId": "save_marks",
+        "parameters": [
+          {
+            "name": "assessment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Assessment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarksIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarksSheet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/assessments/{assessment_id}/publish": {
+      "post": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Publish Marks",
+        "operationId": "publish_marks",
+        "parameters": [
+          {
+            "name": "assessment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Assessment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarksSheet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/classes/{offering_id}": {
+      "get": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Class Page",
+        "operationId": "class_page",
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Offering Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/materials": {
+      "post": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Upload Notes",
+        "operationId": "upload_notes",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_notes"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shared"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/register/{slot_id}/{on_date}": {
+      "get": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Open Register",
+        "operationId": "open_register",
+        "parameters": [
+          {
+            "name": "slot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Slot Id"
+            }
+          },
+          {
+            "name": "on_date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "On Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Register"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/register/{session_id}/students/{student_id}": {
+      "put": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Mark Attendance",
+        "operationId": "mark_attendance",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Student Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkAttendance"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/register/{session_id}/rest-present": {
+      "post": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Mark Rest Present",
+        "operationId": "mark_rest_present",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/teaching/register/{session_id}/finish": {
+      "post": {
+        "tags": [
+          "teaching"
+        ],
+        "summary": "Finish Register",
+        "operationId": "finish_register",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Finish Register"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1552,6 +2012,49 @@
         ],
         "title": "AssessmentOut"
       },
+      "Body_upload_notes": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 52.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "offering_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Offering Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "title",
+          "offering_ids"
+        ],
+        "title": "Body_upload_notes"
+      },
       "Book": {
         "properties": {
           "id": {
@@ -1715,6 +2218,71 @@
         ],
         "title": "Card"
       },
+      "CatalogueResults": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "books": {
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            },
+            "type": "array",
+            "title": "Books"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "books"
+        ],
+        "title": "CatalogueResults"
+      },
+      "ClassAssessment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "marked": {
+            "type": "integer",
+            "title": "Marked"
+          },
+          "released": {
+            "type": "boolean",
+            "title": "Released"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "due_at",
+          "weight",
+          "marked",
+          "released"
+        ],
+        "title": "ClassAssessment"
+      },
       "ClassKind": {
         "type": "string",
         "enum": [
@@ -1724,6 +2292,148 @@
           "consultation"
         ],
         "title": "ClassKind"
+      },
+      "ClassPage": {
+        "properties": {
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "term_name": {
+            "type": "string",
+            "title": "Term Name"
+          },
+          "weekly_slots": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklySlot"
+            },
+            "type": "array",
+            "title": "Weekly Slots"
+          },
+          "students": {
+            "items": {
+              "$ref": "#/components/schemas/ClassStudent"
+            },
+            "type": "array",
+            "title": "Students"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/SharedNote"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "assessments": {
+            "items": {
+              "$ref": "#/components/schemas/ClassAssessment"
+            },
+            "type": "array",
+            "title": "Assessments"
+          },
+          "other_classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassSummary"
+            },
+            "type": "array",
+            "title": "Other Classes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offering_id",
+          "module_code",
+          "module_name",
+          "class_group",
+          "term_name",
+          "weekly_slots",
+          "students",
+          "notes",
+          "assessments",
+          "other_classes"
+        ],
+        "title": "ClassPage"
+      },
+      "ClassStudent": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "attended": {
+            "type": "integer",
+            "title": "Attended"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "student_number",
+          "name",
+          "attended",
+          "sessions"
+        ],
+        "title": "ClassStudent"
+      },
+      "ClassSummary": {
+        "properties": {
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "module_name": {
+            "type": "string",
+            "title": "Module Name"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "students": {
+            "type": "integer",
+            "title": "Students"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offering_id",
+          "module_code",
+          "module_name",
+          "class_group",
+          "students"
+        ],
+        "title": "ClassSummary"
       },
       "CompleteIn": {
         "properties": {
@@ -2478,6 +3188,353 @@
         ],
         "title": "LogoutOut"
       },
+      "MarkAttendance": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^(present|late|absent)$",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "MarkAttendance"
+      },
+      "MarkIn": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark"
+          },
+          "is_absent": {
+            "type": "boolean",
+            "title": "Is Absent",
+            "default": false
+          },
+          "absence_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absence Note"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_id"
+        ],
+        "title": "MarkIn"
+      },
+      "MarkRow": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark"
+          },
+          "is_absent": {
+            "type": "boolean",
+            "title": "Is Absent"
+          },
+          "absence_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absence Note"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_id",
+          "student_number",
+          "name",
+          "mark",
+          "is_absent",
+          "absence_note",
+          "comment",
+          "submitted_at"
+        ],
+        "title": "MarkRow"
+      },
+      "MarkingItem": {
+        "properties": {
+          "assessment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Assessment Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "students": {
+            "type": "integer",
+            "title": "Students"
+          },
+          "marked": {
+            "type": "integer",
+            "title": "Marked"
+          },
+          "absent": {
+            "type": "integer",
+            "title": "Absent"
+          },
+          "marks_due_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marks Due On"
+          },
+          "released": {
+            "type": "boolean",
+            "title": "Released"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assessment_id",
+          "kind",
+          "title",
+          "module_code",
+          "class_group",
+          "offering_id",
+          "due_at",
+          "students",
+          "marked",
+          "absent",
+          "marks_due_on",
+          "released"
+        ],
+        "title": "MarkingItem"
+      },
+      "MarksIn": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/MarkIn"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows"
+        ],
+        "title": "MarksIn"
+      },
+      "MarksSheet": {
+        "properties": {
+          "assessment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Assessment Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssessmentKind"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "max_mark": {
+            "type": "number",
+            "title": "Max Mark"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "marks_due_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marks Due On"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "saved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved At"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/MarkRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assessment_id",
+          "title",
+          "kind",
+          "module_code",
+          "class_group",
+          "offering_id",
+          "max_mark",
+          "weight",
+          "due_at",
+          "marks_due_on",
+          "released_at",
+          "saved_at",
+          "rows"
+        ],
+        "title": "MarksSheet"
+      },
       "MeOut": {
         "properties": {
           "id": {
@@ -3156,6 +4213,62 @@
         ],
         "title": "Notice"
       },
+      "Overview": {
+        "properties": {
+          "greeting_name": {
+            "type": "string",
+            "title": "Greeting Name"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TermInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassSummary"
+            },
+            "type": "array",
+            "title": "Classes"
+          },
+          "today": {
+            "items": {
+              "$ref": "#/components/schemas/TeachingClass"
+            },
+            "type": "array",
+            "title": "Today"
+          },
+          "marking": {
+            "items": {
+              "$ref": "#/components/schemas/MarkingItem"
+            },
+            "type": "array",
+            "title": "Marking"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/SharedNote"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "greeting_name",
+          "term",
+          "classes",
+          "today",
+          "marking",
+          "notes"
+        ],
+        "title": "Overview"
+      },
       "PendingUpload": {
         "properties": {
           "id": {
@@ -3267,6 +4380,110 @@
           "uploaded_at"
         ],
         "title": "ReceiptFile"
+      },
+      "Register": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/RegisterRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "module_code",
+          "class_group",
+          "title",
+          "starts_at",
+          "venue",
+          "finished_at",
+          "rows"
+        ],
+        "title": "Register"
+      },
+      "RegisterRow": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "student_number": {
+            "type": "string",
+            "title": "Student Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_id",
+          "student_number",
+          "name",
+          "status"
+        ],
+        "title": "RegisterRow"
       },
       "RemarkIn": {
         "properties": {
@@ -3587,6 +4804,107 @@
         ],
         "title": "SettingsOut"
       },
+      "Shared": {
+        "properties": {
+          "material_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Material Ids"
+          },
+          "students": {
+            "type": "integer",
+            "title": "Students"
+          }
+        },
+        "type": "object",
+        "required": [
+          "material_ids",
+          "students"
+        ],
+        "title": "Shared"
+      },
+      "SharedNote": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "class_groups": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Class Groups"
+          },
+          "downloaded": {
+            "type": "integer",
+            "title": "Downloaded"
+          },
+          "audience": {
+            "type": "integer",
+            "title": "Audience"
+          },
+          "first_material_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "First Material Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "week",
+          "mime_type",
+          "size_bytes",
+          "published_at",
+          "class_groups",
+          "downloaded",
+          "audience",
+          "first_material_id"
+        ],
+        "title": "SharedNote"
+      },
       "Slot": {
         "properties": {
           "module_code": {
@@ -3744,6 +5062,43 @@
         ],
         "title": "StudentInfo"
       },
+      "StudentSearchResults": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleHit"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/NoteHit"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "announcements": {
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementHit"
+            },
+            "type": "array",
+            "title": "Announcements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "modules",
+          "notes",
+          "announcements"
+        ],
+        "title": "StudentSearchResults"
+      },
       "SubmissionMode": {
         "type": "string",
         "enum": [
@@ -3807,6 +5162,97 @@
           "returned"
         ],
         "title": "SubmissionStatus"
+      },
+      "TeachingClass": {
+        "properties": {
+          "slot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Slot Id"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date",
+            "title": "On Date"
+          },
+          "offering_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Offering Id"
+          },
+          "module_code": {
+            "type": "string",
+            "title": "Module Code"
+          },
+          "class_group": {
+            "type": "string",
+            "title": "Class Group"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClassKind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "assessment_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Title"
+          },
+          "students": {
+            "type": "integer",
+            "title": "Students"
+          },
+          "register_taken": {
+            "type": "boolean",
+            "title": "Register Taken"
+          },
+          "cancelled": {
+            "type": "boolean",
+            "title": "Cancelled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slot_id",
+          "on_date",
+          "offering_id",
+          "module_code",
+          "class_group",
+          "kind",
+          "starts_at",
+          "ends_at",
+          "venue",
+          "assessment_title",
+          "students",
+          "register_taken",
+          "cancelled"
+        ],
+        "title": "TeachingClass"
       },
       "TermInfo": {
         "properties": {
@@ -4315,64 +5761,6 @@
           "venue"
         ],
         "title": "WeeklySlot"
-      },
-      "app__api__library__SearchResults": {
-        "properties": {
-          "query": {
-            "type": "string",
-            "title": "Query"
-          },
-          "books": {
-            "items": {
-              "$ref": "#/components/schemas/Book"
-            },
-            "type": "array",
-            "title": "Books"
-          }
-        },
-        "type": "object",
-        "required": [
-          "query",
-          "books"
-        ],
-        "title": "SearchResults"
-      },
-      "app__api__student__SearchResults": {
-        "properties": {
-          "query": {
-            "type": "string",
-            "title": "Query"
-          },
-          "modules": {
-            "items": {
-              "$ref": "#/components/schemas/ModuleHit"
-            },
-            "type": "array",
-            "title": "Modules"
-          },
-          "notes": {
-            "items": {
-              "$ref": "#/components/schemas/NoteHit"
-            },
-            "type": "array",
-            "title": "Notes"
-          },
-          "announcements": {
-            "items": {
-              "$ref": "#/components/schemas/AnnouncementHit"
-            },
-            "type": "array",
-            "title": "Announcements"
-          }
-        },
-        "type": "object",
-        "required": [
-          "query",
-          "modules",
-          "notes",
-          "announcements"
-        ],
-        "title": "SearchResults"
       }
     }
   }

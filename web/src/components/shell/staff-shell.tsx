@@ -16,6 +16,7 @@ import {
 import type { ReactNode } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { Badge } from '@/components/ui/badge'
+import { useOverview } from '@/api/generated/teaching/teaching'
 import { homeFor, useMe, useSignOut, type Role } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
@@ -86,9 +87,19 @@ function groupsFor(roles: Role[]): Group[] {
   return groups
 }
 
+// Lecturers: counts on "Marking" and their classes under "My classes" (design/LecturerHome).
+function useLecturerNav(enabled: boolean) {
+  const { data } = useOverview({ query: { enabled, staleTime: 60_000 } })
+  const counts: Record<string, number> = data ? { '/staff/teaching/marking': data.marking.length } : {}
+  const classes = data?.classes ?? []
+  return { counts, classes }
+}
+
 export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
   const { data: me } = useMe()
   const signOut = useSignOut()
+  const lecturer = !!me?.roles.includes('lecturer')
+  const { counts, classes } = useLecturerNav(lecturer)
   if (!me) return null
   return (
     <div className="flex min-h-dvh bg-background">
@@ -118,10 +129,35 @@ export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
                 >
                   <Icon className="size-4" strokeWidth={1.5} aria-hidden />
                   {label}
+                  {!!counts[to] && <span className="ml-auto font-mono text-xs">{counts[to]}</span>}
                 </NavLink>
               ))}
             </div>
           ))}
+          {lecturer && classes.length > 0 && (
+            <div className="flex flex-col gap-0.5">
+              <div className="px-2.5 pt-4 pb-1.5 text-xs font-semibold text-muted-foreground">My classes</div>
+              {classes.map((c) => (
+                <NavLink
+                  key={c.offering_id}
+                  to={`/staff/teaching/classes/${c.offering_id}`}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm text-muted-foreground hover:bg-muted',
+                      isActive && 'bg-primary-soft font-semibold text-primary hover:bg-primary-soft',
+                    )
+                  }
+                >
+                  <span className="font-mono text-[13px]">{c.module_code}</span>
+                  {c.class_group}
+                  <span className="ml-auto font-mono text-xs">
+                    {c.students}
+                    <span className="sr-only"> students</span>
+                  </span>
+                </NavLink>
+              ))}
+            </div>
+          )}
           {extraNav}
         </nav>
         <div className="mt-auto flex items-center gap-2.5 border-t px-2.5 pt-3">

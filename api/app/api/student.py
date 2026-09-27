@@ -374,7 +374,7 @@ class AnnouncementHit(BaseModel):
     publish_at: datetime
 
 
-class SearchResults(BaseModel):
+class StudentSearchResults(BaseModel):
     query: str
     modules: list[ModuleHit]
     notes: list[NoteHit]
@@ -387,7 +387,7 @@ async def search_student(
     cu: CurrentUser = Depends(current_user),
     student: Student = Depends(current_student),
     db: AsyncSession = Depends(get_db),
-) -> SearchResults:
+) -> StudentSearchResults:
     term = q.strip().lower()
     now = clock.now()
     offerings = await current_offerings(db, student)
@@ -425,7 +425,7 @@ async def search_student(
         for a in await ann.visible(db, cu.user.id)
         if term in a.title.lower() or term in a.body_md.lower() or term in (a.from_label or "").lower()
     ][:10]
-    return SearchResults(
+    return StudentSearchResults(
         query=q.strip(),
         modules=modules,
         notes=[

@@ -90,6 +90,7 @@ class Assessment(Base):
     allow_late_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     allow_resubmission: Mapped[bool] = mapped_column(Boolean, server_default="true")
     accepted_extensions: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    marks_due_on: Mapped[date | None] = mapped_column(Date)
     max_file_mb: Mapped[int] = mapped_column(SmallInteger, server_default="20")
     marks_released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
@@ -110,6 +111,8 @@ class Submission(Base):
     mark: Mapped[float | None] = mapped_column(Numeric(6, 2))
     feedback_md: Mapped[str | None] = mapped_column(Text)
     student_note: Mapped[str | None] = mapped_column(Text)
+    is_absent: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    absence_note: Mapped[str | None] = mapped_column(Text)
     marked_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     marked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -167,3 +170,35 @@ class UploadSession(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ClassSession(Base):
+    __tablename__ = "class_sessions"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    offering_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("module_offerings.id", ondelete="CASCADE"))
+    slot_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("timetable_slots.id", ondelete="SET NULL"))
+    on_date: Mapped[date] = mapped_column(Date)
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    venue_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("venues.id"))
+    register_taken_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    taken_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    offering: Mapped[ModuleOffering] = relationship(lazy="joined")
+    venue: Mapped[Venue | None] = relationship(lazy="joined")
+
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("class_sessions.id", ondelete="CASCADE"), primary_key=True
+    )
+    student_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("students.id", ondelete="CASCADE"), primary_key=True
+    )
+    status: Mapped[str] = mapped_column(Text)
+    marked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    marked_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))

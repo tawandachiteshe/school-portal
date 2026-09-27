@@ -22,10 +22,10 @@ import type {
 import type {
   AnnouncementDetail,
   Announcements,
-  AppApiStudentSearchResults,
   Dashboard,
   HTTPValidationError,
-  SearchStudentParams
+  SearchStudentParams,
+  StudentSearchResults
 } from '../model';
 
 import { apiFetch } from '../../fetcher';
@@ -368,9 +368,9 @@ export const getSearchStudentUrl = (params: SearchStudentParams,) => {
 /**
  * @summary Search Student
  */
-export const searchStudent = async (params: SearchStudentParams, options?: Parameters<typeof apiFetch>[1]): Promise<AppApiStudentSearchResults> => {
+export const searchStudent = async (params: SearchStudentParams, options?: Parameters<typeof apiFetch>[1]): Promise<StudentSearchResults> => {
 
-  return apiFetch<AppApiStudentSearchResults>(getSearchStudentUrl(params),
+  return apiFetch<StudentSearchResults>(getSearchStudentUrl(params),
   {
     ...options,
     method: 'GET'

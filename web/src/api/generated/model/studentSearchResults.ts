@@ -8,7 +8,7 @@ import type { AnnouncementHit } from './announcementHit';
 import type { ModuleHit } from './moduleHit';
 import type { NoteHit } from './noteHit';
 
-export interface AppApiStudentSearchResults {
+export interface StudentSearchResults {
   query: string;
   modules: ModuleHit[];
   notes: NoteHit[];
