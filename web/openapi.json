@@ -2964,6 +2964,467 @@
           }
         }
       }
+    },
+    "/apply/national-id": {
+      "get": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "National Id",
+        "operationId": "national_id",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalIdState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Confirm National Id",
+        "operationId": "confirm_national_id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIdIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalIdState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Upload National Id",
+        "operationId": "upload_national_id",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_national_id"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalIdState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/handoffs": {
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Start Handoff",
+        "description": "A new link; any earlier one stops working.",
+        "operationId": "start_handoff",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartHandoffIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewHandoff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/handoffs/current": {
+      "get": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Current Handoff",
+        "description": "Polled by the computer while the phone works (design/HandoffWaiting).",
+        "operationId": "current_handoff",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/HandoffOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Current Handoff"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/handoffs/current/sms": {
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Send Handoff Link",
+        "operationId": "send_handoff_link",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendLinkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/handoffs/current/disconnect": {
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Disconnect Handoff",
+        "operationId": "disconnect_handoff",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoffOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/{code}": {
+      "get": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Handoff Landing",
+        "operationId": "handoff_landing",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoffLanding"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/{code}/claim": {
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Claim Handoff",
+        "operationId": "claim_handoff",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claimed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/{code}/mismatch": {
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Report Mismatch",
+        "description": "The codes didn't match: close the link so nothing can be added through it (design/CodesMismatch).",
+        "operationId": "report_mismatch",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claimed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/current": {
+      "get": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Phone State",
+        "operationId": "phone_state",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneSession"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/national-id": {
+      "put": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Phone Confirm National Id",
+        "operationId": "phone_confirm_national_id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIdIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalIdState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apply id"
+        ],
+        "summary": "Phone Upload National Id",
+        "operationId": "phone_upload_national_id",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_phone_upload_national_id"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalIdState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3610,6 +4071,34 @@
         ],
         "title": "AudienceKind"
       },
+      "Body_phone_upload_national_id": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_phone_upload_national_id"
+      },
+      "Body_upload_national_id": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_national_id"
+      },
       "Body_upload_notes": {
         "properties": {
           "file": {
@@ -3911,6 +4400,19 @@
         ],
         "title": "CatalogueResults"
       },
+      "Claimed": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok"
+        ],
+        "title": "Claimed"
+      },
       "ClassAssessment": {
         "properties": {
           "id": {
@@ -4155,6 +4657,40 @@
           "sms_max"
         ],
         "title": "ComposeOptions"
+      },
+      "ConfirmIdIn": {
+        "properties": {
+          "id_number": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Id Number"
+          },
+          "surname": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Surname"
+          },
+          "first_names": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "First Names"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "title": "Date Of Birth"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id_number",
+          "surname",
+          "first_names",
+          "date_of_birth"
+        ],
+        "title": "ConfirmIdIn"
       },
       "Contact": {
         "properties": {
@@ -4984,6 +5520,105 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HandoffLanding": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/LandingState"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "step": {
+            "type": "string",
+            "title": "Step"
+          },
+          "match_code": {
+            "type": "string",
+            "title": "Match Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "first_name",
+          "programme",
+          "step",
+          "match_code"
+        ],
+        "title": "HandoffLanding"
+      },
+      "HandoffOut": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/HandoffState"
+          },
+          "match_code": {
+            "type": "string",
+            "title": "Match Code"
+          },
+          "claim_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Claim Expires At"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At"
+          },
+          "national_id": {
+            "$ref": "#/components/schemas/NationalIdState"
+          },
+          "results_started": {
+            "type": "boolean",
+            "title": "Results Started"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "match_code",
+          "claim_expires_at",
+          "device",
+          "connected_at",
+          "national_id",
+          "results_started"
+        ],
+        "title": "HandoffOut"
+      },
+      "HandoffState": {
+        "type": "string",
+        "enum": [
+          "waiting",
+          "connected",
+          "expired",
+          "ended"
+        ],
+        "title": "HandoffState"
+      },
       "HeldBook": {
         "properties": {
           "reservation_id": {
@@ -5045,6 +5680,74 @@
           "closes"
         ],
         "title": "Hours"
+      },
+      "IdFields": {
+        "properties": {
+          "id_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Number"
+          },
+          "surname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surname"
+          },
+          "first_names": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Names"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id_number",
+          "surname",
+          "first_names",
+          "date_of_birth"
+        ],
+        "title": "IdFields"
+      },
+      "IdStatus": {
+        "type": "string",
+        "enum": [
+          "none",
+          "reading",
+          "read",
+          "failed",
+          "confirmed"
+        ],
+        "title": "IdStatus"
       },
       "Identity": {
         "properties": {
@@ -5307,6 +6010,16 @@
         ],
         "title": "Issued"
       },
+      "LandingState": {
+        "type": "string",
+        "enum": [
+          "ready",
+          "yours",
+          "expired",
+          "closed"
+        ],
+        "title": "LandingState"
+      },
       "Lecturer": {
         "properties": {
           "name": {
@@ -5445,6 +6158,19 @@
           "receipt_ref"
         ],
         "title": "Line"
+      },
+      "LinkSent": {
+        "properties": {
+          "sms_queued": {
+            "type": "boolean",
+            "title": "Sms Queued"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sms_queued"
+        ],
+        "title": "LinkSent"
       },
       "LoanItem": {
         "properties": {
@@ -6506,6 +7232,208 @@
         ],
         "title": "MyApplication"
       },
+      "NationalIdState": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/IdStatus"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "received_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Received At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "capture_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Device"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/IdFields"
+          },
+          "low_confidence": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Low Confidence"
+          },
+          "check_letter_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Letter Valid"
+          },
+          "expected_letter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Letter"
+          },
+          "registered_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered In"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "document_id",
+          "received_at",
+          "read_at",
+          "capture_device",
+          "fields",
+          "low_confidence",
+          "check_letter_valid",
+          "expected_letter",
+          "registered_in",
+          "origin",
+          "error"
+        ],
+        "title": "NationalIdState"
+      },
+      "NewHandoff": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/HandoffState"
+          },
+          "match_code": {
+            "type": "string",
+            "title": "Match Code"
+          },
+          "claim_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Claim Expires At"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At"
+          },
+          "national_id": {
+            "$ref": "#/components/schemas/NationalIdState"
+          },
+          "results_started": {
+            "type": "boolean",
+            "title": "Results Started"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "match_code",
+          "claim_expires_at",
+          "device",
+          "connected_at",
+          "national_id",
+          "results_started",
+          "code",
+          "token"
+        ],
+        "title": "NewHandoff"
+      },
       "NextPayment": {
         "properties": {
           "label": {
@@ -7089,6 +8017,38 @@
           "received_bytes"
         ],
         "title": "PendingUpload"
+      },
+      "PhoneSession": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "programme": {
+            "type": "string",
+            "title": "Programme"
+          },
+          "match_code": {
+            "type": "string",
+            "title": "Match Code"
+          },
+          "national_id": {
+            "$ref": "#/components/schemas/NationalIdState"
+          },
+          "results_started": {
+            "type": "boolean",
+            "title": "Results Started"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "programme",
+          "match_code",
+          "national_id",
+          "results_started"
+        ],
+        "title": "PhoneSession"
       },
       "ProgrammeChoice": {
         "properties": {
@@ -8276,6 +9236,19 @@
         ],
         "title": "Role"
       },
+      "SendLinkIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "SendLinkIn"
+      },
       "Sent": {
         "properties": {
           "sms_queued": {
@@ -8681,6 +9654,17 @@
           "position"
         ],
         "title": "StaffInfo"
+      },
+      "StartHandoffIn": {
+        "properties": {
+          "start_step": {
+            "type": "string",
+            "title": "Start Step",
+            "default": "national_id"
+          }
+        },
+        "type": "object",
+        "title": "StartHandoffIn"
       },
       "Steps": {
         "properties": {

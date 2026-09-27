@@ -62,6 +62,14 @@ class Settings(BaseSettings):
     application_fee_usd: str = "20.00"
 
     ocr_llm_mode: str = "fallback"  # off | fallback | always
+    ocr_min_confidence: float = 0.80
+    anthropic_api_key: str = ""
+    ocr_claude_model: str = "claude-sonnet-5"
+    # Phone handoff (docs/10 §10.10): a link works for 15 minutes; a claimed phone for 2 hours.
+    handoff_claim_minutes: int = 15
+    handoff_session_hours: int = 2
+    document_max_mb: int = 5
+    document_retention: str = ""  # design/IdDesktop "[RETENTION PERIOD]": shown once the college sets it
     claude_model: str = "claude-opus-5"
     assistant_enabled: bool = True
 

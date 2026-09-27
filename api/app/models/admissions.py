@@ -16,7 +16,7 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import INET, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.academic import Intake, Programme
@@ -110,6 +110,9 @@ class Document(Base):
 
     id: Mapped[uuid.UUID] = uuid_pk()
     application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id", ondelete="CASCADE"))
+    handoff_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("device_handoffs.id", ondelete="SET NULL")
+    )
     kind: Mapped[str] = mapped_column(DOCUMENT_KIND)
     status: Mapped[str] = mapped_column(
         pg_enum(
@@ -130,12 +133,18 @@ class Document(Base):
     sha256: Mapped[bytes] = mapped_column(LargeBinary)
     page_count: Mapped[int] = mapped_column(SmallInteger, server_default="1")
     quality_score: Mapped[float | None] = mapped_column(Numeric(4, 3))
+    ocr_engine: Mapped[str | None] = mapped_column(
+        pg_enum("ocr_engine", "paddle", "tesseract", "llm", "manual")
+    )
+    ocr_text: Mapped[str | None] = mapped_column(Text)
     ocr_confidence: Mapped[float | None] = mapped_column(Numeric(4, 3))
+    error: Mapped[str | None] = mapped_column(Text)
     extracted: Mapped[dict | None] = mapped_column(JSONB)
     capture_device: Mapped[str | None] = mapped_column(Text)  # 'phone (Android · Chrome)'
     reviewed_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     fields: Mapped[list["DocumentField"]] = relationship(lazy="selectin", cascade="all, delete-orphan")
 
@@ -204,3 +213,28 @@ class ApplicationFlag(Base):
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     resolution: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at()
+
+
+class DeviceHandoff(Base):
+    """ "Continue on your phone": a single-use link giving a phone a short onboarding-only session."""
+
+    __tablename__ = "device_handoffs"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id", ondelete="CASCADE"))
+    created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    token_hash: Mapped[bytes] = mapped_column(LargeBinary, unique=True)
+    short_code_hash: Mapped[bytes] = mapped_column(LargeBinary, unique=True)
+    match_code: Mapped[str] = mapped_column(String(4))
+    start_step: Mapped[str] = mapped_column(Text)
+    sent_via: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = created_at()
+    claim_expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    claimed_user_agent: Mapped[str | None] = mapped_column(Text)
+    claimed_ip: Mapped[str | None] = mapped_column(INET)
+    session_hash: Mapped[bytes | None] = mapped_column(LargeBinary, unique=True)
+    session_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    application: Mapped[Application] = relationship(lazy="joined")
