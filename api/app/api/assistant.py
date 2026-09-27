@@ -311,7 +311,10 @@ class AnswerFeedbackOut(BaseModel):
 
 @router.post("/messages/{message_id}/feedback", dependencies=[Depends(_enabled)])
 async def answer_feedback(
-    message_id: int, body: AnswerFeedbackIn, cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
+    message_id: int,
+    body: AnswerFeedbackIn,
+    cu: CurrentUser = Depends(asker),
+    db: AsyncSession = Depends(get_db),
 ) -> AnswerFeedbackOut:
     m = (
         await db.execute(
