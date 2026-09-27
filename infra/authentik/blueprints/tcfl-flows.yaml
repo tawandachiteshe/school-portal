@@ -1,0 +1,210 @@
+# TCFL Portal sign-in and sign-up flows (docs/10 §10.3). The portal renders its own screens for
+# every stage by driving the flow executor API (web/src/lib/authentik-flow.ts); Authentik's own UI is
+# only the fallback for a stage the portal doesn't know.
+#
+# - tcfl-authentication: username (student number, staff email or mobile number) and password on one
+#   screen (design/SignIn, StaffSignIn), then MFA for anyone who has set up a device.
+# - tcfl-enrollment: applicant sign-up. Name, mobile number (becomes the username), password; the
+#   number is checked with an SMS code (design/VerifyPhone) when SIGNUP_VERIFY_PHONE is set. Codes go through Authentik's generic SMS
+#   provider to the portal (POST /api/internal/sms), which queues them like any other text.
+#
+# Password reset by SMS code (design/ForgotPassword) is done by the portal, not a flow.
+version: 1
+metadata:
+  name: TCFL Portal flows
+  labels:
+    blueprints.goauthentik.io/depends-on: tcfl-portal
+entries:
+  # --- sign-in ---------------------------------------------------------------------------------
+  - model: authentik_stages_password.passwordstage
+    id: password
+    identifiers: { name: tcfl-password }
+    attrs:
+      backends: [authentik.core.auth.InbuiltBackend]
+      failed_attempts_before_cancel: 5
+
+  - model: authentik_flows.flow
+    id: enrollment-flow
+    identifiers: { slug: tcfl-enrollment }
+    attrs:
+      name: TCFL applicant sign-up
+      title: Start an application
+      designation: enrollment
+      authentication: require_unauthenticated
+
+  - model: authentik_stages_identification.identificationstage
+    id: identification
+    identifiers: { name: tcfl-identification }
+    attrs:
+      user_fields: [username, email]
+      case_insensitive_matching: true
+      show_matched_user: false
+      password_stage: !KeyOf password
+      enrollment_flow: !KeyOf enrollment-flow
+
+  - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
+    id: mfa
+    identifiers: { name: tcfl-mfa }
+    attrs:
+      device_classes: [totp, webauthn, static]
+      not_configured_action: skip
+
+  - model: authentik_stages_user_login.userloginstage
+    id: login
+    identifiers: { name: tcfl-login }
+    attrs:
+      session_duration: hours=8
+      remember_me_offset: days=14
+
+  - model: authentik_flows.flow
+    id: authentication-flow
+    identifiers: { slug: tcfl-authentication }
+    attrs:
+      name: TCFL sign-in
+      title: Sign in
+      designation: authentication
+      authentication: none
+
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf authentication-flow, stage: !KeyOf identification, order: 10 }
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf authentication-flow, stage: !KeyOf mfa, order: 20 }
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf authentication-flow, stage: !KeyOf login, order: 30 }
+
+  # --- applicant sign-up --------------------------------------------------------------------------
+  - model: authentik_stages_prompt.prompt
+    id: prompt-name
+    identifiers: { name: tcfl-prompt-name }
+    attrs:
+      field_key: name
+      label: Full name
+      type: text
+      required: true
+      placeholder: As it is on your National ID
+      order: 10
+  - model: authentik_stages_prompt.prompt
+    id: prompt-username
+    identifiers: { name: tcfl-prompt-mobile }
+    attrs:
+      field_key: username
+      label: Mobile number
+      type: text
+      required: true
+      placeholder: "263773184521"
+      order: 20
+  - model: authentik_stages_prompt.prompt
+    id: prompt-password
+    identifiers: { name: tcfl-prompt-password }
+    attrs:
+      field_key: password
+      label: Password
+      type: password
+      required: true
+      order: 30
+  - model: authentik_stages_prompt.prompt
+    id: prompt-password-repeat
+    identifiers: { name: tcfl-prompt-password-repeat }
+    attrs:
+      field_key: password_repeat
+      label: Password again
+      type: password
+      required: true
+      order: 40
+
+  - model: authentik_policies_password.passwordpolicy
+    id: password-policy
+    identifiers: { name: tcfl-password-policy }
+    attrs:
+      password_field: password
+      amount_digits: 0
+      amount_uppercase: 0
+      amount_lowercase: 0
+      amount_symbols: 0
+      length_min: 10
+      check_static_rules: true
+      check_have_i_been_pwned: false
+      check_zxcvbn: true
+      zxcvbn_score_threshold: 2
+      error_message: Use at least 10 characters. A few words together is easy to remember and hard to guess.
+
+  - model: authentik_policies_expression.expressionpolicy
+    id: mobile-username
+    identifiers: { name: tcfl-mobile-username }
+    attrs:
+      expression: |
+        # The mobile number is the username (263773184521): accept 077…, +263… or 263….
+        import re
+        raw = request.context.get("prompt_data", {}).get("username", "")
+        digits = re.sub(r"\D", "", raw)
+        if digits.startswith("0") and len(digits) == 10:
+            digits = "263" + digits[1:]
+        if not re.fullmatch(r"2637\d{8}", digits):
+            ak_message("Enter a Zimbabwe mobile number, like 077 318 4521.")
+            return False
+        request.context["prompt_data"]["username"] = digits
+        request.context["prompt_data"]["attributes"] = {"phone_number": "+" + digits}
+        return True
+
+  - model: authentik_stages_prompt.promptstage
+    id: signup-prompt
+    identifiers: { name: tcfl-signup }
+    attrs:
+      fields:
+        - !KeyOf prompt-name
+        - !KeyOf prompt-username
+        - !KeyOf prompt-password
+        - !KeyOf prompt-password-repeat
+      validation_policies:
+        - !KeyOf mobile-username
+        - !KeyOf password-policy
+
+  - model: authentik_stages_user_write.userwritestage
+    id: signup-write
+    identifiers: { name: tcfl-signup-write }
+    attrs:
+      user_creation_mode: always_create
+      create_users_as_inactive: false
+      create_users_group: !Find [authentik_core.group, [name, portal-applicants]]
+      user_type: internal
+
+  - model: authentik_stages_authenticator_sms.authenticatorsmsstage
+    id: verify-phone
+    identifiers: { name: tcfl-verify-phone }
+    attrs:
+      provider: generic
+      from_number: TCFL
+      account_sid: !Env [PORTAL_SMS_WEBHOOK_URL, "http://host.docker.internal:8000/internal/sms"]
+      auth: !Env [SMS_WEBHOOK_SECRET, dev-sms-webhook-secret]
+      auth_type: bearer
+      verify_only: true
+
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf signup-prompt, order: 10 }
+  # Authentik's SMS stage needs the user to exist, so the account is written before the number is
+  # checked; an unfinished sign-up leaves an applicant account whose number isn't verified.
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf signup-write, order: 20 }
+  - model: authentik_flows.flowstagebinding
+    id: verify-phone-binding
+    identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf verify-phone, order: 30 }
+    attrs:
+      evaluate_on_plan: false
+      re_evaluate_policies: true
+  # SIGNUP_VERIFY_PHONE=1 turns the SMS check on. Off (unset) until an SMS provider is set up: the
+  # applicant goes straight from the form into their application, and the number is unchecked.
+  - model: authentik_policies_expression.expressionpolicy
+    id: verify-phone-on
+    identifiers: { name: tcfl-verify-phone-on }
+    attrs:
+      expression: !Format ["return %r != ''", !Env [SIGNUP_VERIFY_PHONE, ""]]
+  - model: authentik_policies.policybinding
+    identifiers: { target: !KeyOf verify-phone-binding, policy: !KeyOf verify-phone-on, order: 0 }
+  - model: authentik_flows.flowstagebinding
+    identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf login, order: 40 }
+
+  # Authentik's own pages default to these flows too.
+  - model: authentik_brands.brand
+    identifiers: { domain: authentik-default }
+    attrs:
+      flow_authentication: !KeyOf authentication-flow

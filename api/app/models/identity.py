@@ -10,6 +10,7 @@ from sqlalchemy import (
     Identity,
     Integer,
     LargeBinary,
+    SmallInteger,
     String,
     Text,
     func,
@@ -149,3 +150,34 @@ class NotificationDelivery(Base):
     attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     notification: Mapped[Notification] = relationship()
+
+
+class SmsOutbox(Base):
+    """Texts that aren't portal notifications, e.g. Authentik's verification codes (app/api/internal.py)."""
+
+    __tablename__ = "sms_outbox"
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    to_phone: Mapped[str] = mapped_column(Text)
+    body: Mapped[str] = mapped_column(Text)
+    purpose: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text, server_default="queued")
+    provider_ref: Mapped[str | None] = mapped_column(Text)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = created_at()
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PasswordReset(Base):
+    """A code texted for design/ForgotPassword; the password itself is set in Authentik."""
+
+    __tablename__ = "password_resets"
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    username: Mapped[str] = mapped_column(Text)
+    code_hash: Mapped[bytes] = mapped_column(LargeBinary)
+    phone: Mapped[str] = mapped_column(Text)
+    attempts: Mapped[int] = mapped_column(SmallInteger, server_default="0")
+    created_at: Mapped[datetime] = created_at()
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

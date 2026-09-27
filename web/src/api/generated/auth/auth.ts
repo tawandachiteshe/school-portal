@@ -28,7 +28,13 @@ import type {
   DevLogin200,
   DevLoginIn,
   HTTPValidationError,
-  LogoutOut
+  LogoutOut,
+  OidcCallbackParams,
+  OidcLoginParams,
+  ResetDone,
+  ResetFinishIn,
+  ResetStartIn,
+  ResetStarted
 } from '../model';
 
 import { apiFetch } from '../../fetcher';
@@ -62,6 +68,7 @@ export const getLogoutUrl = () => {
 }
 
 /**
+ * Ends the portal session, and Authentik's too (RP-initiated logout) when it signed the user in.
  * @summary Logout
  */
 export const logout = async ( options?: Parameters<typeof apiFetch>[1]): Promise<LogoutOut> => {
@@ -126,7 +133,222 @@ export const useLogout = <TError = unknown,
       > => {
       return useMutation(getLogoutMutationOptions(options), queryClient);
     }
-    export const getDevAccountsUrl = () => {
+    export const getOidcLoginUrl = (params?: OidcLoginParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/auth/login?${stringifiedParams}` : `/auth/login`
+}
+
+/**
+ * After the sign-in screens: Authentik has a session, so this comes straight back with a code.
+ * @summary Oidc Login
+ */
+export const oidcLogin = async (params?: OidcLoginParams, options?: Parameters<typeof apiFetch>[1]): Promise<unknown> => {
+
+  return apiFetch<unknown>(getOidcLoginUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getOidcLoginQueryKey = (params?: OidcLoginParams,) => {
+    return [
+    `/auth/login`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getOidcLoginQueryOptions = <TData = Awaited<ReturnType<typeof oidcLogin>>, TError = void | HTTPValidationError>(params?: OidcLoginParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOidcLoginQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof oidcLogin>>> = ({ signal }) => oidcLogin(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OidcLoginQueryResult = NonNullable<Awaited<ReturnType<typeof oidcLogin>>>
+export type OidcLoginQueryError = void | HTTPValidationError
+
+
+export function useOidcLogin<TData = Awaited<ReturnType<typeof oidcLogin>>, TError = void | HTTPValidationError>(
+ params: undefined |  OidcLoginParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oidcLogin>>,
+          TError,
+          Awaited<ReturnType<typeof oidcLogin>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOidcLogin<TData = Awaited<ReturnType<typeof oidcLogin>>, TError = void | HTTPValidationError>(
+ params?: OidcLoginParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oidcLogin>>,
+          TError,
+          Awaited<ReturnType<typeof oidcLogin>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOidcLogin<TData = Awaited<ReturnType<typeof oidcLogin>>, TError = void | HTTPValidationError>(
+ params?: OidcLoginParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Oidc Login
+ */
+
+export function useOidcLogin<TData = Awaited<ReturnType<typeof oidcLogin>>, TError = void | HTTPValidationError>(
+ params?: OidcLoginParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcLogin>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOidcLoginQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getOidcCallbackUrl = (params?: OidcCallbackParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/auth/callback?${stringifiedParams}` : `/auth/callback`
+}
+
+/**
+ * @summary Oidc Callback
+ */
+export const oidcCallback = async (params?: OidcCallbackParams, options?: Parameters<typeof apiFetch>[1]): Promise<unknown> => {
+
+  return apiFetch<unknown>(getOidcCallbackUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getOidcCallbackQueryKey = (params?: OidcCallbackParams,) => {
+    return [
+    `/auth/callback`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getOidcCallbackQueryOptions = <TData = Awaited<ReturnType<typeof oidcCallback>>, TError = void | HTTPValidationError>(params?: OidcCallbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOidcCallbackQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof oidcCallback>>> = ({ signal }) => oidcCallback(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OidcCallbackQueryResult = NonNullable<Awaited<ReturnType<typeof oidcCallback>>>
+export type OidcCallbackQueryError = void | HTTPValidationError
+
+
+export function useOidcCallback<TData = Awaited<ReturnType<typeof oidcCallback>>, TError = void | HTTPValidationError>(
+ params: undefined |  OidcCallbackParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oidcCallback>>,
+          TError,
+          Awaited<ReturnType<typeof oidcCallback>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOidcCallback<TData = Awaited<ReturnType<typeof oidcCallback>>, TError = void | HTTPValidationError>(
+ params?: OidcCallbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oidcCallback>>,
+          TError,
+          Awaited<ReturnType<typeof oidcCallback>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOidcCallback<TData = Awaited<ReturnType<typeof oidcCallback>>, TError = void | HTTPValidationError>(
+ params?: OidcCallbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Oidc Callback
+ */
+
+export function useOidcCallback<TData = Awaited<ReturnType<typeof oidcCallback>>, TError = void | HTTPValidationError>(
+ params?: OidcCallbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oidcCallback>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOidcCallbackQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getDevAccountsUrl = () => {
 
 
 
@@ -312,4 +534,178 @@ export const useDevLogin = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getDevLoginMutationOptions(options), queryClient);
+    }
+    export const getResetStartUrl = () => {
+
+
+
+
+  return `/auth/reset/start`
+}
+
+/**
+ * @summary Reset Start
+ */
+export const resetStart = async (resetStartIn: ResetStartIn, options?: Parameters<typeof apiFetch>[1]): Promise<ResetStarted> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<ResetStarted>(getResetStartUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resetStartIn)
+  }
+);}
+
+
+
+
+
+export const getResetStartMutationKey = () => ['resetStart'] as const;
+
+export const getResetStartMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetStart>>, TError,ResetStartMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetStart>>, TError,ResetStartMutationVariables, TContext> => {
+
+const mutationKey = getResetStartMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetStart>>, ResetStartMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  resetStart(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetStartMutationResult = NonNullable<Awaited<ReturnType<typeof resetStart>>>
+    export type ResetStartMutationBody = ResetStartIn
+    export type ResetStartMutationError = HTTPValidationError
+    export type ResetStartMutationVariables = {data: ResetStartIn}
+
+    /**
+ * @summary Reset Start
+ */
+export const useResetStart = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetStart>>, TError,ResetStartMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resetStart>>,
+        TError,
+        ResetStartMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResetStartMutationOptions(options), queryClient);
+    }
+    export const getResetFinishUrl = () => {
+
+
+
+
+  return `/auth/reset/finish`
+}
+
+/**
+ * @summary Reset Finish
+ */
+export const resetFinish = async (resetFinishIn: ResetFinishIn, options?: Parameters<typeof apiFetch>[1]): Promise<ResetDone> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<ResetDone>(getResetFinishUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resetFinishIn)
+  }
+);}
+
+
+
+
+
+export const getResetFinishMutationKey = () => ['resetFinish'] as const;
+
+export const getResetFinishMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetFinish>>, TError,ResetFinishMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetFinish>>, TError,ResetFinishMutationVariables, TContext> => {
+
+const mutationKey = getResetFinishMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetFinish>>, ResetFinishMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  resetFinish(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetFinishMutationResult = NonNullable<Awaited<ReturnType<typeof resetFinish>>>
+    export type ResetFinishMutationBody = ResetFinishIn
+    export type ResetFinishMutationError = HTTPValidationError
+    export type ResetFinishMutationVariables = {data: ResetFinishIn}
+
+    /**
+ * @summary Reset Finish
+ */
+export const useResetFinish = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetFinish>>, TError,ResetFinishMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resetFinish>>,
+        TError,
+        ResetFinishMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResetFinishMutationOptions(options), queryClient);
     }

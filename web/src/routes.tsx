@@ -3,6 +3,9 @@ import { RequireAuth } from '@/components/shell/require-auth'
 import { StaffIndex, StaffShell } from '@/components/shell/staff-shell'
 import { StudentRoot, StudentShell } from '@/components/shell/student-shell'
 import DevSignIn from '@/pages/auth/DevSignIn'
+import ForgotPassword from '@/pages/auth/ForgotPassword'
+import SignUp from '@/pages/auth/Register'
+import SignIn from '@/pages/auth/SignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
@@ -45,7 +48,10 @@ import { AnnouncementDetail, AnnouncementsList } from '@/pages/student/Announcem
 
 // Route map follows docs/design-handoff.md. Screens are added as they are built.
 export const router = createBrowserRouter([
-  { path: '/login', element: <DevSignIn /> },
+  { path: '/login', element: <SignIn /> },
+  { path: '/login/dev', element: <DevSignIn /> },
+  { path: '/register', element: <SignUp /> },
+  { path: '/forgot', element: <ForgotPassword /> },
   { path: '/foundations', element: <Foundations /> },
   {
     element: (

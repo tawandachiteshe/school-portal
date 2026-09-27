@@ -30,8 +30,8 @@ Every screen below is a file in `design/`. Suggested routes are a starting point
 |---|---|---|---|
 | SignIn | Sign in (phone) | `/login` | authentication flow: Identification → Password |
 | StaffSignIn | Sign in (desktop, shared-computer checkbox) | `/login` | same flow |
-| Register | Create applicant account | `/register` | enrollment flow: Prompt stage |
-| VerifyPhone / VerifyPhoneError | SMS code, wrong-code state (`state` prop) | `/register/verify` | Authenticator SMS stage, verify-only |
+| (no design) | Create applicant account: name, mobile number, password twice, in the style of SignIn. `design/Register.dc.html` is the lecturer's attendance register, not sign-up | `/register` | enrollment flow: Prompt stage |
+| VerifyPhone / VerifyPhoneError | SMS code, wrong-code state (`state` prop). Only when `SIGNUP_VERIFY_PHONE` is set (docs/10 §10.3) | `/register` (next step of the same page) | Authenticator SMS stage, verify-only |
 | ForgotPassword | Reset password | `/forgot` | recovery flow |
 
 Identification stage only matches username/email/UPN: set applicant usernames to their E.164 number without `+` (e.g. `263773184521`) and students' to their student number.

@@ -24,6 +24,7 @@ dependencies = [
   "boto3>=1.43.103",
   "python-multipart>=0.0.32",
   "pillow>=11",
+  "joserfc>=1.7",
 ]
 
 [project.optional-dependencies]

@@ -51,7 +51,9 @@ Authentik is served **under `/auth/` on the portal origin** (`AUTHENTIK_WEB__PAT
 
 **Flow-executor client notes (`web/src/lib/authentik-flow.ts`):**
 - **Unknown challenges:** map `component` → screen. Anything unmapped falls back to "Continue in a browser" by redirecting to `/auth/if/flow/<slug>/`, so a new stage type added in Authentik never locks users out.
-- **CSRF:** send `X-authentik-CSRF` (read from the `authentik_csrf` cookie) on POSTs. Use `credentials: "same-origin"`.
+- **CSRF:** send `X-authentik-CSRF` (read from the `authentik_csrf` cookie) on POSTs. Use `credentials: "same-origin"`. Authentik only checks it for a session that is already signed in, and its cookie has `Path=/auth/`, so the SPA at `/login` can't read it. So the sign-in and sign-up screens first ask `GET /auth/api/v3/core/users/me/`. If someone is still signed in to Authentik (the portal session ended first, or someone else used the browser), they show "You're signed in as … · Continue as … · Not you? Sign out" instead of the form. Sign out ends the portal session and then `GET`s the `default-invalidation-flow` executor, which runs its logout stage without a CSRF token.
+- **Stages answered for the user:** `ak-stage-user-login` is answered with `remember_me` (from "This is a shared computer" on StaffSignIn), so there's no extra screen. The SMS stage is sent the number typed on the sign-up form, and its code is sent as a number.
+- **Mobile numbers as usernames:** SignIn turns `077 318 4521`, `0773184521` or `+263 77 318 4521` into `263773184521` before sending it, the same way sign-up stores it.
 - **Usernames:** applicants' usernames are their E.164 number without `+` (e.g. `263773184521`), and students' are their student number. The identification stage matches username, email or UPN (design-handoff.md).
 
 ## 10.3 Authentik objects
@@ -93,10 +95,23 @@ Everything below is created by the blueprint in `infra/authentik/blueprints/tcfl
 
 | Flow | Purpose |
 |------|---------|
-| `tcfl-authentication` | Identification (email / username) → password → MFA validation (**required** for members of `portal-staff`, optional otherwise) → login |
-| `tcfl-enrollment` | Applicant sign-up: email, name, password (policy: 10+ characters, zxcvbn score ≥ 3) → **email verification** → optional **phone verification (SMS, verify-only)** → add to `portal-applicants` → login |
-| `tcfl-recovery` | Email link to reset the password |
+| `tcfl-authentication` | Identification (username or email) and password on one screen → MFA validation for anyone with a device → login (8 h; 14 days with "remember me") |
+| `tcfl-enrollment` | Applicant sign-up: name, mobile number (becomes the username), password twice (10+ characters, zxcvbn score ≥ 2) → write the user into `portal-applicants` → **phone check by SMS code** (verify-only; only when `SIGNUP_VERIFY_PHONE` is set) → login |
+| Password reset | Done by the portal, not a flow (below) |
 | `tcfl-invitation` | For imported students and staff: set a password from an invitation link |
+
+Both flows are in `infra/authentik/blueprints/tcfl-flows.yaml`.
+
+**Phone check on sign-up (`SIGNUP_VERIFY_PHONE`).** The SMS stage is bound to `tcfl-enrollment` with an expression policy, `tcfl-verify-phone-on`, which is true only when `SIGNUP_VERIFY_PHONE` is set in Authentik's environment. It is **off until an SMS provider is set up**: applicants go from the form straight into their application, and their number isn't checked. To turn it on, set `SIGNUP_VERIFY_PHONE=1` and restart the Authentik worker so the blueprint is applied again. The stage needs the user to exist, so the account is written before the number is checked. An abandoned sign-up leaves an applicant account whose number isn't verified.
+
+**SMS.** Authentik's *generic* SMS provider posts `{From, To, Body}` with a bearer token (`SMS_WEBHOOK_SECRET`) to the portal at `POST /api/internal/sms` (`PORTAL_SMS_WEBHOOK_URL`). This covers the sign-up code. The text joins `sms_outbox`, which the SMS worker sends once `SMS_PROVIDER` is set. In development there is no provider, and the API logs `SMS to +263…: <code>` instead.
+
+**Password reset by SMS code (design/ForgotPassword).** Students and applicants have phones, not reliable email, so the portal does this itself:
+- `POST /api/auth/reset/start {identifier}` takes a student number or mobile number. It texts a 6-digit code (valid 10 minutes, at most 3 codes an hour) and always answers `{minutes: 10}`, so the page can't be used to find accounts.
+- `POST /api/auth/reset/finish {identifier, code, password}` checks the code (keyed hash, 5 tries, used once), then sets the password with the Authentik admin API (`AUTHENTIK_API_URL`, `AUTHENTIK_API_TOKEN`). Authentik's password policy errors are shown as they come.
+- Staff reset through ICT Services or their TCFL email, as the design says.
+
+**Development accounts.** `uv run python -m app.authentik_dev` (in `api/`) creates or updates an Authentik user for every seeded portal user. It sets their groups and phone and the password `tcfl-dev-2027`, and links them. Rerun it after `app.seed`, or to put back passwords changed while testing. `/login/dev` still signs in as a sample account without Authentik while `DEV_LOGIN` is on.
 
 ## 10.4 Two layers of authorisation
 

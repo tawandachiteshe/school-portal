@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     session_encryption_key: str = ""  # base64, 32 bytes; derived from secret_key when empty (dev only)
     # Sign in as a seeded user without Authentik. Never enabled in production.
     dev_login: bool = True
+    # Authentik's generic SMS provider posts codes to /api/internal/sms with this bearer token.
+    sms_webhook_secret: str = "dev-sms-webhook-secret"
+    # Authentik admin API (docs/10 §10.4): the portal adds accepted applicants to portal-students
+    # and resets passwords after an SMS code. Development: the bootstrap token works.
+    authentik_api_url: str = "http://localhost:9000/auth/api/v3/"
+    authentik_api_token: str = ""
+    authentik_dev_password: str = "tcfl-dev-2027"  # app/authentik_dev.py
 
     s3_endpoint: str = "http://localhost:8333"
     s3_access_key: str = ""
