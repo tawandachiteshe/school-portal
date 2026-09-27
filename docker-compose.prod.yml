@@ -1,9 +1,15 @@
 # Production stack for Dokploy (Compose deployment, compose path: docker-compose.prod.yml).
-# No host ports: Dokploy's Traefik routes the portal domain to the services (docs/06 §6.7):
-#   https://portal.tcfl.ac.zw/        → web:80
-#   https://portal.tcfl.ac.zw/api     → api:8000            (strip path prefix: on)
-#   https://portal.tcfl.ac.zw/auth    → authentik-server:9000 (strip path prefix: off)
-# Environment variables are set in Dokploy's Environment tab (template: .env.example).
+# No host ports. Routing is in the Traefik labels below (Dokploy's Traefik reads them from
+# containers on dokploy-network), so there's nothing to add in Dokploy's Domains tab:
+#   https://${APP_HOST}/       → web:80
+#   https://${APP_HOST}/api    → api:8000              (/api stripped)
+#   https://${APP_HOST}/auth   → authentik-server:9000 (Authentik serves under /auth/)
+#   https://${ID_HOST}/        → authentik-server:9000 (the admin console; / goes to /auth/if/admin/)
+# Environment variables are set in Dokploy's Environment tab (template: .env.production.example).
+# Stops the deploy with a clear message when the hosts aren't set (Compose checks extension fields too).
+x-required-hosts:
+  - "${APP_HOST:?APP_HOST is missing - paste .env.production into Dokploy's Environment tab}"
+  - "${ID_HOST:?ID_HOST is missing - paste .env.production into Dokploy's Environment tab}"
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -49,6 +55,21 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }
     restart: unless-stopped
+    networks: [default, dokploy-network]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.tcfl-api.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tcfl-api.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-api.service=tcfl-api"
+      - "traefik.http.services.tcfl-api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.tcfl-api-http.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tcfl-api-http.entrypoints=web"
+      - "traefik.http.routers.tcfl-api-http.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.tcfl-api-http.service=tcfl-api"
+      - "traefik.http.routers.tcfl-api.middlewares=tcfl-api-strip"
+      - "traefik.http.middlewares.tcfl-api-strip.stripprefix.prefixes=/api"
 
   # Background jobs: scheduled announcements, SMS (app/worker.py). One instance: it also runs beat.
   worker:
@@ -63,6 +84,19 @@ services:
   web:
     build: { context: ./web, target: prod }
     restart: unless-stopped
+    networks: [default, dokploy-network]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.tcfl-web.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.tcfl-web.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-web.service=tcfl-web"
+      - "traefik.http.services.tcfl-web.loadbalancer.server.port=80"
+      - "traefik.http.routers.tcfl-web-http.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.tcfl-web-http.entrypoints=web"
+      - "traefik.http.routers.tcfl-web-http.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.tcfl-web-http.service=tcfl-web"
 
   authentik-db:
     image: postgres:16-alpine
@@ -91,6 +125,30 @@ services:
     shm_size: 512mb
     depends_on: { authentik-db: { condition: service_healthy } }
     restart: unless-stopped
+    networks: [default, dokploy-network]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.tcfl-auth.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
+      - "traefik.http.routers.tcfl-auth.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-auth.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-auth.service=tcfl-auth"
+      - "traefik.http.services.tcfl-auth.loadbalancer.server.port=9000"
+      - "traefik.http.routers.tcfl-auth-http.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
+      - "traefik.http.routers.tcfl-auth-http.entrypoints=web"
+      - "traefik.http.routers.tcfl-auth-http.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.tcfl-auth-http.service=tcfl-auth"
+      - "traefik.http.routers.tcfl-id.rule=Host(`${ID_HOST}`)"
+      - "traefik.http.routers.tcfl-id.entrypoints=websecure"
+      - "traefik.http.routers.tcfl-id.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-id.service=tcfl-auth"
+      - "traefik.http.routers.tcfl-id.middlewares=tcfl-id-admin"
+      - "traefik.http.middlewares.tcfl-id-admin.redirectregex.regex=^https://[^/]+/$$"
+      - "traefik.http.middlewares.tcfl-id-admin.redirectregex.replacement=https://${ID_HOST}/auth/if/admin/"
+      - "traefik.http.routers.tcfl-id-http.rule=Host(`${ID_HOST}`)"
+      - "traefik.http.routers.tcfl-id-http.entrypoints=web"
+      - "traefik.http.routers.tcfl-id-http.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.tcfl-id-http.service=tcfl-auth"
 
   authentik-worker:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}
@@ -106,3 +164,8 @@ services:
     restart: unless-stopped
 
 volumes: { pgdata: {}, s3data: {}, authentik-db: {}, authentik-data: {} }
+
+# Dokploy's Traefik network (created by Dokploy on the server).
+networks:
+  dokploy-network:
+    external: true

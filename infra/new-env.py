@@ -2,7 +2,9 @@
 """Fill .env.production.example for a domain, with a fresh random value for every secret.
 
     python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production
-    python3 infra/new-env.py --demo https://tcfl.example.com > .env.production   # pitch site
+    python3 infra/new-env.py --demo https://tcfl.example.com id.example.com > .env.production   # pitch site
+
+The second, optional argument is the host for Authentik's admin console (default id.<app host>).
 
 --demo: sample data allowed (DEMO=true), student portal shown, and an Authentik admin token made on
 first start (AUTHENTIK_BOOTSTRAP_TOKEN), which the API uses to create the sample accounts' sign-ins.
@@ -18,11 +20,14 @@ from pathlib import Path
 args = sys.argv[1:]
 demo = "--demo" in args
 args = [a for a in args if a != "--demo"]
-if len(args) != 1 or not args[0].startswith("https://"):
-    sys.exit("usage: new-env.py [--demo] https://portal.example.ac.zw")
+if len(args) not in (1, 2) or not args[0].startswith("https://"):
+    sys.exit("usage: new-env.py [--demo] https://portal.example.ac.zw [id.example.ac.zw]")
 origin = args[0].rstrip("/")
+app_host = origin.removeprefix("https://")
+id_host = args[1] if len(args) == 2 else f"id.{app_host}"
 text = (Path(__file__).resolve().parent.parent / ".env.production.example").read_text()
-text = text.replace("https://portal.tcfl.ac.zw", origin)
+text = text.replace("ID_HOST=id.portal.tcfl.ac.zw", f"ID_HOST={id_host}")
+text = text.replace("https://portal.tcfl.ac.zw", origin).replace("APP_HOST=portal.tcfl.ac.zw", f"APP_HOST={app_host}")
 
 
 def token(n: int = 36) -> str:

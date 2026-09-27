@@ -132,13 +132,14 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 2. **DNS:** point the portal's domain (for example `portal.tcfl.ac.zw`) at the server.
 3. **Environment:** on your own machine, run `python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production`. It fills [.env.production.example](../.env.production.example) with a fresh random value for every secret. Keep the file out of git and somewhere safe (a password manager): it's needed to restore backups.
 4. **Create the application:** in Dokploy, **Create → Compose**, choose the git repository and branch `main`, set **Compose path** to `docker-compose.prod.yml`, and paste `.env.production` into the **Environment** tab.
-5. **Domains** (Domains tab), all on the portal's host, HTTPS with Let's Encrypt:
+5. **Routing** is in the Traefik labels in `docker-compose.prod.yml`, from `APP_HOST` and `ID_HOST`: nothing to add in Dokploy's **Domains** tab (remove any domains added there, or Traefik gets two routes for one host). Certificates come from Dokploy's `letsencrypt` resolver, and plain http redirects to https. The web, api and authentik-server containers join Dokploy's `dokploy-network`.
 
-   | Service | Port | Path | Strip path |
-   |---------|------|------|------------|
-   | `web` | 80 | `/` | off |
-   | `api` | 8000 | `/api` | **on** |
-   | `authentik-server` | 9000 | `/auth` | **off** (Authentik expects the `/auth/` prefix) |
+   | Address | Goes to |
+   |---------|---------|
+   | `https://APP_HOST/` | `web` (port 80) |
+   | `https://APP_HOST/api` | `api` (port 8000), `/api` stripped |
+   | `https://APP_HOST/auth` | `authentik-server` (port 9000), kept (Authentik expects `/auth/`) |
+   | `https://ID_HOST/` | `authentik-server`; `/` goes to the admin console `/auth/if/admin/` |
 
 6. **Restrict Authentik's admin:** add a Traefik `ipAllowList` middleware (staff LAN/VPN ranges) for `PathPrefix(/auth/if/admin)` and `PathPrefix(/auth/api/v3/admin)`, through Dokploy's advanced Traefik settings or labels on `authentik-server`.
 7. **Deploy.** The API runs migrations and creates its storage buckets every time it starts. Authentik applies the blueprints in `infra/authentik/blueprints/` (groups, the portal's OIDC client, the sign-in and sign-up flows) within a minute or two.
@@ -159,7 +160,7 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 
 **A pitch or training site** (sample data, not real applicants):
 - Environment: `python3 infra/new-env.py --demo https://tcfl.example.com > .env.production`. It sets `DEMO=true` (allows the sample data on a production server), `STUDENT_PORTAL_OPEN=true`, and an Authentik admin token made on first start (`AUTHENTIK_BOOTSTRAP_TOKEN`, also used as `AUTHENTIK_API_TOKEN`).
-- Domains: the three routes of step 5 on the app's host. Authentik can have a second host of its own for the admin console, for example `id.example.com` → `authentik-server`, port 9000, path `/`, strip off. It's still served under `/auth/`: the admin is at `https://id.example.com/auth/if/admin/`. The app keeps using `/auth` on its own host, which the portal's sign-in screens need.
+- Hosts: `new-env.py --demo https://tcfl.example.com id.example.com` sets `APP_HOST` and `ID_HOST`; the labels route both (step 5). The admin console is at `https://id.example.com/` (it goes to `/auth/if/admin/`). The app keeps using `/auth` on its own host, which the portal's sign-in screens need.
 - After deploying, in the `api` terminal: `python -m app.seed`, then `python -m app.authentik_dev` (every persona's password is `tcfl-dev-2027`; [11-test-personas.md](11-test-personas.md)). Run both again to reset the site after a demo.
 - The one-click sign-in page (`/login/dev`) stays off: it's never on in production.
 
