@@ -49,6 +49,10 @@ class LibraryLoan(Base):
     fine_amount: Mapped[float] = mapped_column(Numeric(10, 2), server_default="0")
     fine_currency: Mapped[str] = mapped_column(String(3), server_default="USD")
     fine_paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_reminder_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_reminder_channel: Mapped[str | None] = mapped_column(Text)
+    issued_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    returned_to: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
 
     copy: Mapped[LibraryCopy] = relationship(lazy="joined")
     person: Mapped["Person"] = relationship()  # noqa: F821

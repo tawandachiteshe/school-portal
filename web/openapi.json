@@ -1660,6 +1660,342 @@
           }
         }
       }
+    },
+    "/staff/library/today": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Desk Today",
+        "operationId": "desk_today",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeskToday"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/borrowers/{number}": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Find Borrower",
+        "operationId": "find_borrower",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Borrower"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/copies/{barcode}": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Find Copy",
+        "operationId": "find_copy",
+        "parameters": [
+          {
+            "name": "barcode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Barcode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeskCopy"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/loans": {
+      "post": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Issue Book",
+        "operationId": "issue_book",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Issued"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/returns": {
+      "post": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Return Book",
+        "operationId": "return_book",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Returned"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/loans/{loan_id}/renew": {
+      "post": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Desk Renew",
+        "operationId": "desk_renew",
+        "parameters": [
+          {
+            "name": "loan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Loan Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenewedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/overdue": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Overdue",
+        "operationId": "overdue",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverdueList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/overdue.csv": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Overdue Csv",
+        "operationId": "overdue_csv",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/overdue/remind": {
+      "post": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Remind",
+        "operationId": "remind",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemindIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reminded"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/library/reservations": {
+      "get": {
+        "tags": [
+          "library desk"
+        ],
+        "summary": "Reservations",
+        "operationId": "reservations",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeskReservation"
+                  },
+                  "type": "array",
+                  "title": "Response Reservations"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2166,6 +2502,80 @@
           "reservation"
         ],
         "title": "Book"
+      },
+      "Borrower": {
+        "properties": {
+          "person_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Person Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "initials": {
+            "type": "string",
+            "title": "Initials"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "programme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Programme"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/DeskLoan"
+            },
+            "type": "array",
+            "title": "Loans"
+          },
+          "held": {
+            "items": {
+              "$ref": "#/components/schemas/HeldBook"
+            },
+            "type": "array",
+            "title": "Held"
+          },
+          "overdue": {
+            "type": "integer",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "person_id",
+          "name",
+          "initials",
+          "number",
+          "programme",
+          "class_group",
+          "loans",
+          "held",
+          "overdue"
+        ],
+        "title": "Borrower"
       },
       "Card": {
         "properties": {
@@ -2736,6 +3146,283 @@
         ],
         "title": "Deadlines"
       },
+      "DeskCopy": {
+        "properties": {
+          "copy_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Copy Id"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "on_loan_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On Loan To"
+          },
+          "held_for_person_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held For Person Id"
+          },
+          "held_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held For"
+          }
+        },
+        "type": "object",
+        "required": [
+          "copy_id",
+          "barcode",
+          "title",
+          "authors",
+          "edition",
+          "call_number",
+          "status",
+          "on_loan_to",
+          "held_for_person_id",
+          "held_for"
+        ],
+        "title": "DeskCopy"
+      },
+      "DeskLoan": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "days_late": {
+            "type": "integer",
+            "title": "Days Late"
+          },
+          "renewals_left": {
+            "type": "integer",
+            "title": "Renewals Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "author",
+          "barcode",
+          "due_at",
+          "days_late",
+          "renewals_left"
+        ],
+        "title": "DeskLoan"
+      },
+      "DeskReservation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "collect_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collect By"
+          },
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Barcode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "name",
+          "number",
+          "status",
+          "created_at",
+          "collect_by",
+          "barcode"
+        ],
+        "title": "DeskReservation"
+      },
+      "DeskToday": {
+        "properties": {
+          "closes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes"
+          },
+          "issued_today": {
+            "type": "integer",
+            "title": "Issued Today"
+          },
+          "returned_today": {
+            "type": "integer",
+            "title": "Returned Today"
+          },
+          "overdue": {
+            "type": "integer",
+            "title": "Overdue"
+          },
+          "reservations_waiting": {
+            "type": "integer",
+            "title": "Reservations Waiting"
+          },
+          "reservations_ready": {
+            "type": "integer",
+            "title": "Reservations Ready"
+          },
+          "loan_days": {
+            "type": "integer",
+            "title": "Loan Days"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          }
+        },
+        "type": "object",
+        "required": [
+          "closes",
+          "issued_today",
+          "returned_today",
+          "overdue",
+          "reservations_waiting",
+          "reservations_ready",
+          "loan_days",
+          "location"
+        ],
+        "title": "DeskToday"
+      },
       "DevAccount": {
         "properties": {
           "username": {
@@ -2910,6 +3597,50 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HeldBook": {
+        "properties": {
+          "reservation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Reservation Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Barcode"
+          },
+          "collect_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collect By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reservation_id",
+          "title",
+          "barcode",
+          "collect_by"
+        ],
+        "title": "HeldBook"
+      },
       "Hours": {
         "properties": {
           "opens": {
@@ -2927,6 +3658,60 @@
           "closes"
         ],
         "title": "Hours"
+      },
+      "IssueIn": {
+        "properties": {
+          "person_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Person Id"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "allow_with_overdue": {
+            "type": "boolean",
+            "title": "Allow With Overdue",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "person_id",
+          "barcode"
+        ],
+        "title": "IssueIn"
+      },
+      "Issued": {
+        "properties": {
+          "loan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Loan Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "sms_queued": {
+            "type": "boolean",
+            "title": "Sms Queued"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loan_id",
+          "title",
+          "due_at",
+          "sms_queued"
+        ],
+        "title": "Issued"
       },
       "Lecturer": {
         "properties": {
@@ -4213,6 +4998,133 @@
         ],
         "title": "Notice"
       },
+      "OverdueList": {
+        "properties": {
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/OverdueLoan"
+            },
+            "type": "array",
+            "title": "Loans"
+          },
+          "borrowers": {
+            "type": "integer",
+            "title": "Borrowers"
+          },
+          "longest": {
+            "type": "integer",
+            "title": "Longest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loans",
+          "borrowers",
+          "longest"
+        ],
+        "title": "OverdueList"
+      },
+      "OverdueLoan": {
+        "properties": {
+          "loan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Loan Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "class_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Group"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "days_late": {
+            "type": "integer",
+            "title": "Days Late"
+          },
+          "last_reminder_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reminder At"
+          },
+          "last_reminder_channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reminder Channel"
+          },
+          "has_phone": {
+            "type": "boolean",
+            "title": "Has Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loan_id",
+          "name",
+          "number",
+          "class_group",
+          "title",
+          "author",
+          "due_at",
+          "days_late",
+          "last_reminder_at",
+          "last_reminder_channel",
+          "has_phone"
+        ],
+        "title": "OverdueLoan"
+      },
       "Overview": {
         "properties": {
           "greeting_name": {
@@ -4506,6 +5418,48 @@
         ],
         "title": "RemarkIn"
       },
+      "RemindIn": {
+        "properties": {
+          "loan_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Loan Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loan_ids"
+        ],
+        "title": "RemindIn"
+      },
+      "Reminded": {
+        "properties": {
+          "reminded": {
+            "type": "integer",
+            "title": "Reminded"
+          },
+          "sms_queued": {
+            "type": "integer",
+            "title": "Sms Queued"
+          },
+          "no_phone": {
+            "type": "integer",
+            "title": "No Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reminded",
+          "sms_queued",
+          "no_phone"
+        ],
+        "title": "Reminded"
+      },
       "RenewOut": {
         "properties": {
           "id": {
@@ -4530,6 +5484,25 @@
           "renewals_left"
         ],
         "title": "RenewOut"
+      },
+      "RenewedOut": {
+        "properties": {
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "renewals_left": {
+            "type": "integer",
+            "title": "Renewals Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "due_at",
+          "renewals_left"
+        ],
+        "title": "RenewedOut"
       },
       "ReservationOut": {
         "properties": {
@@ -4759,6 +5732,54 @@
           "published"
         ],
         "title": "ResultsStatus"
+      },
+      "ReturnIn": {
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "title": "ReturnIn"
+      },
+      "Returned": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "borrower": {
+            "type": "string",
+            "title": "Borrower"
+          },
+          "days_late": {
+            "type": "integer",
+            "title": "Days Late"
+          },
+          "hold_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hold For"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "borrower",
+          "days_late",
+          "hold_for"
+        ],
+        "title": "Returned"
       },
       "Role": {
         "type": "string",

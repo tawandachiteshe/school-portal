@@ -17,6 +17,7 @@ import type { ReactNode } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { useOverview } from '@/api/generated/teaching/teaching'
+import { useDeskToday } from '@/api/generated/library-desk/library-desk'
 import { homeFor, useMe, useSignOut, type Role } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { Initials, Wordmark } from './wordmark'
@@ -95,11 +96,24 @@ function useLecturerNav(enabled: boolean) {
   return { counts, classes }
 }
 
+// Librarians: open overdue loans and reservations waiting on the desk (design/LibraryOverdue).
+function useLibrarianCounts(enabled: boolean): Record<string, number> {
+  const { data } = useDeskToday({ query: { enabled, staleTime: 60_000 } })
+  return data
+    ? {
+        '/staff/library/overdue': data.overdue,
+        '/staff/library/reservations': data.reservations_waiting + data.reservations_ready,
+      }
+    : {}
+}
+
 export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
   const { data: me } = useMe()
   const signOut = useSignOut()
   const lecturer = !!me?.roles.includes('lecturer')
-  const { counts, classes } = useLecturerNav(lecturer)
+  const { counts: lecturerCounts, classes } = useLecturerNav(lecturer)
+  const libraryCounts = useLibrarianCounts(!!me?.roles.includes('librarian'))
+  const counts = { ...lecturerCounts, ...libraryCounts }
   if (!me) return null
   return (
     <div className="flex min-h-dvh bg-background">

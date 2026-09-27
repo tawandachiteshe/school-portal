@@ -92,7 +92,7 @@ class Person(Base):
     photo_object_key: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at()
 
-    user: Mapped[User | None] = relationship(back_populates="person")
+    user: Mapped[User | None] = relationship(back_populates="person", lazy="selectin")
 
     @property
     def given_name(self) -> str:
@@ -135,3 +135,17 @@ class Notification(Base):
     dedupe_key: Mapped[str | None] = mapped_column(Text)
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
+
+
+class NotificationDelivery(Base):
+    __tablename__ = "notification_deliveries"
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    notification_id: Mapped[int] = mapped_column(ForeignKey("notifications.id", ondelete="CASCADE"))
+    channel: Mapped[str] = mapped_column(pg_enum("notif_channel", "in_app", "push", "email", "sms"))
+    status: Mapped[str] = mapped_column(Text)  # queued | sent | failed
+    provider_ref: Mapped[str | None] = mapped_column(Text)
+    error: Mapped[str | None] = mapped_column(Text)
+    attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    notification: Mapped[Notification] = relationship()

@@ -20,7 +20,15 @@ from app.models.content import (
     MaterialDownload,
 )
 from app.models.finance import FeeDueDate, FeeTransaction, RemarkRequest
-from app.models.identity import Notification, NotificationPreference, Person, User, UserRole, WebSession
+from app.models.identity import (
+    Notification,
+    NotificationDelivery,
+    NotificationPreference,
+    Person,
+    User,
+    UserRole,
+    WebSession,
+)
 from app.models.library import LibraryCopy, LibraryItem, LibraryLoan, LibraryReservation, ReadingListItem
 from app.models.people import Staff, Student
 from app.models.teaching import (
@@ -60,6 +68,7 @@ __all__ = [
     "ModuleOffering",
     "ModuleResult",
     "Notification",
+    "NotificationDelivery",
     "NotificationPreference",
     "OfferingLecturer",
     "Person",

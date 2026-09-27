@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import deadlines, library, me, modules, records, student, teaching
+from app.api import deadlines, library, library_desk, me, modules, records, student, teaching
 from app.auth import routes as auth_routes
 from app.auth.csrf import CSRFMiddleware
 from app.config import get_settings
@@ -32,6 +32,7 @@ def create_app() -> FastAPI:
     app.include_router(deadlines.router)
     app.include_router(records.router)
     app.include_router(teaching.router)
+    app.include_router(library_desk.router)
     return app
 
 

@@ -103,6 +103,7 @@ class Seeder:
         self.today = today
         self._reads: list[Announcement] = []
         self.materials_by: dict[tuple[str, str], CourseMaterial] = {}
+        self.pending_loans: list[tuple[LibraryCopy, str, int]] = []  # (copy, student number, days late)
 
     def user(self, username: str, *, surname: str, first_names: str, roles: list[str], **kw) -> Person:
         u = User(
@@ -485,6 +486,39 @@ class Seeder:
                     submitted_at=now - timedelta(days=10, hours=i % 7),
                     mark=(9 + (i * 7) % 12) if marked else None,
                     marked_at=now - timedelta(days=1) if marked else None,
+                )
+            )
+
+        # design/LibraryOverdue: two second-years with long-overdue books (reminded by SMS a week ago).
+        year2 = []
+        for number, surname, first, programme, group, phone in (
+            ("TCFL/2026/0388", "Gumbo", "Tapiwa", dte, "DTE-2A", "+263772210388"),
+            ("TCFL/2026/0214", "Chikwanha", "Blessing", dit, "DIT-2B", "+263712660214"),
+        ):
+            p = self.person_user(number, surname, first)
+            p.user.phone = phone
+            st = Student(
+                person=p,
+                student_number=number,
+                programme=programme,
+                intake=intake,
+                class_group=group,
+                current_term_number=3,
+            )
+            self.db.add(st)
+            year2.append(st)
+        await self.db.flush()
+        by_number = {st.student_number: st.person for st in [*dit_students, *dte_students, *year2]}
+        for copy, number, days in self.pending_loans:
+            reminded = number.startswith("TCFL/2026")
+            self.db.add(
+                LibraryLoan(
+                    copy=copy,
+                    person=by_number[number],
+                    borrowed_at=now - timedelta(days=14 + days),
+                    due_at=now - timedelta(days=days),
+                    last_reminder_at=now - timedelta(days=days - 7) if reminded else None,
+                    last_reminder_channel="sms" if reminded else None,
                 )
             )
 
@@ -897,7 +931,7 @@ class Seeder:
             "7th edition",
             2013,
             "510 STR",
-            {"TCFL-B-001873": "tariro"},
+            {"TCFL-B-001873": "tariro", "TCFL-B-001874": "late:TCFL/2027/0130:2"},
         ),
         (
             "forouzan",
@@ -906,7 +940,7 @@ class Seeder:
             "5th edition",
             2012,
             "004.6 FOR",
-            {"TCFL-B-003390": "tariro", "TCFL-B-003391": "other"},
+            {"TCFL-B-003390": "tariro", "TCFL-B-003391": "late:TCFL/2027/0147:1"},
         ),
         (
             "tanenbaum",
@@ -915,7 +949,7 @@ class Seeder:
             "5th edition",
             2011,
             "004.6 TAN",
-            {"TCFL-B-002214": "held", "TCFL-B-002215": "other"},
+            {"TCFL-B-004512": "held", "TCFL-B-002215": "late:TCFL/2027/0126:6"},
         ),
         (
             "stallings",
@@ -989,6 +1023,34 @@ class Seeder:
             "510 BIR",
             {"TCFL-B-001902": None, "TCFL-B-001903": "other"},
         ),
+        # design/LibraryOverdue: books out with other students
+        (
+            "kochan",
+            "Programming in C",
+            ["S. G. Kochan"],
+            "4th edition",
+            2014,
+            "005.133 KOC",
+            {"TCFL-B-001410": "late:TCFL/2027/0111:8"},
+        ),
+        (
+            "floyd",
+            "Digital Electronics",
+            ["T. L. Floyd"],
+            "11th edition",
+            2015,
+            "621.381 FLO",
+            {"TCFL-B-002630": "late:TCFL/2026/0388:17"},
+        ),
+        (
+            "connolly",
+            "Database Systems",
+            ["T. Connolly", "C. Begg"],
+            "6th edition",
+            2014,
+            "005.74 CON",
+            {"TCFL-B-003020": "late:TCFL/2026/0214:14"},
+        ),
         (
             "stroud-adv",
             "Advanced Engineering Mathematics",
@@ -1022,8 +1084,11 @@ class Seeder:
             for barcode, holder in copies.items():
                 copy = LibraryCopy(item=item, barcode=barcode, location=f"Block A · shelf {call}")
                 self.db.add(copy)
-                if holder in ("tariro", "other"):
+                if holder in ("tariro", "other") or (holder or "").startswith("late:"):
                     copy.status = "on_loan"
+                if (holder or "").startswith("late:"):
+                    _, number, days = holder.split(":")
+                    self.pending_loans.append((copy, number, int(days)))
                 if holder == "tariro" and key == "stroud":  # overdue (design: "Overdue since Mon 8 Mar")
                     self.db.add(
                         LibraryLoan(

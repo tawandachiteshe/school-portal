@@ -1,6 +1,7 @@
 export * from './auth/auth';
 export * from './deadlines/deadlines';
 export * from './library/library';
+export * from './library-desk/library-desk';
 export * from './me/me';
 export * from './modules/modules';
 export * from './ops/ops';

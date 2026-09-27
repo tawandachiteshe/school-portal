@@ -6,6 +6,9 @@ import DevSignIn from '@/pages/auth/DevSignIn'
 import Foundations from '@/pages/Foundations'
 import NotFound from '@/pages/NotFound'
 import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
+import LibraryDesk from '@/pages/staff/library/Desk'
+import LibraryOverdue from '@/pages/staff/library/Overdue'
+import LibraryReservations from '@/pages/staff/library/Reservations'
 import ClassPage from '@/pages/staff/teaching/ClassPage'
 import Marking from '@/pages/staff/teaching/Marking'
 import Marks from '@/pages/staff/teaching/Marks'
@@ -87,9 +90,9 @@ export const router = createBrowserRouter([
       { path: 'teaching/marking', element: <Marking /> },
       { path: 'teaching/assessments/:id/marks', element: <Marks /> },
       { path: 'teaching/classes/:id', element: <ClassPage /> },
-      { path: 'library', element: <StaffPlaceholder context="Library" title="Issue and return" /> },
-      { path: 'library/overdue', element: <StaffPlaceholder context="Library" title="Overdue" /> },
-      { path: 'library/reservations', element: <StaffPlaceholder context="Library" title="Reservations" /> },
+      { path: 'library', element: <LibraryDesk /> },
+      { path: 'library/overdue', element: <LibraryOverdue /> },
+      { path: 'library/reservations', element: <LibraryReservations /> },
       { path: 'library/catalogue', element: <StaffPlaceholder context="Library" title="Catalogue" /> },
       { path: 'library/reading-lists', element: <StaffPlaceholder context="Library" title="Reading lists" /> },
       { path: 'announcements', element: <StaffPlaceholder context="College" title="Announcements" /> },
