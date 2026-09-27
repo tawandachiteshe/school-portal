@@ -33,6 +33,7 @@ export function homeFor(me: Me): string {
   if (r.has('lecturer')) return '/staff/teaching'
   if (r.has('librarian')) return '/staff/library'
   if (r.has('student_affairs')) return '/staff/announcements'
+  if (r.has('accounts')) return '/staff/accounts/payments'
   if (r.has('applicant')) return '/apply'
   return '/staff'
 }

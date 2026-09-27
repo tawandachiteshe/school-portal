@@ -16,7 +16,7 @@ import BirthCertificate from '@/pages/apply/birth/BirthCertificate'
 import { HandoffBirth, HandoffId, HandoffLanding, HandoffMismatch, HandoffResults } from '@/pages/apply/id/Handoff'
 import ApplyResults from '@/pages/apply/results/Results'
 import NationalId from '@/pages/apply/id/NationalId'
-import AdmissionsPayments from '@/pages/staff/admissions/Payments'
+import AccountsPayments from '@/pages/staff/accounts/Payments'
 import AdmissionsQueue from '@/pages/staff/admissions/Queue'
 import AdmissionsReview from '@/pages/staff/admissions/Review'
 import AnnouncementCompose from '@/pages/staff/announcements/Compose'
@@ -120,15 +120,15 @@ export const router = createBrowserRouter([
   {
     path: '/staff',
     element: (
-      <RequireAuth roles={['lecturer', 'admissions', 'registry', 'librarian', 'admin', 'student_affairs']}>
+      <RequireAuth roles={['lecturer', 'admissions', 'registry', 'librarian', 'admin', 'student_affairs', 'accounts']}>
         <StaffShell />
       </RequireAuth>
     ),
     children: [
       { index: true, element: <StaffIndex /> },
+      { path: 'accounts/payments', element: <AccountsPayments /> },
       { path: 'admissions', element: <AdmissionsQueue /> },
       { path: 'admissions/decided', element: <AdmissionsQueue decided /> },
-      { path: 'admissions/payments', element: <AdmissionsPayments /> },
       { path: 'admissions/places', element: <StaffPlaceholder context="Admissions" title="Intake places" /> },
       { path: 'admissions/:reference', element: <AdmissionsReview /> },
       { path: 'teaching', element: <LecturerToday /> },

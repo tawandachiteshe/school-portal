@@ -85,6 +85,7 @@ Everything below is created by the blueprint in `infra/authentik/blueprints/tcfl
 | `portal-admissions` | `admissions` | ICT in Authentik |
 | `portal-registry` | `registry` | ICT in Authentik |
 | `portal-librarians` | `librarian` | ICT in Authentik |
+| `portal-accounts` | `accounts` | ICT in Authentik. Confirms bank and cash application fees |
 | `portal-admins` | `admin` | ICT in Authentik (small group, MFA required) |
 | `portal-staff` | (none) | Parent group of all staff groups, used by the MFA policy |
 

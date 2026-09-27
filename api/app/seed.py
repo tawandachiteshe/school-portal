@@ -64,6 +64,7 @@ GROUPS = {
     "librarian": "portal-librarians",
     "admin": "portal-admins",
     "student_affairs": "portal-student-affairs",
+    "accounts": "portal-accounts",
 }
 
 # Tables the seed owns; truncated (with CASCADE) before re-seeding.
@@ -267,6 +268,10 @@ class Seeder:
             ["librarian"],
             position="Librarian · Block A desk",
             office="Block A",
+        )
+        # Accounts: confirms bank and cash application fees. Not in the designs; a placeholder name.
+        self.staff(
+            "nmapfumo", "TCFL-S-0104", None, "Nyasha", "Mapfumo", ["accounts"], position="Accounts officer"
         )
         mushonga = self.staff(
             "tmushonga",

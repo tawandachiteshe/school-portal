@@ -94,12 +94,14 @@ async def test_cash_waits_for_admissions_to_confirm():
         a = (await c.get("/apply/application")).json()
         assert a["payment_waiting"] and a["status"] == "draft"
         ref = a["reference"]
-    async with signed_in("cmarufu") as c:
-        rows = (await c.get("/staff/admissions/payments")).json()
+    async with signed_in("cmarufu") as c:  # Admissions don't handle money
+        assert (await c.get("/staff/accounts/payments")).status_code == 403
+    async with signed_in("nmapfumo") as c:
+        rows = (await c.get("/staff/accounts/payments")).json()
         mine = next(r for r in rows if r["reference"] == ref)
         assert mine["method"] == "cash" and mine["amount"] == "20.00"
         rows = (
-            await c.post(f"/staff/admissions/payments/{mine['id']}/confirm", json={"receipt": "AO-1042"})
+            await c.post(f"/staff/accounts/payments/{mine['id']}/confirm", json={"receipt": "AO-1042"})
         ).json()
         assert all(r["reference"] != ref for r in rows)
     async with signed_in(NEW) as c:

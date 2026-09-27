@@ -9,12 +9,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
 import type { PaymentToConfirm } from '@/api/generated/model'
 import {
-  getDocumentFileUrl,
+  getPaymentProofUrl,
   getPaymentsToConfirmQueryKey,
   useConfirmPayment,
   usePaymentsToConfirm,
   useRejectPayment,
-} from '@/api/generated/admissions/admissions'
+} from '@/api/generated/accounts/accounts'
 import { ApiError } from '@/lib/api'
 import { formatLongDate, shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -22,7 +22,7 @@ import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
 const METHOD = { cash: 'Cash', bank: 'Bank transfer', ecocash: 'EcoCash', onemoney: 'OneMoney' } as const
 
-// No design: bank transfers and cash the applicant says they've paid, for Accounts/Admissions to
+// No design: bank transfers and cash the applicant says they've paid, for Accounts to
 // match against the bank statement or the cash book (design/PayOffice "once Accounts confirm").
 export default function Payments() {
   const qc = useQueryClient()
@@ -43,7 +43,7 @@ export default function Payments() {
   const now = new Date()
   return (
     <>
-      <StaffTopBar left="Admissions · application fees" />
+      <StaffTopBar left="Accounts · application fees" />
       <main className="flex flex-col gap-4 px-8 py-6">
         <div>
           <h1 className={staffH1}>Payments to confirm</h1>
@@ -85,7 +85,7 @@ export default function Payments() {
                   </td>
                   <td className={td}>
                     {p.proof_document_id ? (
-                      <a href={`/api${getDocumentFileUrl(p.proof_document_id)}`} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                      <a href={`/api${getPaymentProofUrl(p.id)}`} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
                         Open
                       </a>
                     ) : (

@@ -18,7 +18,8 @@ import type { ReactNode } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { useOverview } from '@/api/generated/teaching/teaching'
-import { usePaymentsToConfirm, useQueueSummary } from '@/api/generated/admissions/admissions'
+import { usePaymentsToConfirm } from '@/api/generated/accounts/accounts'
+import { useQueueSummary } from '@/api/generated/admissions/admissions'
 import { useDeskToday } from '@/api/generated/library-desk/library-desk'
 import { homeFor, useMe, useSignOut, type Role } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -38,7 +39,6 @@ const NAV: Partial<Record<Role, Group[]>> = {
       items: [
         { to: '/staff/admissions', label: 'Applications', icon: Inbox, end: true },
         { to: '/staff/admissions/decided', label: 'Decisions sent', icon: Check },
-        { to: '/staff/admissions/payments', label: 'Payments to confirm', icon: Banknote },
         { to: '/staff/admissions/places', label: 'Intake places', icon: CalendarDays },
       ],
     },
@@ -65,6 +65,13 @@ const NAV: Partial<Record<Role, Group[]>> = {
         { to: '/staff/library/reading-lists', label: 'Reading lists', icon: FileText },
       ],
     },
+  ],
+  accounts: [
+    {
+      title: 'Accounts',
+      items: [{ to: '/staff/accounts/payments', label: 'Payments to confirm', icon: Banknote }],
+    },
+    { title: 'College', items: [announcements] },
   ],
   student_affairs: [
     {
@@ -113,11 +120,13 @@ function useLibrarianCounts(enabled: boolean): Record<string, number> {
 // Admissions: open applications and decisions sent (design/StaffQueue "Applications 52").
 function useAdmissionsCounts(enabled: boolean): Record<string, number> {
   const { data } = useQueueSummary({ query: { enabled, staleTime: 60_000 } })
-  const { data: pay } = usePaymentsToConfirm({ query: { enabled, staleTime: 60_000 } })
-  return {
-    ...(data ? { '/staff/admissions': data.open, '/staff/admissions/decided': data.decided } : {}),
-    ...(pay ? { '/staff/admissions/payments': pay.length } : {}),
-  }
+  return data ? { '/staff/admissions': data.open, '/staff/admissions/decided': data.decided } : {}
+}
+
+// Accounts: bank and cash application fees waiting to be matched.
+function useAccountsCounts(enabled: boolean): Record<string, number> {
+  const { data } = usePaymentsToConfirm({ query: { enabled, staleTime: 60_000 } })
+  return data ? { '/staff/accounts/payments': data.length } : {}
 }
 
 export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
@@ -127,7 +136,8 @@ export function StaffShell({ extraNav }: { extraNav?: ReactNode }) {
   const { counts: lecturerCounts, classes } = useLecturerNav(lecturer)
   const libraryCounts = useLibrarianCounts(!!me?.roles.includes('librarian'))
   const admissionsCounts = useAdmissionsCounts(!!me?.roles.includes('admissions'))
-  const counts = { ...lecturerCounts, ...libraryCounts, ...admissionsCounts }
+  const accountsCounts = useAccountsCounts(!!me?.roles.includes('accounts'))
+  const counts = { ...lecturerCounts, ...libraryCounts, ...admissionsCounts, ...accountsCounts }
   if (!me) return null
   return (
     <div className="flex min-h-dvh bg-background">

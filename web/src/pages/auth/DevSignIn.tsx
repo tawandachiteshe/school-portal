@@ -15,6 +15,7 @@ const ROLE_LABEL: Record<string, string> = {
   admissions: 'Admissions',
   librarian: 'Library',
   student_affairs: 'Student Affairs',
+  accounts: 'Accounts',
   registry: 'Registry',
   admin: 'Admin',
 }

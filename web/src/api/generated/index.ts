@@ -1,3 +1,4 @@
+export * from './accounts/accounts';
 export * from './admissions/admissions';
 export * from './apply/apply';
 export * from './apply-birth-certificate/apply-birth-certificate';

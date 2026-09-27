@@ -4271,10 +4271,10 @@
         }
       }
     },
-    "/staff/admissions/payments": {
+    "/staff/accounts/payments": {
       "get": {
         "tags": [
-          "admissions"
+          "accounts"
         ],
         "summary": "Payments To Confirm",
         "operationId": "payments_to_confirm",
@@ -4296,10 +4296,46 @@
         }
       }
     },
-    "/staff/admissions/payments/{payment_id}/confirm": {
+    "/staff/accounts/payments/{payment_id}/proof": {
+      "get": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Payment Proof",
+        "operationId": "payment_proof",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Payment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/accounts/payments/{payment_id}/confirm": {
       "post": {
         "tags": [
-          "admissions"
+          "accounts"
         ],
         "summary": "Confirm Payment",
         "operationId": "confirm_payment",
@@ -4353,10 +4389,10 @@
         }
       }
     },
-    "/staff/admissions/payments/{payment_id}/reject": {
+    "/staff/accounts/payments/{payment_id}/reject": {
       "post": {
         "tags": [
-          "admissions"
+          "accounts"
         ],
         "summary": "Reject Payment",
         "operationId": "reject_payment",
@@ -11306,7 +11342,8 @@
           "registry",
           "librarian",
           "admin",
-          "student_affairs"
+          "student_affairs",
+          "accounts"
         ],
         "title": "Role"
       },

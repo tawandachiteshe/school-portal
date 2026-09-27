@@ -25,6 +25,9 @@ entries:
     identifiers: { name: portal-student-affairs }
     attrs: { parent: !KeyOf staff }
   - model: authentik_core.group
+    identifiers: { name: portal-accounts }
+    attrs: { parent: !KeyOf staff }
+  - model: authentik_core.group
     identifiers: { name: portal-admins }
     attrs: { parent: !KeyOf staff }
   - model: authentik_core.group

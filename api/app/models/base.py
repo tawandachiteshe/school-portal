@@ -32,6 +32,7 @@ ROLES = (
     "librarian",
     "admin",
     "student_affairs",
+    "accounts",
 )
 STAFF_ROLES = frozenset(ROLES) - {"applicant", "student"}
 USER_ROLE = pg_enum("user_role", *ROLES)

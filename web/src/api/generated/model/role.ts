@@ -17,4 +17,5 @@ export const Role = {
   librarian: 'librarian',
   admin: 'admin',
   student_affairs: 'student_affairs',
+  accounts: 'accounts',
 } as const;

@@ -17,7 +17,7 @@ from app.services import announcements as ann
 from app.services import clock
 
 router = APIRouter(prefix="/staff/announcements", tags=["staff announcements"])
-STAFF = ("lecturer", "admissions", "registry", "librarian", "admin", "student_affairs")
+STAFF = ("lecturer", "admissions", "registry", "librarian", "admin", "student_affairs", "accounts")
 WRITERS = ("student_affairs", "admin")
 staff = require_role(*STAFF)
 writer = require_role(*WRITERS)

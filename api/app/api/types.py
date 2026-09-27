@@ -13,6 +13,7 @@ class Role(StrEnum):
     librarian = "librarian"
     admin = "admin"
     student_affairs = "student_affairs"
+    accounts = "accounts"
 
 
 class AssessmentKind(StrEnum):
