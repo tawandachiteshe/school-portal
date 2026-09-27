@@ -74,6 +74,62 @@
    "x": 940,
    "y": 0
   },
+  "DeskAsk.dc.html": {
+   "h": 1000,
+   "page": "studentdesk",
+   "title": "Ask TCFL · desktop",
+   "w": 1280,
+   "x": 2720,
+   "y": 1720
+  },
+  "DeskDeadlines.dc.html": {
+   "h": 900,
+   "page": "studentdesk",
+   "title": "Deadlines · desktop",
+   "w": 1280,
+   "x": 4080,
+   "y": 0
+  },
+  "DeskHome.dc.html": {
+   "h": 1320,
+   "page": "studentdesk",
+   "title": "Dashboard · desktop",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "DeskLibrary.dc.html": {
+   "h": 900,
+   "page": "studentdesk",
+   "title": "Library · desktop",
+   "w": 1280,
+   "x": 1360,
+   "y": 1720
+  },
+  "DeskModule.dc.html": {
+   "h": 1000,
+   "page": "studentdesk",
+   "title": "Module · DCN201 notes",
+   "w": 1280,
+   "x": 2720,
+   "y": 0
+  },
+  "DeskResults.dc.html": {
+   "h": 820,
+   "page": "studentdesk",
+   "title": "Results · desktop",
+   "w": 1280,
+   "x": 0,
+   "y": 1720
+  },
+  "DeskTimetable.dc.html": {
+   "h": 900,
+   "page": "studentdesk",
+   "title": "Timetable · week grid",
+   "w": 1280,
+   "x": 1360,
+   "y": 0
+  },
   "DownloadSheet.dc.html": {
    "h": 844,
    "page": "states",
@@ -258,6 +314,38 @@
    "x": 5640,
    "y": 4000
   },
+  "PayFailed.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "Step 5 · Payment failed",
+   "w": 390,
+   "x": 4230,
+   "y": 4000
+  },
+  "PayOffice.dc.html": {
+   "h": 1040,
+   "page": "onboarding",
+   "title": "Step 5 · Pay by bank transfer",
+   "w": 390,
+   "x": 4700,
+   "y": 4000
+  },
+  "PayWaiting.dc.html": {
+   "h": 844,
+   "page": "onboarding",
+   "title": "Step 5 · Approve EcoCash on phone",
+   "w": 390,
+   "x": 3760,
+   "y": 4000
+  },
+  "Payment.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "Step 5 · Pay the fee",
+   "w": 390,
+   "x": 3290,
+   "y": 4000
+  },
   "PhoneCamera.dc.html": {
    "h": 844,
    "page": "onboarding",
@@ -329,6 +417,14 @@
    "w": 390,
    "x": 940,
    "y": 1960
+  },
+  "ReviewDesktop.dc.html": {
+   "h": 1100,
+   "page": "onboarding",
+   "title": "G · Review · desktop",
+   "w": 1280,
+   "x": 1360,
+   "y": 6000
   },
   "ReviewEligible.dc.html": {
    "h": 1600,
@@ -418,6 +514,14 @@
    "x": 1880,
    "y": 4000
   },
+  "StatusDesktop.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "H · After submission · desktop",
+   "w": 1280,
+   "x": 4080,
+   "y": 6000
+  },
   "StudentCard.dc.html": {
    "h": 844,
    "page": "student",
@@ -433,6 +537,14 @@
    "w": 390,
    "x": 2350,
    "y": 4000
+  },
+  "SubmitDesktop.dc.html": {
+   "h": 900,
+   "page": "onboarding",
+   "title": "Step 5 · Submit · desktop",
+   "w": 1280,
+   "x": 2720,
+   "y": 6000
   },
   "SubmitError.dc.html": {
    "h": 1100,
@@ -514,6 +626,14 @@
    "x": 2820,
    "y": 2600
   },
+  "ZimsecDesktop.dc.html": {
+   "h": 1000,
+   "page": "onboarding",
+   "title": "E · ZIMSEC results · desktop",
+   "w": 1280,
+   "x": 0,
+   "y": 6000
+  },
   "ZimsecPages.dc.html": {
    "h": 900,
    "page": "onboarding",
@@ -522,125 +642,21 @@
    "x": 3290,
    "y": 2600
   },
-  "ZimsecDesktop.dc.html": {
-   "x": 0,
-   "y": 6000,
-   "w": 1280,
-   "h": 1000,
-   "title": "E · ZIMSEC results · desktop",
-   "page": "onboarding"
-  },
-  "ReviewDesktop.dc.html": {
-   "x": 1360,
-   "y": 6000,
-   "w": 1280,
-   "h": 1100,
-   "title": "G · Review · desktop",
-   "page": "onboarding"
-  },
-  "SubmitDesktop.dc.html": {
-   "x": 2720,
-   "y": 6000,
-   "w": 1280,
-   "h": 900,
-   "title": "Step 5 · Submit · desktop",
-   "page": "onboarding"
-  },
-  "StatusDesktop.dc.html": {
-   "x": 4080,
-   "y": 6000,
-   "w": 1280,
-   "h": 900,
-   "title": "H · After submission · desktop",
-   "page": "onboarding"
-  },
-  "Payment.dc.html": {
-   "x": 3290,
-   "y": 4000,
-   "w": 390,
-   "h": 1100,
-   "title": "Step 5 · Pay the fee",
-   "page": "onboarding"
-  },
-  "PayWaiting.dc.html": {
-   "x": 3760,
-   "y": 4000,
-   "w": 390,
-   "h": 844,
-   "title": "Step 5 · Approve EcoCash on phone",
-   "page": "onboarding"
-  },
-  "PayFailed.dc.html": {
-   "x": 4230,
-   "y": 4000,
-   "w": 390,
-   "h": 900,
-   "title": "Step 5 · Payment failed",
-   "page": "onboarding"
-  },
-  "PayOffice.dc.html": {
-   "x": 4700,
-   "y": 4000,
-   "w": 390,
-   "h": 1040,
-   "title": "Step 5 · Pay by bank transfer",
-   "page": "onboarding"
-  },
-  "DeskHome.dc.html": {
+  "Landing.dc.html": {
    "x": 0,
    "y": 0,
    "w": 1280,
-   "h": 1320,
-   "title": "Dashboard · desktop",
-   "page": "studentdesk"
+   "h": 3260,
+   "title": "Landing · desktop",
+   "page": "landing"
   },
-  "DeskTimetable.dc.html": {
+  "LandingPhone.dc.html": {
    "x": 1360,
    "y": 0,
-   "w": 1280,
-   "h": 900,
-   "title": "Timetable · week grid",
-   "page": "studentdesk"
-  },
-  "DeskModule.dc.html": {
-   "x": 2720,
-   "y": 0,
-   "w": 1280,
-   "h": 1000,
-   "title": "Module · DCN201 notes",
-   "page": "studentdesk"
-  },
-  "DeskDeadlines.dc.html": {
-   "x": 4080,
-   "y": 0,
-   "w": 1280,
-   "h": 900,
-   "title": "Deadlines · desktop",
-   "page": "studentdesk"
-  },
-  "DeskResults.dc.html": {
-   "x": 0,
-   "y": 1720,
-   "w": 1280,
-   "h": 820,
-   "title": "Results · desktop",
-   "page": "studentdesk"
-  },
-  "DeskLibrary.dc.html": {
-   "x": 1360,
-   "y": 1720,
-   "w": 1280,
-   "h": 900,
-   "title": "Library · desktop",
-   "page": "studentdesk"
-  },
-  "DeskAsk.dc.html": {
-   "x": 2720,
-   "y": 1720,
-   "w": 1280,
-   "h": 1000,
-   "title": "Ask TCFL · desktop",
-   "page": "studentdesk"
+   "w": 390,
+   "h": 3260,
+   "title": "Landing · phone",
+   "page": "landing"
   }
  },
  "createdOnFiles": {
@@ -649,8 +665,8 @@
  },
  "designSystems": [],
  "launch": {
-  "page": "signin",
-  "view": "canvas"
+  "view": "canvas",
+  "page": "landing"
  },
  "notes": {
   "t-ask": {
@@ -658,6 +674,7 @@
    "maxW": 1330,
    "page": "ask",
    "text": "Ask TCFL assistant",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -666,6 +683,7 @@
    "maxW": 2220,
    "page": "dashboard",
    "text": "Student dashboard and foundations",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -674,6 +692,7 @@
    "maxW": 4000,
    "page": "onboarding",
    "text": "Onboarding on a computer",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -682,14 +701,25 @@
    "maxW": 4000,
    "page": "onboarding",
    "text": "Continue on your phone: computer states",
+   "w": 240,
    "x": 0,
    "y": 1000
+  },
+  "t-desk3": {
+   "kind": "title1",
+   "maxW": 5360,
+   "page": "onboarding",
+   "text": "Results, review, submit and status on a computer",
+   "w": 240,
+   "x": 0,
+   "y": 5700
   },
   "t-lect": {
    "kind": "title1",
    "maxW": 4470,
    "page": "lecturer",
    "text": "Lecturer · desktop",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -698,6 +728,7 @@
    "maxW": 2640,
    "page": "library",
    "text": "Librarian · desktop",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -706,6 +737,7 @@
    "maxW": 4150,
    "page": "onboarding",
    "text": "Onboarding on a phone",
+   "w": 240,
    "x": 0,
    "y": 2300
   },
@@ -714,14 +746,34 @@
    "maxW": 6030,
    "page": "onboarding",
    "text": "Results, review, payment, submit and status",
+   "w": 240,
    "x": 0,
    "y": 3700
+  },
+  "t-sd1": {
+   "kind": "title1",
+   "maxW": 5360,
+   "page": "studentdesk",
+   "text": "Student app on a computer (lab PCs, laptops)",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "t-sd2": {
+   "kind": "title1",
+   "maxW": 4000,
+   "page": "studentdesk",
+   "text": "Results, library and Ask TCFL on a computer",
+   "w": 240,
+   "x": 0,
+   "y": 1420
   },
   "t-signin": {
    "kind": "title1",
    "maxW": 3630,
    "page": "signin",
    "text": "Sign in and phone verification",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -730,6 +782,7 @@
    "maxW": 1800,
    "page": "states",
    "text": "Loading, offline, empty, signed out",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -738,6 +791,7 @@
    "maxW": 2270,
    "page": "states",
    "text": "Uploads, downloads and camera",
+   "w": 240,
    "x": 0,
    "y": 1340
   },
@@ -746,6 +800,7 @@
    "maxW": 2640,
    "page": "staff",
    "text": "Admissions officer · desktop",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -754,6 +809,7 @@
    "maxW": 4000,
    "page": "staff",
    "text": "Decisions, requests and announcements",
+   "w": 240,
    "x": 0,
    "y": 1340
   },
@@ -762,6 +818,7 @@
    "maxW": 2270,
    "page": "student",
    "text": "Student app: the other four tabs",
+   "w": 240,
    "x": 0,
    "y": -300
   },
@@ -770,32 +827,17 @@
    "maxW": 2270,
    "page": "student",
    "text": "Screens linked from the student app",
+   "w": 240,
    "x": 0,
    "y": 1660
   },
-  "t-desk3": {
-   "x": 0,
-   "y": 5700,
-   "text": "Results, review, submit and status on a computer",
-   "kind": "title1",
-   "maxW": 5360,
-   "page": "onboarding"
-  },
-  "t-sd1": {
+  "t-landing": {
    "x": 0,
    "y": -300,
-   "text": "Student app on a computer (lab PCs, laptops)",
+   "text": "Landing page · portal.tcfl.ac.zw",
    "kind": "title1",
-   "maxW": 5360,
-   "page": "studentdesk"
-  },
-  "t-sd2": {
-   "x": 0,
-   "y": 1420,
-   "text": "Results, library and Ask TCFL on a computer",
-   "kind": "title1",
-   "maxW": 4000,
-   "page": "studentdesk"
+   "maxW": 1750,
+   "page": "landing"
   }
  },
  "order": [
@@ -878,9 +920,15 @@
   "DeskDeadlines.dc.html",
   "DeskResults.dc.html",
   "DeskLibrary.dc.html",
-  "DeskAsk.dc.html"
+  "DeskAsk.dc.html",
+  "Landing.dc.html",
+  "LandingPhone.dc.html"
  ],
  "pages": [
+  {
+   "id": "landing",
+   "name": "Landing page"
+  },
   {
    "id": "signin",
    "name": "Sign in"

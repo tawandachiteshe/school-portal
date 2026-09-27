@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TCFL Portal · home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tcfl.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="tc {{theme}}" style="width: 1280px; height: 3260px; display: flex; flex-direction: column">
+
+<header class="bar" style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 80px; flex: none">
+<div style="display: flex; align-items: center; gap: 40px">
+<a href="Landing.dc.html" style="display: flex; align-items: baseline; gap: 6px; color: inherit; text-decoration: none"><span style="font-weight: 700; letter-spacing: 0.02em">TCFL</span><span class="muted">Portal</span></a>
+<nav aria-label="Main" style="display: flex; gap: 28px" class="sm">
+<a href="#programmes" style="color: var(--foreground); text-decoration: none">Programmes</a>
+<a href="#apply" style="color: var(--foreground); text-decoration: none">How to apply</a>
+<a href="#students" style="color: var(--foreground); text-decoration: none">For students</a>
+<a href="#help" style="color: var(--foreground); text-decoration: none">Help</a>
+</nav>
+</div>
+<div style="display: flex; gap: 8px">
+<a class="btn btn-secondary btn-sm" href="StaffSignIn.dc.html">Sign in</a>
+<a class="btn btn-primary btn-sm" href="Register.dc.html">Apply now</a>
+</div>
+</header>
+
+<main style="display: flex; flex-direction: column">
+
+<section style="padding: 80px 80px 72px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 80px; align-items: start; border-bottom: 1px solid var(--border)">
+<div style="display: flex; flex-direction: column; gap: 24px; padding-top: 24px">
+<p class="eyebrow">TelOne Centre for Learning · Harare</p>
+<h1 style="margin: 0; font-size: 48px; line-height: 56px; font-weight: 600; letter-spacing: -0.02em; max-width: 640px">Apply, study and keep up with college in one place.</h1>
+<p style="font-size: 20px; line-height: 30px; max-width: 600px" class="muted">Apply for the 2027 intake from your phone, with no forms to print. Students see their timetable, deadlines, notes and results here, instead of on notice boards, WhatsApp groups and office counters.</p>
+<div style="display: flex; gap: 12px; align-items: center; margin-top: 8px">
+<a class="btn btn-primary" href="Register.dc.html" style="height: 48px; padding: 0 20px">Apply for the 2027 intake</a>
+<a class="btn btn-secondary" href="StaffSignIn.dc.html" style="height: 48px; padding: 0 20px">Sign in</a>
+</div>
+<div class="alert alert-info" style="max-width: 600px; margin-top: 16px">
+<svg class="ic primary" viewBox="0 0 24 24" style="margin-top: 2px"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
+<p>Applications for the 2027 intake are open. They close on <span class="fw6">[CLOSING DATE]</span>.</p>
+</div>
+</div>
+<figure aria-label="The student dashboard on a phone" style="width: 400px; height: 640px; border: 1px solid var(--border-strong); border-radius: 20px; overflow: hidden; background: var(--card); padding: 5px">
+<div style="width: 390px; height: 628px; overflow: hidden; border-radius: 15px"><dc-import name="Main" theme="{{theme}}" hint-size="390px,2320px"></dc-import></div>
+</figure>
+</section>
+
+<section id="apply" aria-labelledby="h-apply" style="padding: 72px 80px; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 80px; border-bottom: 1px solid var(--border)">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="h-apply" style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600">How applying works</h2>
+<p class="muted" style="font-size: 18px; line-height: 28px">About 20 minutes. Start on a computer or phone. When you need to photograph a document, you can switch to your phone and carry on.</p>
+</div>
+<ol class="list" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<li style="display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 18px 0"><span class="mono muted" style="font-size: 18px">1</span><span><span class="fw6" style="display: block">Choose a programme</span><span class="muted">See the entry requirements before you choose.</span></span></li>
+<li style="display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 18px 0"><span class="mono muted" style="font-size: 18px">2</span><span><span class="fw6" style="display: block">Add your National ID</span><span class="muted">Photograph it with your phone. We read the number, name and date of birth for you.</span></span></li>
+<li style="display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 18px 0"><span class="mono muted" style="font-size: 18px">3</span><span><span class="fw6" style="display: block">Add your ZIMSEC results</span><span class="muted">Photograph your result slip. Check the grades we read, and add any resits.</span></span></li>
+<li style="display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 18px 0"><span class="mono muted" style="font-size: 18px">4</span><span><span class="fw6" style="display: block">Check your eligibility</span><span class="muted">You'll see straight away whether you meet the entry requirements, and what to do if you don't.</span></span></li>
+<li style="display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 18px 0"><span class="mono muted" style="font-size: 18px">5</span><span><span class="fw6" style="display: block">Pay and submit</span><span class="muted">Pay the application fee by EcoCash, OneMoney, bank transfer or cash. Then track your application here and by SMS.</span></span></li>
+</ol>
+<div><a class="btn btn-primary" href="Register.dc.html">Start my application</a></div>
+</div>
+<aside class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; align-self: start">
+<h3 class="h2" style="margin: 0">Have these ready</h3>
+<ul style="display: flex; flex-direction: column; gap: 14px">
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><svg class="ic success" viewBox="0 0 24 24" style="margin-top: 2px"><path d="M20 6 9 17l-5-5"></path></svg><span>Your National ID, metal or plastic</span></li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><svg class="ic success" viewBox="0 0 24 24" style="margin-top: 2px"><path d="M20 6 9 17l-5-5"></path></svg><span>Your ZIMSEC O-Level result slip or certificate</span></li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><svg class="ic success" viewBox="0 0 24 24" style="margin-top: 2px"><path d="M20 6 9 17l-5-5"></path></svg><span>A phone that can receive SMS, with a camera</span></li>
+<li style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px"><svg class="ic success" viewBox="0 0 24 24" style="margin-top: 2px"><path d="M20 6 9 17l-5-5"></path></svg><span>The application fee: <span class="mono fw6">US$ 20.00</span></span></li>
+</ul>
+<p class="sm muted" style="padding-top: 12px; border-top: 1px solid var(--border)">No smartphone? Use a college lab computer and upload scans, or ask at the Admissions Office in Block A.</p>
+</aside>
+</section>
+
+<section id="programmes" aria-labelledby="h-prog" style="padding: 72px 80px; display: flex; flex-direction: column; gap: 24px; border-bottom: 1px solid var(--border)">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px"><h2 id="h-prog" style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600">Programmes for 2027</h2><p class="muted" style="font-size: 18px; line-height: 28px">HEXCO-certified. Full-time, at the Harare campus.</p></div>
+</div>
+<table class="tbl" style="font-size: 16px; line-height: 24px">
+<thead><tr><th>Programme</th><th style="width: 220px">Award</th><th style="width: 100px">Length</th><th>Entry requirements</th></tr></thead>
+<tbody>
+<tr><td class="fw6">Diploma in Information Technology</td><td class="muted">HEXCO National Diploma</td><td class="muted">3 years</td><td>5 O-Levels at C or better, including English Language and Mathematics</td></tr>
+<tr><td class="fw6">Diploma in Software Engineering</td><td class="muted">HEXCO National Diploma</td><td class="muted">3 years</td><td>5 O-Levels at C or better, including English Language and Mathematics</td></tr>
+<tr><td class="fw6">Diploma in Telecommunications Engineering</td><td class="muted">HEXCO National Diploma</td><td class="muted">3 years</td><td>5 O-Levels at C or better, including English Language, Mathematics and Physical Science</td></tr>
+<tr><td class="fw6">Certificate in Computer Networking</td><td class="muted">HEXCO National Certificate</td><td class="muted">2 years</td><td>5 O-Levels at C or better, including English Language and Mathematics</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="students" aria-labelledby="h-stu" style="padding: 72px 80px; display: flex; flex-direction: column; gap: 32px; border-bottom: 1px solid var(--border)">
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 720px">
+<h2 id="h-stu" style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600">Already a student?</h2>
+<p class="muted" style="font-size: 18px; line-height: 28px">Sign in with your student number. Everything the college sends you is in one place.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--foreground)">
+<h3 class="h2" style="margin: 0">Results on your phone</h3>
+<p class="muted">See your marks as soon as they're published, and download your results slip. No trip to the office.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--foreground)">
+<h3 class="h2" style="margin: 0">Your day, in order</h3>
+<p class="muted">Today's classes and rooms, tests and assignments due, new lecture notes, notices and library loans.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--foreground)">
+<h3 class="h2" style="margin: 0">Works on slow data</h3>
+<p class="muted">Pages are light. Your timetable and saved notes still open without signal, and uploads wait until you're back online.</p>
+</div>
+</div>
+<div><a class="btn btn-secondary" href="StaffSignIn.dc.html">Sign in with your student number</a></div>
+</section>
+
+<section aria-labelledby="h-dates" style="padding: 72px 80px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 80px; border-bottom: 1px solid var(--border)">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h2 id="h-dates" style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600">Key dates · 2027 intake</h2>
+<dl class="list" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<div style="display: flex; justify-content: space-between; padding: 14px 0"><dt>Applications close</dt><dd class="fw6">[CLOSING DATE]</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 0"><dt>Decisions sent</dt><dd class="fw6">Within [N] working days of applying</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 0"><dt>Registration</dt><dd class="fw6">Monday 1 February 2027, 08:00</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 0"><dt>Classes start</dt><dd class="fw6">Monday 1 February 2027</dd></div>
+</dl>
+</div>
+<div id="help" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600">Need help?</h2>
+<dl class="list" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border)">
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 14px 0"><dt>Applications</dt><dd>Admissions Office, Block A · [PHONE]</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 14px 0"><dt>Signing in</dt><dd>ICT Services, Block C</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 14px 0"><dt>Fees and payments</dt><dd>Accounts Office, Block A</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 14px 0"><dt>Everything else</dt><dd>Student Affairs, Block A · [EMAIL]</dd></div>
+</dl>
+<p class="sm muted">Students can also ask questions in the portal with Ask TCFL. Its answers link to the official source.</p>
+</div>
+</section>
+</main>
+
+<footer style="margin-top: auto; padding: 32px 80px; display: flex; justify-content: space-between; align-items: center; gap: 24px" class="sm muted">
+<span><span class="fw6 fg">TelOne Centre for Learning</span> · Harare, Zimbabwe</span>
+<nav aria-label="Footer" style="display: flex; gap: 24px"><a class="link" href="#" style="color: var(--muted-foreground)">Privacy</a><a class="link" href="#" style="color: var(--muted-foreground)">Accessibility</a><a class="link" href="#" style="color: var(--muted-foreground)">Staff sign in</a></nav>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":3260}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>
