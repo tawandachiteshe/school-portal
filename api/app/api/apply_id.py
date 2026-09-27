@@ -550,6 +550,7 @@ class HandoffLanding(BaseModel):
     first_name: str
     programme: str
     step: str
+    start_step: str
     match_code: str
 
 
@@ -592,6 +593,7 @@ async def handoff_landing(code: str, request: Request, db: AsyncSession = Depend
         first_name=a.person.given_name,
         programme=a.programme.name,
         step=STEP_LABEL.get(h.start_step, "National ID"),
+        start_step=h.start_step,
         match_code=h.match_code,
     )
 

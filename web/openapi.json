@@ -3425,6 +3425,450 @@
           }
         }
       }
+    },
+    "/apply/results": {
+      "get": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Application Results",
+        "operationId": "application_results",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Save Results",
+        "operationId": "save_results",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveResultsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/results/pages": {
+      "post": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Add Results Page",
+        "operationId": "add_results_page",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_results_page"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/results/pages/{document_id}": {
+      "delete": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Remove Results Page",
+        "operationId": "remove_results_page",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/results/scans/{scan}/read": {
+      "post": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Read Results Scan",
+        "operationId": "read_results_scan",
+        "parameters": [
+          {
+            "name": "scan",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scan"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apply/documents/{document_id}/file": {
+      "get": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "My Document File",
+        "operationId": "my_document_file",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/results": {
+      "get": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Results",
+        "operationId": "phone_results",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Save Results",
+        "operationId": "phone_save_results",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveResultsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/results/pages": {
+      "post": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Add Results Page",
+        "operationId": "phone_add_results_page",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_phone_add_results_page"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/results/pages/{document_id}": {
+      "delete": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Remove Results Page",
+        "operationId": "phone_remove_results_page",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/results/scans/{scan}/read": {
+      "post": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Read Results Scan",
+        "operationId": "phone_read_results_scan",
+        "parameters": [
+          {
+            "name": "scan",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scan"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/handoff/session/documents/{document_id}/file": {
+      "get": {
+        "tags": [
+          "apply results"
+        ],
+        "summary": "Phone Document File",
+        "operationId": "phone_document_file",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4071,6 +4515,78 @@
         ],
         "title": "AudienceKind"
       },
+      "Body_add_results_page": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "scan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scan"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_add_results_page"
+      },
+      "Body_phone_add_results_page": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "scan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scan"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_phone_add_results_page"
+      },
       "Body_phone_upload_national_id": {
         "properties": {
           "file": {
@@ -4716,6 +5232,50 @@
           "verified"
         ],
         "title": "Contact"
+      },
+      "Crop": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Id"
+          },
+          "x": {
+            "type": "integer",
+            "title": "X"
+          },
+          "y": {
+            "type": "integer",
+            "title": "Y"
+          },
+          "w": {
+            "type": "integer",
+            "title": "W"
+          },
+          "h": {
+            "type": "integer",
+            "title": "H"
+          },
+          "page_w": {
+            "type": "integer",
+            "title": "Page W"
+          },
+          "page_h": {
+            "type": "integer",
+            "title": "Page H"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "x",
+          "y",
+          "w",
+          "h",
+          "page_w",
+          "page_h"
+        ],
+        "title": "Crop"
       },
       "Dashboard": {
         "properties": {
@@ -5537,6 +6097,10 @@
             "type": "string",
             "title": "Step"
           },
+          "start_step": {
+            "type": "string",
+            "title": "Start Step"
+          },
           "match_code": {
             "type": "string",
             "title": "Match Code"
@@ -5548,6 +6112,7 @@
           "first_name",
           "programme",
           "step",
+          "start_step",
           "match_code"
         ],
         "title": "HandoffLanding"
@@ -7989,6 +8554,63 @@
         ],
         "title": "Overview"
       },
+      "Page": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PageQuality"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Received At"
+          },
+          "capture_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Device"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "number",
+          "quality",
+          "received_at",
+          "capture_device"
+        ],
+        "title": "Page"
+      },
+      "PageQuality": {
+        "type": "string",
+        "enum": [
+          "clear",
+          "blurry",
+          "dark"
+        ],
+        "title": "PageQuality"
+      },
       "PendingUpload": {
         "properties": {
           "id": {
@@ -8920,6 +9542,42 @@
         ],
         "title": "Results"
       },
+      "ResultsState": {
+        "properties": {
+          "sittings": {
+            "items": {
+              "$ref": "#/components/schemas/SittingOut"
+            },
+            "type": "array",
+            "title": "Sittings"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/ZimsecSubjectOut"
+            },
+            "type": "array",
+            "title": "Subjects"
+          },
+          "name_on_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name On Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sittings",
+          "subjects",
+          "name_on_id"
+        ],
+        "title": "ResultsState"
+      },
       "ResultsStatus": {
         "properties": {
           "term_name": {
@@ -9236,6 +9894,35 @@
         ],
         "title": "Role"
       },
+      "SaveResultsIn": {
+        "properties": {
+          "sittings": {
+            "items": {
+              "$ref": "#/components/schemas/SittingIn"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Sittings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sittings"
+        ],
+        "title": "SaveResultsIn"
+      },
+      "ScanStatus": {
+        "type": "string",
+        "enum": [
+          "pages",
+          "reading",
+          "read",
+          "failed",
+          "saved"
+        ],
+        "title": "ScanStatus"
+      },
       "SendLinkIn": {
         "properties": {
           "code": {
@@ -9470,6 +10157,196 @@
           "rows"
         ],
         "title": "Sitting"
+      },
+      "SittingIn": {
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          },
+          "level": {
+            "type": "string",
+            "pattern": "^(O|A)$",
+            "title": "Level"
+          },
+          "session": {
+            "type": "string",
+            "pattern": "^(JUNE|NOVEMBER)$",
+            "title": "Session"
+          },
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1980.0,
+            "title": "Year"
+          },
+          "centre_number": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Centre Number"
+          },
+          "candidate_number": {
+            "type": "string",
+            "pattern": "^\\d{4}$",
+            "title": "Candidate Number"
+          },
+          "candidate_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Name"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectIn"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Subjects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "session",
+          "year",
+          "centre_number",
+          "candidate_number",
+          "subjects"
+        ],
+        "title": "SittingIn"
+      },
+      "SittingOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScanStatus"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "centre_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centre Number"
+          },
+          "candidate_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Number"
+          },
+          "candidate_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Name"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectOut"
+            },
+            "type": "array",
+            "title": "Subjects"
+          },
+          "pages": {
+            "items": {
+              "$ref": "#/components/schemas/Page"
+            },
+            "type": "array",
+            "title": "Pages"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "status",
+          "level",
+          "session",
+          "year",
+          "centre_number",
+          "candidate_number",
+          "candidate_name",
+          "subjects",
+          "pages",
+          "read_at"
+        ],
+        "title": "SittingOut"
       },
       "Slot": {
         "properties": {
@@ -9765,6 +10642,104 @@
           "announcements"
         ],
         "title": "StudentSearchResults"
+      },
+      "SubjectIn": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{4}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "grade": {
+            "type": "string",
+            "maxLength": 5,
+            "title": "Grade"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "grade"
+        ],
+        "title": "SubjectIn"
+      },
+      "SubjectOut": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "check": {
+            "type": "boolean",
+            "title": "Check"
+          },
+          "read_as": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read As"
+          },
+          "crop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Crop"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "grade",
+          "check",
+          "read_as",
+          "crop"
+        ],
+        "title": "SubjectOut"
       },
       "SubjectRow": {
         "properties": {
@@ -10474,6 +11449,24 @@
           "venue"
         ],
         "title": "WeeklySlot"
+      },
+      "ZimsecSubjectOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "ZimsecSubjectOut"
       }
     }
   }

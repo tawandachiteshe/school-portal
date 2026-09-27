@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { CircleAlert, CircleCheck, Info, Link2, TriangleAlert } from 'lucide-react'
+import { useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
 import { toast } from 'sonner'
 import { Alert } from '@/components/ui/alert'
@@ -17,6 +18,16 @@ import {
   useReportMismatch,
 } from '@/api/generated/apply-id/apply-id'
 import { ApiError } from '@/lib/api'
+import {
+  getPhoneDocumentFileUrl,
+  getPhoneResultsQueryKey,
+  phoneAddResultsPage,
+  phoneReadResultsScan,
+  phoneRemoveResultsPage,
+  phoneSaveResults,
+  usePhoneResults,
+} from '@/api/generated/apply-results/apply-results'
+import { ResultsFlow } from '../results/ResultsFlow'
 import { PhoneFlow } from './PhoneFlow'
 
 const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -77,7 +88,7 @@ export function HandoffLanding() {
   const { data, isPending, error } = useHandoffLanding(code, { query: { retry: false } })
   const claim = useClaimHandoff({
     mutation: {
-      onSuccess: () => navigate(`/h/${code}/id`, { replace: true }),
+      onSuccess: () => navigate(`/h/${code}/${data?.start_step === 'results' ? 'results' : 'id'}`, { replace: true }),
       onError: (e) => toast(e instanceof ApiError ? e.message : "Couldn't connect. Try again."),
     },
   })
@@ -91,7 +102,7 @@ export function HandoffLanding() {
         <p>{error instanceof ApiError ? error.message : 'Check the link, or create a new one on your computer.'}</p>
       </PhoneFrame>
     )
-  if (data.state === 'yours') return <Navigate to={`/h/${code}/id`} replace />
+  if (data.state === 'yours') return <Navigate to={`/h/${code}/${data.start_step === 'results' ? 'results' : 'id'}`} replace />
   if (data.state === 'expired')
     return (
       <PhoneFrame linked={false}>
@@ -251,15 +262,46 @@ export function HandoffId() {
   )
 }
 
-// /h/:code/results until step 3 is built on the phone.
-export function HandoffResultsPending() {
-  const { data } = usePhoneState({ query: { retry: false } })
+// /h/:code/results: photograph and check the result slip on the linked phone.
+export function HandoffResults() {
+  const { code = '' } = useParams()
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const [saved, setSaved] = useState(false)
+  const session = usePhoneState({ query: { retry: false } })
+  const { data, error } = usePhoneResults({
+    query: {
+      retry: false,
+      refetchInterval: (q) => (q.state.data?.sittings.some((s) => s.status === 'reading') ? 1500 : false),
+    },
+  })
+  if ((error instanceof ApiError && error.status === 410) || (session.error instanceof ApiError && session.error.status === 410))
+    return <Disconnected />
+  const match = session.data?.match_code
+  const put = (s: unknown) => qc.setQueryData(getPhoneResultsQueryKey(), s)
+  if (saved)
+    return (
+      <PhoneFrame code={match}>
+        <div role="status" className="flex flex-col gap-3">
+          <CircleCheck className="size-6 text-success" strokeWidth={1.5} aria-hidden />
+          {h1('Results added')}
+          <p className="text-muted-foreground">Go back to your computer to review everything and submit. You can close this page.</p>
+        </div>
+      </PhoneFrame>
+    )
   return (
-    <PhoneFrame code={data?.match_code}>
-      {h1('ZIMSEC results')}
-      <p className="text-muted-foreground">
-        Scanning results on the phone isn't available yet. Carry on with your results on your computer.
-      </p>
-    </PhoneFrame>
+    <ResultsFlow
+      api={{
+        state: data,
+        addPage: (file, scan, quality) => phoneAddResultsPage({ file, scan: scan ?? null, quality }).then(put),
+        removePage: (id) => phoneRemoveResultsPage(id).then(put),
+        read: (scan) => phoneReadResultsScan(scan).then(put),
+        save: (body) => phoneSaveResults(body).then(put),
+        fileUrl: (id) => `/api${getPhoneDocumentFileUrl(id)}`,
+      }}
+      onBack={() => navigate(`/h/${code}/id`)}
+      onSaved={() => setSaved(true)}
+      frame={(children) => <PhoneFrame code={match}>{children}</PhoneFrame>}
+    />
   )
 }

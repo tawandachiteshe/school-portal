@@ -34,7 +34,7 @@ const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long'
 const title = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
 const h1 = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
 const errText = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback)
-const LINK_KEY = 'tcfl-handoff' // the link is shown once: keep it for this tab only
+export const LINK_KEY = 'tcfl-handoff' // the link is shown once: keep it for this tab only
 
 function registration(s: NationalIdState) {
   return [s.registered_in && `Registered in ${s.registered_in}`, s.origin && `Origin ${s.origin}`].filter(Boolean).join(' · ')
@@ -182,7 +182,19 @@ function useCountdown(until: string) {
   return `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`
 }
 
-function LinkPanel({ link, app, onUpload }: { link: NewHandoff; app: MyApplication; onUpload: () => void }) {
+export function LinkPanel({
+  link,
+  app,
+  onUpload,
+  back = 'National ID options',
+  what = 'a photo of your ID',
+}: {
+  link: NewHandoff
+  app: MyApplication
+  onUpload: () => void
+  back?: string
+  what?: string
+}) {
   const [qr, setQr] = useState<string>()
   const url = `${window.location.origin}/h/${link.token}`
   const typed = `${window.location.host}/h/${link.code}`
@@ -201,11 +213,11 @@ function LinkPanel({ link, app, onUpload }: { link: NewHandoff; app: MyApplicati
       <div className="flex max-w-[720px] flex-col gap-2">
         <button type="button" onClick={onUpload} className="inline-flex min-h-6 items-center gap-1 self-start text-primary hover:underline">
           <ArrowLeft className="size-4" strokeWidth={1.5} aria-hidden />
-          National ID options
+          {back}
         </button>
         <h1 className={h1}>Continue on your phone</h1>
         <p className="text-muted-foreground">
-          Open the link on your phone, take a photo of your ID, and this page updates by itself. Keep this page open.
+          Open the link on your phone, take {what}, and this page updates by itself. Keep this page open.
         </p>
       </div>
       <section className="grid max-w-[1120px] grid-cols-[248px_minmax(0,1fr)_300px] rounded-md border bg-card">
@@ -270,7 +282,7 @@ function LinkPanel({ link, app, onUpload }: { link: NewHandoff; app: MyApplicati
 }
 
 // design/HandoffExpired (also when this tab no longer has the link it showed)
-function LinkGone({ h, lost, onNew, onUpload, starting }: { h: HandoffOut; lost: boolean; onNew: () => void; onUpload: () => void; starting: boolean }) {
+export function LinkGone({ h, lost, onNew, onUpload, starting }: { h: HandoffOut; lost: boolean; onNew: () => void; onUpload: () => void; starting: boolean }) {
   return (
     <>
       <h1 className={h1}>Continue on your phone</h1>

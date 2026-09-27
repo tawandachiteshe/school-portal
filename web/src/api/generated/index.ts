@@ -1,6 +1,7 @@
 export * from './admissions/admissions';
 export * from './apply/apply';
 export * from './apply-id/apply-id';
+export * from './apply-results/apply-results';
 export * from './auth/auth';
 export * from './deadlines/deadlines';
 export * from './library/library';

@@ -11,5 +11,6 @@ export interface HandoffLanding {
   first_name: string;
   programme: string;
   step: string;
+  start_step: string;
   match_code: string;
 }

@@ -1,6 +1,7 @@
 import { ArrowLeft, Flashlight, TriangleAlert } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 type Hint = 'starting' | 'dark' | 'glare-left' | 'glare-right' | 'blurry' | 'steady'
 
@@ -52,14 +53,24 @@ function analyse(ctx: CanvasRenderingContext2D, w: number, h: number, prev: Floa
   return { mean: sum / (w * h), glareL: glareL / half, glareR: glareR / half, sharp, moved, lum }
 }
 
-function Blocked({ onRetry, onGallery, onBack }: { onRetry: () => void; onGallery: () => void; onBack: () => void }) {
+function Blocked({
+  title,
+  onRetry,
+  onGallery,
+  onBack,
+}: {
+  title: string
+  onRetry: () => void
+  onGallery: () => void
+  onBack: () => void
+}) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="flex h-14 items-center gap-1 border-b bg-card pr-4 pl-1">
         <button type="button" aria-label="Back" onClick={onBack} className="inline-flex size-11 items-center justify-center">
           <ArrowLeft className="size-5" strokeWidth={1.5} />
         </button>
-        <span className="font-semibold">Front of National ID</span>
+        <span className="font-semibold">{title}</span>
       </header>
       <main className="flex grow flex-col gap-6 px-4 py-6">
         <div className="flex flex-col gap-3">
@@ -107,15 +118,39 @@ function Blocked({ onRetry, onGallery, onBack }: { onRetry: () => void; onGaller
   )
 }
 
-// design/PhoneCamera, CameraBlocked. The photo is taken by itself when the ID is steady and sharp.
+export type PhotoQuality = 'clear' | 'blurry' | 'dark'
+
+// Shape of the outline and the words around it, per document.
+const KINDS = {
+  id: {
+    title: 'Front of National ID',
+    frame: 'aspect-[1.585] w-[86%] rounded-lg',
+    crop: [0.86, 0.54],
+    help: 'The photo is taken by itself when your ID is steady and inside the outline.',
+    upload: 'Gallery',
+  },
+  slip: {
+    title: 'ZIMSEC result slip',
+    frame: 'aspect-[1/1.414] h-[88%] max-w-[82%] rounded-sm',
+    crop: [0.7, 0.9],
+    help: 'Lay the slip flat. The photo is taken by itself when all four corners are inside.',
+    upload: 'Upload a file',
+  },
+} as const
+
+// design/PhoneCamera, ZimsecCamera, CameraBlocked. The photo is taken by itself when it's steady and sharp.
 export function IdCamera({
   onPhoto,
   onType,
   onBack,
   step = 'Step 2 of 5',
+  kind = 'id',
+  page,
 }: {
-  onPhoto: (photo: Blob) => void
-  onType: () => void
+  onPhoto: (photo: Blob, quality: PhotoQuality | null) => void
+  onType?: () => void
+  kind?: keyof typeof KINDS
+  page?: number
   onBack: () => void
   step?: string
 }) {
@@ -128,6 +163,9 @@ export function IdCamera({
   const [progress, setProgress] = useState(0)
   const [torch, setTorch] = useState<boolean | null>(null) // null: not supported
   const taken = useRef(false)
+  const last = useRef<PhotoQuality | null>(null)
+  const k = KINDS[kind]
+  const title = page ? `${k.title} · page ${page}` : k.title
 
   const capture = useCallback(() => {
     const v = video.current
@@ -137,7 +175,7 @@ export function IdCamera({
     c.width = v.videoWidth
     c.height = v.videoHeight
     c.getContext('2d')?.drawImage(v, 0, 0)
-    c.toBlob((b) => b && onPhoto(b), 'image/jpeg', 0.9)
+    c.toBlob((b) => b && onPhoto(b, last.current), 'image/jpeg', 0.9)
   }, [onPhoto])
 
   useEffect(() => {
@@ -165,8 +203,8 @@ export function IdCamera({
           const v = video.current
           if (stop || !v || !ctx || !v.videoWidth) return
           // The outline covers the middle 86% × 54% of the view.
-          const sw = v.videoWidth * 0.86
-          const sh = v.videoHeight * 0.54
+          const sw = v.videoWidth * KINDS[kind].crop[0]
+          const sh = v.videoHeight * KINDS[kind].crop[1]
           ctx.drawImage(v, (v.videoWidth - sw) / 2, (v.videoHeight - sh) / 2, sw, sh, 0, 0, 160, 100)
           const a = analyse(ctx, 160, 100, prev)
           prev = a.lum
@@ -189,6 +227,7 @@ export function IdCamera({
             steadySince = 0
             setProgress(0)
           }
+          last.current = next === 'dark' ? 'dark' : next === 'blurry' ? 'blurry' : 'clear'
           setHint(next)
         }
         timer = window.setInterval(tick, 200)
@@ -201,7 +240,7 @@ export function IdCamera({
       clearInterval(timer)
       stream.current?.getTracks().forEach((t) => t.stop())
     }
-  }, [attempt, capture])
+  }, [attempt, capture, kind])
 
   const toggleTorch = async () => {
     const track = stream.current?.getVideoTracks()[0]
@@ -224,7 +263,7 @@ export function IdCamera({
       className="sr-only"
       onChange={(e) => {
         const f = e.target.files?.[0]
-        if (f) onPhoto(f)
+        if (f) onPhoto(f, null)
       }}
     />
   )
@@ -235,6 +274,7 @@ export function IdCamera({
         {galleryInput}
         <Blocked
           onBack={onBack}
+          title={title}
           onGallery={() => gallery.current?.click()}
           onRetry={() => {
             setBlocked(false)
@@ -244,7 +284,7 @@ export function IdCamera({
       </>
     )
 
-  const [title, body] = HINTS[hint]
+  const [hintTitle, body] = HINTS[hint]
   return (
     <div className="flex min-h-dvh flex-col bg-[#0F0F0E] text-[#F4F2EE]">
       {galleryInput}
@@ -253,7 +293,7 @@ export function IdCamera({
           <ArrowLeft className="size-5" strokeWidth={1.5} />
         </button>
         <div className="flex flex-col">
-          <span className="font-medium">Front of National ID</span>
+          <span className="font-medium">{title}</span>
           <span className="text-xs text-[#B8B3AA]">{step}</span>
         </div>
       </div>
@@ -263,7 +303,7 @@ export function IdCamera({
         aria-live="polite"
         className="mx-4 mt-2 flex min-h-[72px] flex-col gap-0.5 rounded-md bg-[#F4F2EE] px-4 py-3 text-[#1B1A18]"
       >
-        <span className="font-semibold">{title}</span>
+        <span className="font-semibold">{hintTitle}</span>
         <span className="text-sm text-[#4A463F]">{body}</span>
         {hint === 'steady' && (
           <span className="mt-2 block h-1 overflow-hidden rounded-full bg-[#E2DFD9]">
@@ -277,14 +317,14 @@ export function IdCamera({
         {/* Outline to line up the ID (ID-1 card, 85.6 × 54 mm). */}
         <div
           aria-hidden
-          className="relative aspect-[1.585] w-[86%] rounded-lg border-2 shadow-[0_0_0_9999px_rgba(15,15,14,0.55)]"
+          className={cn('relative border-2 shadow-[0_0_0_9999px_rgba(15,15,14,0.55)]', k.frame)}
           style={{ borderColor: hint === 'steady' ? '#74C48F' : '#F4F2EE' }}
         />
       </div>
 
       <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-4 pb-6">
         <p className="text-center text-sm text-[#B8B3AA]">
-          The photo is taken by itself when your ID is steady and inside the outline.
+          {k.help}
         </p>
         <div className="grid w-full grid-cols-[1fr_72px_1fr] items-center">
           {torch !== null ? (
@@ -313,12 +353,14 @@ export function IdCamera({
             onClick={() => gallery.current?.click()}
             className="justify-self-end text-sm text-[#A9CBF2] hover:underline"
           >
-            Gallery
+            {k.upload}
           </button>
         </div>
-        <button type="button" onClick={onType} className="min-h-11 text-[#A9CBF2] hover:underline">
-          Type the details in instead
-        </button>
+        {onType && (
+          <button type="button" onClick={onType} className="min-h-11 text-[#A9CBF2] hover:underline">
+            Type the details in instead
+          </button>
+        )}
       </div>
     </div>
   )
