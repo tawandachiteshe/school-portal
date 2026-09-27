@@ -90,12 +90,16 @@ Amber rule on the dashboard/deadlines: `due - now <= 48h` and not submitted → 
 |---|---|---|
 | StaffQueue | Admissions queue | `/staff/admissions` |
 | StaffReview | Application review | `/staff/admissions/:ref` |
+| (no design) | Intake places per programme, against offers (places start unset) | `/staff/admissions/places` |
+| (no design) | Find a student (Admissions, Student Affairs): contacts, class, loans; views audited | `/staff/students` |
 | OfferDialog / AskInfo | Offer a place (Dialog), ask for information (Sheet) | same |
 | LecturerHome | Lecturer today | `/staff/teaching` |
 | LecturerMarks | Enter marks | `/staff/teaching/assessments/:id/marks` |
 | LecturerUpload | Class notes + upload dialog | `/staff/teaching/classes/:id/notes` |
 | Register | Take the register (phone) | `/staff/teaching/sessions/:id/register` |
 | LibraryDesk / LibraryOverdue | Issue/return desk, overdue loans | `/staff/library`, `/staff/library/overdue` |
+| (no design) | Library catalogue: search, add books and copies | `/staff/library/catalogue` |
+| (no design) | Reading lists per module this term | `/staff/library/reading-lists` |
 | AnnouncementCompose | Write an announcement (audience, pin, SMS) | `/staff/announcements/new` |
 | Foundations | Tokens and primitives reference | — |
 

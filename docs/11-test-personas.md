@@ -73,4 +73,7 @@ One persona for each staff role that has pages, used on a laptop (1280 px). Regi
 | Ask TCFL | Tariro, then Thandeka (`TCFL/2027/0147`) | Answers cite their source; each sees only their own loans and deadlines; questions sent to Student Affairs reach Takudzwa (`tmushonga`) |
 | Teaching | Eng. Chikore (`fchikore`) | Register and marks for DIT-1A; DTE-1A shows only DCN201 |
 | Library desk | Shamiso (`schinembiri`) | Issue to Tariro, return Thandeka's overdue book |
+| Catalogue and reading lists | Shamiso (`schinembiri`) | Search by barcode (`TCFL-B-003390`), add a book and its copies, add it to a module's reading list |
+| Intake places | Chipo (`cmarufu`) | Places start "Not set"; after setting them, Remaining counts Munashe's offer |
+| Find a student | Takudzwa (`tmushonga`) or Chipo | Search "moyo" or "0147"; the profile shows contacts and loans, never the ID number or results |
 | Sign-up, sign-in and password reset | A new number, or Tariro | Codes appear in the API log until an SMS provider is set up |
