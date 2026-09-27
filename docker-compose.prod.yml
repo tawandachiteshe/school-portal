@@ -1,6 +1,8 @@
 # Production stack for Dokploy (Compose deployment, compose path: docker-compose.prod.yml).
 # No host ports. Routing is in the Traefik labels below (Dokploy's Traefik reads them from
-# containers on dokploy-network), so there's nothing to add in Dokploy's Domains tab:
+# containers on dokploy-network), so there's nothing to add in Dokploy's Domains tab.
+# Cloudflare holds the certificate and reaches the server over plain http (SSL mode Flexible), so
+# the routers use Dokploy's http entrypoint and tell the apps the visitor came over https:
 #   https://${APP_HOST}/       → web:80
 #   https://${APP_HOST}/api    → api:8000              (/api stripped)
 #   https://${APP_HOST}/auth   → authentik-server:9000 (Authentik serves under /auth/)
@@ -60,15 +62,10 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-api.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.tcfl-api.entrypoints=websecure"
-      - "traefik.http.routers.tcfl-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-api.entrypoints=web"
+      - "traefik.http.routers.tcfl-api.middlewares=tcfl-api-strip@docker,tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-api.service=tcfl-api"
       - "traefik.http.services.tcfl-api.loadbalancer.server.port=8000"
-      - "traefik.http.routers.tcfl-api-http.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.tcfl-api-http.entrypoints=web"
-      - "traefik.http.routers.tcfl-api-http.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.tcfl-api-http.service=tcfl-api"
-      - "traefik.http.routers.tcfl-api.middlewares=tcfl-api-strip"
       - "traefik.http.middlewares.tcfl-api-strip.stripprefix.prefixes=/api"
 
   # Background jobs: scheduled announcements, SMS (app/worker.py). One instance: it also runs beat.
@@ -89,14 +86,11 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-web.rule=Host(`${APP_HOST}`)"
-      - "traefik.http.routers.tcfl-web.entrypoints=websecure"
-      - "traefik.http.routers.tcfl-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-web.entrypoints=web"
+      - "traefik.http.routers.tcfl-web.middlewares=tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-web.service=tcfl-web"
       - "traefik.http.services.tcfl-web.loadbalancer.server.port=80"
-      - "traefik.http.routers.tcfl-web-http.rule=Host(`${APP_HOST}`)"
-      - "traefik.http.routers.tcfl-web-http.entrypoints=web"
-      - "traefik.http.routers.tcfl-web-http.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.tcfl-web-http.service=tcfl-web"
+      - "traefik.http.middlewares.tcfl-https-proto.headers.customrequestheaders.X-Forwarded-Proto=https"
 
   authentik-db:
     image: postgres:16-alpine
@@ -130,25 +124,16 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.tcfl-auth.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
-      - "traefik.http.routers.tcfl-auth.entrypoints=websecure"
-      - "traefik.http.routers.tcfl-auth.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-auth.entrypoints=web"
+      - "traefik.http.routers.tcfl-auth.middlewares=tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-auth.service=tcfl-auth"
       - "traefik.http.services.tcfl-auth.loadbalancer.server.port=9000"
-      - "traefik.http.routers.tcfl-auth-http.rule=Host(`${APP_HOST}`) && PathPrefix(`/auth`)"
-      - "traefik.http.routers.tcfl-auth-http.entrypoints=web"
-      - "traefik.http.routers.tcfl-auth-http.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.tcfl-auth-http.service=tcfl-auth"
       - "traefik.http.routers.tcfl-id.rule=Host(`${ID_HOST}`)"
-      - "traefik.http.routers.tcfl-id.entrypoints=websecure"
-      - "traefik.http.routers.tcfl-id.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tcfl-id.entrypoints=web"
+      - "traefik.http.routers.tcfl-id.middlewares=tcfl-id-admin@docker,tcfl-https-proto@docker"
       - "traefik.http.routers.tcfl-id.service=tcfl-auth"
-      - "traefik.http.routers.tcfl-id.middlewares=tcfl-id-admin"
-      - "traefik.http.middlewares.tcfl-id-admin.redirectregex.regex=^https://[^/]+/$$"
+      - "traefik.http.middlewares.tcfl-id-admin.redirectregex.regex=^https?://[^/]+/$$"
       - "traefik.http.middlewares.tcfl-id-admin.redirectregex.replacement=https://${ID_HOST}/auth/if/admin/"
-      - "traefik.http.routers.tcfl-id-http.rule=Host(`${ID_HOST}`)"
-      - "traefik.http.routers.tcfl-id-http.entrypoints=web"
-      - "traefik.http.routers.tcfl-id-http.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.tcfl-id-http.service=tcfl-auth"
 
   authentik-worker:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}

@@ -132,7 +132,13 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 2. **DNS:** point the portal's domain (for example `portal.tcfl.ac.zw`) at the server.
 3. **Environment:** on your own machine, run `python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production`. It fills [.env.production.example](../.env.production.example) with a fresh random value for every secret. Keep the file out of git and somewhere safe (a password manager): it's needed to restore backups.
 4. **Create the application:** in Dokploy, **Create → Compose**, choose the git repository and branch `main`, set **Compose path** to `docker-compose.prod.yml`, and paste `.env.production` into the **Environment** tab.
-5. **Routing** is in the Traefik labels in `docker-compose.prod.yml`, from `APP_HOST` and `ID_HOST`: nothing to add in Dokploy's **Domains** tab (remove any domains added there, or Traefik gets two routes for one host). Certificates come from Dokploy's `letsencrypt` resolver, and plain http redirects to https. The web, api and authentik-server containers join Dokploy's `dokploy-network`.
+5. **Routing** is in the Traefik labels in `docker-compose.prod.yml`, from `APP_HOST` and `ID_HOST`: nothing to add in Dokploy's **Domains** tab (remove any domains added there, or Traefik gets two routes for one host). The web, api and authentik-server containers join Dokploy's `dokploy-network`.
+
+   **Cloudflare in front** (how the labels are set up): Cloudflare holds the certificate and reaches the server over plain http, so the routers use Dokploy's http entrypoint (`web`, port 80) and add `X-Forwarded-Proto: https`, which Authentik needs to issue `https://` addresses that match `OIDC_ISSUER`. In Cloudflare:
+   - DNS: `APP_HOST` and `ID_HOST` as **proxied** records (orange cloud) pointing at the server.
+   - SSL/TLS mode **Flexible**, and **Always Use HTTPS** on. Don't use Full: the server has no certificate.
+   - Leave Rocket Loader off (it rewrites the app's scripts). WebSockets on (Authentik uses them).
+   - On the server, allow port 80 only from [Cloudflare's IP ranges](https://www.cloudflare.com/ips/): between Cloudflare and the server, traffic isn't encrypted.
 
    | Address | Goes to |
    |---------|---------|
