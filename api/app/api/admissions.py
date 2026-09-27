@@ -7,7 +7,7 @@ import uuid
 from datetime import date, datetime
 from enum import StrEnum
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -29,7 +29,7 @@ from app.models import (
     Person,
     User,
 )
-from app.services import clock, eligibility, phones
+from app.services import audit, clock, eligibility, phones
 
 router = APIRouter(prefix="/staff/admissions", tags=["admissions"])
 officer = require_role("admissions", "admin")
@@ -640,9 +640,13 @@ async def _review(db: AsyncSession, cu: CurrentUser, a: Application) -> Review:
 
 @router.get("/applications/{reference}")
 async def review(
-    reference: str, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
+    reference: str, request: Request, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
 ) -> Review:
-    return await _review(db, cu, await _get(db, reference))
+    a = await _get(db, reference)
+    # The review shows the National ID number, date of birth and results (docs/07: audited).
+    await audit.record(db, cu, request, "application.view", "application", a.reference)
+    await db.commit()
+    return await _review(db, cu, a)
 
 
 @router.post("/applications/{reference}/assign")
@@ -671,9 +675,10 @@ def _require_open(a: Application) -> None:
 
 @router.post("/applications/{reference}/identity-checked")
 async def mark_identity_checked(
-    reference: str, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
+    reference: str, request: Request, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
 ) -> Review:
     a = await _get(db, reference)
+    await audit.record(db, cu, request, "application.identity_checked", "application", a.reference)
     doc = next((d for d in a.documents if d.kind == "national_id"), None)
     if doc is None:
         raise HTTPException(409, "There's no National ID photo on this application.")
@@ -689,10 +694,12 @@ async def mark_identity_checked(
 async def mark_zimsec_verified(
     reference: str,
     sitting_id: uuid.UUID,
+    request: Request,
     cu: CurrentUser = Depends(officer),
     db: AsyncSession = Depends(get_db),
 ) -> Review:
     a = await _get(db, reference)
+    await audit.record(db, cu, request, "application.zimsec_verified", "application", a.reference)
     s = next((s for s in a.sittings if s.id == sitting_id), None)
     if s is None:
         raise HTTPException(404, "That exam sitting isn't on this application.")
@@ -801,7 +808,11 @@ class DecisionIn(BaseModel):
 
 @router.post("/applications/{reference}/decision")
 async def decide(
-    reference: str, body: DecisionIn, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
+    reference: str,
+    body: DecisionIn,
+    request: Request,
+    cu: CurrentUser = Depends(officer),
+    db: AsyncSession = Depends(get_db),
 ) -> Review:
     a = await _get(db, reference)
     _require_open(a)
@@ -825,6 +836,7 @@ async def decide(
         Decision.ask: "TCFL Admissions needs more information for your application",
     }[body.decision]
     _notify(db, a, title, message, True, f"application:{a.id}:{to}:{now:%Y%m%d%H%M%S}")
+    await audit.record(db, cu, request, "application.decide", "application", a.reference, {"status": to})
     await db.commit()
     return await _review(db, cu, a)
 
@@ -834,12 +846,17 @@ async def decide(
 
 @router.get("/documents/{document_id}/file", response_class=StreamingResponse)
 async def document_file(
-    document_id: uuid.UUID, _: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
+    document_id: uuid.UUID,
+    request: Request,
+    cu: CurrentUser = Depends(officer),
+    db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     d = await db.get(Document, document_id)
     bucket = get_settings().s3_bucket_documents
     if d is None or storage.size(bucket, d.object_key) is None:
         raise HTTPException(404, "This document is missing.")
+    await audit.record(db, cu, request, "document.view", "document", str(d.id), {"kind": d.kind})
+    await db.commit()
     return StreamingResponse(
         storage.stream(bucket, d.object_key),
         media_type=d.mime_type,

@@ -8,7 +8,7 @@ from decimal import Decimal
 from enum import StrEnum
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -31,7 +31,7 @@ from app.models import (
     Person,
 )
 from app.pdf import make_pdf
-from app.services import clock, eligibility, payments
+from app.services import audit, clock, eligibility, payments
 from app.services.phones import local_phone, to_e164
 
 router = APIRouter(tags=["apply submit"])
@@ -490,13 +490,18 @@ async def payments_to_confirm(
 
 @staff_router.get("/payments/{payment_id}/proof", response_class=StreamingResponse)
 async def payment_proof(
-    payment_id: uuid.UUID, _: CurrentUser = Depends(accounts), db: AsyncSession = Depends(get_db)
+    payment_id: uuid.UUID,
+    request: Request,
+    cu: CurrentUser = Depends(accounts),
+    db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     p = await db.get(ApplicationPayment, payment_id)
     d = await db.get(Document, p.proof_document_id) if p and p.proof_document_id else None
     bucket = get_settings().s3_bucket_documents
     if d is None or storage.size(bucket, d.object_key) is None:
         raise HTTPException(404, "There's no proof of payment for this.")
+    await audit.record(db, cu, request, "document.view", "document", str(d.id), {"kind": d.kind})
+    await db.commit()
     return StreamingResponse(storage.stream(bucket, d.object_key), media_type=d.mime_type)
 
 
@@ -519,10 +524,14 @@ async def _payment(db: AsyncSession, payment_id: uuid.UUID) -> tuple[Application
 async def confirm_payment(
     payment_id: uuid.UUID,
     body: ConfirmPaymentIn,
+    request: Request,
     cu: CurrentUser = Depends(accounts),
     db: AsyncSession = Depends(get_db),
 ) -> list[PaymentToConfirm]:
     p, a = await _payment(db, payment_id)
+    await audit.record(
+        db, cu, request, "payment.confirm", "payment", str(p.id), {"receipt": body.receipt.strip()}
+    )
     p.status, p.paid_at, p.receipt, p.confirmed_by = "paid", clock.now(), body.receipt.strip(), cu.user.id
     await submit_application(db, a, p)
     await db.commit()
@@ -533,10 +542,12 @@ async def confirm_payment(
 async def reject_payment(
     payment_id: uuid.UUID,
     body: RejectPaymentIn,
+    request: Request,
     cu: CurrentUser = Depends(accounts),
     db: AsyncSession = Depends(get_db),
 ) -> list[PaymentToConfirm]:
     p, a = await _payment(db, payment_id)
+    await audit.record(db, cu, request, "payment.reject", "payment", str(p.id))
     p.status, p.failure, p.confirmed_by = "failed", body.reason.strip(), cu.user.id
     user = a.person.user
     if user:
