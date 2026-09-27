@@ -169,14 +169,15 @@ class SmsOutbox(Base):
 
 
 class PasswordReset(Base):
-    """A code texted for design/ForgotPassword; the password itself is set in Authentik."""
+    """A code sent for design/ForgotPassword (SMS and/or email); the password itself is set in Authentik."""
 
     __tablename__ = "password_resets"
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
     username: Mapped[str] = mapped_column(Text)
     code_hash: Mapped[bytes] = mapped_column(LargeBinary)
-    phone: Mapped[str] = mapped_column(Text)
+    phone: Mapped[str | None] = mapped_column(Text)
+    email: Mapped[str | None] = mapped_column(Text)
     attempts: Mapped[int] = mapped_column(SmallInteger, server_default="0")
     created_at: Mapped[datetime] = created_at()
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

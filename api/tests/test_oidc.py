@@ -10,6 +10,7 @@ from joserfc import jwt
 from joserfc.errors import JoseError
 from joserfc.jwk import KeySet, RSAKey
 
+from app import mail
 from app.auth import oidc, reset
 from app.auth.oidc import Discovery, Tokens
 from app.config import get_settings
@@ -337,3 +338,38 @@ async def test_sign_in_options_follow_the_google_setting(monkeypatch):
         assert (await c.get("/auth/options")).json() == {"google": False}
         monkeypatch.setattr(get_settings(), "google_client_id", "x.apps.googleusercontent.com")
         assert (await c.get("/auth/options")).json() == {"google": True}
+
+
+@pytest.fixture
+def email_only(authentik):
+    """A Google sign-up: an email address and no mobile number."""
+    authentik.users["rudo.google@gmail.com"] = {
+        "pk": 45,
+        "username": "rudo.google@gmail.com",
+        "email": "rudo.google@gmail.com",
+        "is_active": True,
+        "attributes": {},
+    }
+    return authentik
+
+
+async def _start(identifier: str) -> httpx.Response:
+    async with client() as c:
+        await c.get("/healthz")
+        c.headers["X-CSRF-Token"] = c.cookies["portal_csrf"]
+        return await c.post("/auth/reset/start", json={"identifier": identifier})
+
+
+async def test_reset_code_is_emailed_when_smtp_is_set_up(email_only, monkeypatch):
+    sent: list[tuple[str, str, str]] = []
+    monkeypatch.setattr(get_settings(), "smtp_host", "smtp.example.org")
+    monkeypatch.setattr(mail, "_send", lambda to, subject, body: sent.append((to, subject, body)))
+    assert (await _start("rudo.google@gmail.com")).json() == {"minutes": 10}
+    assert sent and sent[0][0] == "rudo.google@gmail.com" and "123456" in sent[0][2]
+
+
+async def test_without_smtp_nothing_is_emailed(email_only, monkeypatch):
+    sent: list = []
+    monkeypatch.setattr(mail, "_send", lambda *a: sent.append(a))
+    assert (await _start("rudo.google@gmail.com")).json() == {"minutes": 10}
+    assert sent == []

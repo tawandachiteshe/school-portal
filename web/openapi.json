@@ -10884,7 +10884,7 @@
         "properties": {
           "identifier": {
             "type": "string",
-            "maxLength": 40,
+            "maxLength": 254,
             "minLength": 3,
             "title": "Identifier"
           },
@@ -10912,7 +10912,7 @@
         "properties": {
           "identifier": {
             "type": "string",
-            "maxLength": 40,
+            "maxLength": 254,
             "minLength": 3,
             "title": "Identifier"
           }

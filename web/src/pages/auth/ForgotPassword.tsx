@@ -80,7 +80,7 @@ export default function ForgotPassword() {
             <AuthHeading
               eyebrow="Signing in"
               title="Reset your password"
-              lead="We'll text a code to the mobile number on your account. Then you choose a new password."
+              lead="We'll send a code to the mobile number and email on your account. Then you choose a new password."
             />
             <form
               className="flex flex-col gap-5"
@@ -105,7 +105,7 @@ export default function ForgotPassword() {
                 />
               </div>
               <Button type="submit" block disabled={busy || identifier.trim().length < 3}>
-                Text me a code
+                Send me a code
               </Button>
             </form>
           </>
@@ -117,8 +117,8 @@ export default function ForgotPassword() {
               title="Choose a new password"
               lead={
                 <>
-                  If <span className="font-mono text-foreground">{identifier}</span> is an account with a mobile number, we've texted a
-                  code to it. It works for {minutes} minutes.
+                  If <span className="font-mono text-foreground">{identifier}</span> is an account, we've sent a code to its mobile number
+                  or email. It works for {minutes} minutes.
                 </>
               }
             />
@@ -134,7 +134,7 @@ export default function ForgotPassword() {
               }}
             >
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor={ids.code}>Code from the SMS</Label>
+                <Label htmlFor={ids.code}>Code from the SMS or email</Label>
                 <Input
                   id={ids.code}
                   value={code}

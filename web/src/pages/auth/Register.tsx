@@ -96,21 +96,63 @@ function CodeBoxes({ value, onChange, invalid }: { value: string; onChange: (v: 
   )
 }
 
-function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string; challenge: Challenge; onAnswer: (c: Challenge) => void; onChangeNumber: () => void }) {
+// How each check reads: design/VerifyPhone for SMS, the same screen for email.
+const CHANNEL = {
+  sms: {
+    stage: 'ak-stage-authenticator-sms',
+    field: 'phone_number',
+    title: 'Check your phone',
+    legend: 'Code from the SMS',
+    wrong: "That code isn't right. Check the SMS, or send a new code.",
+    waiting: 'No SMS yet?',
+    help: 'Texts can take a minute on busy networks. Check the number is right and that your phone has signal.',
+    change: 'Change number',
+    mono: true,
+  },
+  email: {
+    stage: 'ak-stage-authenticator-email',
+    field: 'email',
+    title: 'Check your email',
+    legend: 'Code from the email',
+    wrong: "That code isn't right. Check the email, or send a new code.",
+    waiting: 'No email yet?',
+    help: 'Emails can take a few minutes. Look in your spam or promotions folder, and check the address is right.',
+    change: 'Change email',
+    mono: false,
+  },
+} as const
+
+function Verify({
+  channel,
+  to,
+  shown,
+  challenge,
+  onAnswer,
+  onChange,
+}: {
+  channel: keyof typeof CHANNEL
+  to: string
+  shown: string
+  challenge: Challenge
+  onAnswer: (c: Challenge) => void
+  onChange: () => void
+}) {
+  const t = CHANNEL[channel]
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [wait, setWait] = useState(RESEND_AFTER)
   const [failed, setFailed] = useState(false)
   const errRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const t = setInterval(() => setWait((w) => Math.max(0, w - 1)), 1000)
-    return () => clearInterval(t)
+    const id = setInterval(() => setWait((w) => Math.max(0, w - 1)), 1000)
+    return () => clearInterval(id)
   }, [])
   const wrong = generalError(challenge) ?? fieldError(challenge, 'code')
   async function verify() {
     setBusy(true)
     try {
-      const c = await answer(FLOW, { component: 'ak-stage-authenticator-sms', code: Number(code) })
+      // As text: a code can start with 0 (Authentik compares strings).
+      const c = await answer(FLOW, { component: t.stage, code })
       setFailed(!!(generalError(c) ?? fieldError(c, 'code')))
       onAnswer(c)
       if (generalError(c) ?? fieldError(c, 'code')) {
@@ -124,7 +166,7 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
   async function resend() {
     setWait(RESEND_AFTER)
     setFailed(false)
-    onAnswer(await answer(FLOW, { component: 'ak-stage-authenticator-sms', phone_number: phone }))
+    onAnswer(await answer(FLOW, { component: t.stage, [t.field]: to }))
   }
   return (
     <>
@@ -132,30 +174,30 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
         <div ref={errRef} tabIndex={-1} role="alert" className="flex flex-col gap-1 rounded-md border-2 border-destructive bg-card p-4">
           <h2 className="font-semibold">There's a problem</h2>
           <a href="#code" className="font-medium text-destructive underline underline-offset-2">
-            That code isn't right. Check the SMS, or send a new code.
+            {t.wrong}
           </a>
         </div>
       )}
       <AuthHeading
         eyebrow="Start an application"
-        title="Check your phone"
+        title={t.title}
         lead={
           <>
-            We sent a 6-digit code to <span className="font-mono whitespace-nowrap text-foreground">{masked(phone)}</span>.
+            We sent a 6-digit code to <span className={cn('whitespace-nowrap text-foreground', t.mono && 'font-mono')}>{shown}</span>.
           </>
         }
       />
       <fieldset id="code" className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium">Code from the SMS</legend>
+        <legend className="mb-2 text-sm font-medium">{t.legend}</legend>
         {failed && wrong && <span className="font-medium text-destructive">Check the code and try again</span>}
         <CodeBoxes value={code} onChange={setCode} invalid={failed} />
       </fieldset>
       <Button block disabled={busy || code.length !== 6} onClick={() => void verify()}>
-        Verify number
+        {channel === 'sms' ? 'Verify number' : 'Verify email'}
       </Button>
       <div className="flex flex-col items-start gap-2 border-t pt-4">
-        <h2 className="font-semibold">No SMS yet?</h2>
-        <p className="text-sm text-muted-foreground">Texts can take a minute on busy networks. Check the number is right and that your phone has signal.</p>
+        <h2 className="font-semibold">{t.waiting}</h2>
+        <p className="text-sm text-muted-foreground">{t.help}</p>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" disabled={wait > 0} onClick={() => void resend()}>
             {wait > 0 ? (
@@ -166,8 +208,8 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
               'Send again'
             )}
           </Button>
-          <Button variant="ghost" onClick={onChangeNumber}>
-            Change number
+          <Button variant="ghost" onClick={onChange}>
+            {t.change}
           </Button>
         </div>
       </div>
@@ -205,7 +247,7 @@ export default function Register() {
     if (c.component === 'ak-stage-user-login') return handle(await answer(FLOW, { component: 'ak-stage-user-login', remember_me: true }))
     if (c.component === 'ak-stage-authenticator-sms' && 'phone_number_required' in c && c.phone_number_required && phone)
       return handle(await answer(FLOW, { component: 'ak-stage-authenticator-sms', phone_number: phone }))
-    const known = ['ak-stage-prompt', 'ak-stage-authenticator-sms', 'ak-stage-access-denied', 'ak-stage-flow-error']
+    const known = ['ak-stage-prompt', 'ak-stage-authenticator-sms', 'ak-stage-authenticator-email', 'ak-stage-access-denied', 'ak-stage-flow-error']
     if (!known.includes(c.component)) return window.location.assign(fallbackUrl(FLOW))
     setChallenge(c)
   }
@@ -250,7 +292,22 @@ export default function Register() {
   )
 
   if (challenge?.component === 'ak-stage-authenticator-sms' && phone)
-    return frame(restart, <Verify phone={phone} challenge={challenge} onAnswer={(c) => void handle(c)} onChangeNumber={restart} />)
+    return frame(
+      restart,
+      <Verify channel="sms" to={phone} shown={masked(phone)} challenge={challenge} onAnswer={(c) => void handle(c)} onChange={restart} />,
+    )
+  if (challenge?.component === 'ak-stage-authenticator-email')
+    return frame(
+      restart,
+      <Verify
+        channel="email"
+        to={form.email.trim()}
+        shown={form.email.trim()}
+        challenge={challenge}
+        onAnswer={(c) => void handle(c)}
+        onChange={restart}
+      />,
+    )
 
   const denied = challenge?.component === 'ak-stage-access-denied'
   const err = (k: string) => fieldError(challenge, k)

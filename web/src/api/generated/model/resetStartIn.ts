@@ -8,7 +8,7 @@
 export interface ResetStartIn {
   /**
      * @minLength 3
-     * @maxLength 40
+     * @maxLength 254
      */
   identifier: string;
 }

@@ -5,7 +5,8 @@
 # - tcfl-authentication: username (student number, staff email or mobile number) and password on one
 #   screen (design/SignIn, StaffSignIn), then MFA for anyone who has set up a device.
 # - tcfl-enrollment: applicant sign-up. Name, mobile number (becomes the username), password; the
-#   number is checked with an SMS code (design/VerifyPhone) when SIGNUP_VERIFY_PHONE is set. Codes go through Authentik's generic SMS
+#   number is checked with an SMS code (design/VerifyPhone) when SIGNUP_VERIFY_PHONE is set, and the
+#   optional email with an emailed code when Authentik can send email (AUTHENTIK_EMAIL__HOST). Codes go through Authentik's generic SMS
 #   provider to the portal (POST /api/internal/sms), which queues them like any other text.
 #
 # - Google (tcfl-source-*): "Continue with Google" when GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set.
@@ -212,6 +213,32 @@ entries:
       expression: !Format ["return %r != ''", !Env [SIGNUP_VERIFY_PHONE, ""]]
   - model: authentik_policies.policybinding
     identifiers: { target: !KeyOf verify-phone-binding, policy: !KeyOf verify-phone-on, order: 0 }
+  # The email address, when given, is checked the same way with a code by email. Only when Authentik
+  # can send email (AUTHENTIK_EMAIL__HOST); without it the address is kept unchecked.
+  - model: authentik_stages_authenticator_email.authenticatoremailstage
+    id: verify-email
+    identifiers: { name: tcfl-verify-email }
+    attrs:
+      friendly_name: Email
+      use_global_settings: true
+      subject: "TCFL Portal: your code"
+      token_expiry: minutes=15
+  - model: authentik_flows.flowstagebinding
+    id: verify-email-binding
+    identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf verify-email, order: 35 }
+    attrs:
+      evaluate_on_plan: false
+      re_evaluate_policies: true
+  - model: authentik_policies_expression.expressionpolicy
+    id: verify-email-on
+    identifiers: { name: tcfl-verify-email-on }
+    attrs:
+      expression: !Format
+        - "return %r != '' and bool(request.context.get('prompt_data', {}).get('email'))"
+        - !Env [AUTHENTIK_EMAIL__HOST, ""]
+  - model: authentik_policies.policybinding
+    identifiers: { target: !KeyOf verify-email-binding, policy: !KeyOf verify-email-on, order: 0 }
+
   - model: authentik_flows.flowstagebinding
     identifiers: { target: !KeyOf enrollment-flow, stage: !KeyOf login, order: 40 }
 

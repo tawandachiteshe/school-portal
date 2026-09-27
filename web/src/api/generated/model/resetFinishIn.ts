@@ -8,7 +8,7 @@
 export interface ResetFinishIn {
   /**
      * @minLength 3
-     * @maxLength 40
+     * @maxLength 254
      */
   identifier: string;
   /** @pattern ^\d{6}$ */

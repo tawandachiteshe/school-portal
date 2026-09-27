@@ -1,14 +1,16 @@
-"""Password reset by SMS code (design/ForgotPassword): "We'll text a code to the mobile number on your
+"""Password reset by code (design/ForgotPassword): "We'll text a code to the mobile number on your
 account. Then you choose a new password."
 
-Authentik's recovery flow resets by email link; students and applicants use their phones, so the
-portal texts the code and sets the new password through the Authentik admin API. Answers never say
+Authentik's recovery flow resets by email link; students and applicants mostly use their phones, so
+the portal sends a 6-digit code by SMS, and by email too when the account has one and SMTP is set up
+(app/mail.py), then sets the new password through the Authentik admin API. Answers never say
 whether an account exists. Staff reset through ICT or their TCFL email (the design says so).
 """
 
 import logging
 import re
 import secrets
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import httpx
@@ -17,6 +19,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import mail
 from app.config import get_settings
 from app.crypto import keyed_hash
 from app.db import get_db
@@ -52,8 +55,15 @@ def _candidates(identifier: str) -> list[str]:
     return list(dict.fromkeys(out))
 
 
-async def _find(db: AsyncSession, identifier: str) -> tuple[str, str] | None:
-    """(Authentik username, phone) for a student number, mobile number or email, if it has a phone."""
+@dataclass
+class Account:
+    username: str  # Authentik username
+    phone: str | None
+    email: str | None
+
+
+async def _find(db: AsyncSession, identifier: str) -> Account | None:
+    """The account for a student number, mobile number or email, if it has a phone or email to send to."""
     names = _candidates(identifier)
     digits = re.sub(r"\D", "", identifier)
     phones = (
@@ -79,24 +89,27 @@ async def _find(db: AsyncSession, identifier: str) -> tuple[str, str] | None:
     if (
         u
         and u.username
-        and u.phone
+        and (u.phone or u.email)
         and not (u.roles and all(r.role not in ("student", "applicant") for r in u.roles))
     ):
-        return u.username, u.phone
+        return Account(u.username, u.phone, u.email)
     # Signed up but never signed in to the portal: ask Authentik.
     async with _authentik() as c:
         lookups = [{"email": e} for e in emails] + [{"username": n} for n in names]
         for params in lookups:
             r = await c.get("core/users/", params=params)
             found = r.json().get("results", []) if r.status_code == 200 else []
-            phone = found[0].get("attributes", {}).get("phone_number") if found else None
-            if found and found[0].get("is_active") and phone:
-                return found[0]["username"], phone
+            if not found or not found[0].get("is_active"):
+                continue
+            phone = found[0].get("attributes", {}).get("phone_number")
+            email = found[0].get("email") or None
+            if phone or email:
+                return Account(found[0]["username"], phone, email)
     return None
 
 
 class ResetStartIn(BaseModel):
-    identifier: str = Field(min_length=3, max_length=40)
+    identifier: str = Field(min_length=3, max_length=254)
 
 
 class ResetStarted(BaseModel):
@@ -110,7 +123,7 @@ async def reset_start(body: ResetStartIn, db: AsyncSession = Depends(get_db)) ->
     found = await _find(db, body.identifier)
     if found is None:
         return ResetStarted(minutes=CODE_MINUTES)
-    username, phone = found
+    username = found.username
     now = datetime.now(UTC)
     recent = await db.scalar(
         select(func.count())
@@ -120,29 +133,34 @@ async def reset_start(body: ResetStartIn, db: AsyncSession = Depends(get_db)) ->
     if (recent or 0) >= MAX_PER_HOUR:
         raise HTTPException(429, "Too many codes. Wait an hour, or ask ICT Services, Block C.")
     code = f"{secrets.randbelow(1_000_000):06d}"
+    text = f"TCFL: your password reset code is {code}. It expires in {CODE_MINUTES} minutes."
+    # SMS and email both, where the account has them. Texts queue until an SMS provider is set up;
+    # email goes only when SMTP is set up. Development logs both.
+    if found.phone:
+        db.add(SmsOutbox(to_phone=found.phone, body=text, purpose="reset"))
     db.add(
         PasswordReset(
             username=username,
             code_hash=keyed_hash(f"reset:{username}:{code}"),
-            phone=phone,
+            phone=found.phone,
+            email=found.email,
             expires_at=now + timedelta(minutes=CODE_MINUTES),
         )
     )
-    db.add(
-        SmsOutbox(
-            to_phone=phone,
-            body=f"TCFL: your password reset code is {code}. It expires in {CODE_MINUTES} minutes.",
-            purpose="reset",
-        )
-    )
     await db.commit()
-    if not get_settings().is_prod:
-        log.warning("SMS to %s: reset code %s", phone, code)
+    if found.phone and not get_settings().is_prod:
+        log.warning("SMS to %s: reset code %s", found.phone, code)
+    if found.email:
+        await mail.send(
+            found.email,
+            "TCFL Portal: your password reset code",
+            f"{text}\n\nIf you didn't ask to reset your password, you can ignore this email.",
+        )
     return ResetStarted(minutes=CODE_MINUTES)
 
 
 class ResetFinishIn(BaseModel):
-    identifier: str = Field(min_length=3, max_length=40)
+    identifier: str = Field(min_length=3, max_length=254)
     code: str = Field(pattern=r"^\d{6}$")
     password: str = Field(min_length=10, max_length=200)
 
@@ -157,7 +175,7 @@ async def reset_finish(body: ResetFinishIn, db: AsyncSession = Depends(get_db)) 
     found = await _find(db, body.identifier)
     if found is None:
         raise wrong
-    username = found[0]
+    username = found.username
     now = datetime.now(UTC)
     r = (
         (

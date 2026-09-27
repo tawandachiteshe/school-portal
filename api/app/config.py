@@ -33,6 +33,13 @@ class Settings(BaseSettings):
     authentik_api_url: str = "http://localhost:9000/auth/api/v3/"
     authentik_api_token: str = ""
     authentik_dev_password: str = "tcfl-dev-2027"  # app/authentik_dev.py
+    # Portal email (password reset codes). Empty host: nothing is sent; development logs the text.
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "TCFL Portal <portal@tcfl.ac.zw>"
+    smtp_use_tls: bool = True
     # Set for Authentik's Google source too (infra/authentik/blueprints/tcfl-flows.yaml): shows
     # "Continue with Google" on sign-in and sign-up.
     google_client_id: str = ""
