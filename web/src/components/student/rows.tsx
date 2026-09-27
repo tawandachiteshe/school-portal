@@ -13,6 +13,7 @@ import {
   shortDateTime,
 } from '@/lib/format'
 import type { AnnouncementItem, DueItem, LoanItem, NoteItem } from '@/api/generated/model'
+import { useOnline } from '@/lib/offline'
 import { KIND_LABEL } from '@/lib/student'
 import { cn } from '@/lib/utils'
 
@@ -88,8 +89,27 @@ export function NoteRow({
   showModule?: boolean
   now?: Date
 }) {
+  const online = useOnline()
   const kind = fileKind(item.mime_type)
   const size = item.size_bytes ? fileSize(item.size_bytes) : null
+  // Offline: notes come from the server, so they wait for the signal (design/StateOffline).
+  if (!online)
+    return (
+      <li className="flex items-center gap-3 py-2">
+        <Badge className="w-11 justify-center font-mono">{kind}</Badge>
+        <div className="min-w-0 grow">
+          <div className="font-medium text-muted-foreground">{item.title}</div>
+          <div className="text-sm text-muted-foreground">
+            {showModule && <span className="font-mono">{item.module_code}</span>}
+            {showModule && ' · '}
+            {[size, item.downloaded ? 'downloaded to this phone' : 'download when back online'].filter(Boolean).join(' · ')}
+          </div>
+        </div>
+        <Button variant="ghost" size="icon" disabled aria-label={`${item.title}: download when back online`}>
+          <Download strokeWidth={1.5} />
+        </Button>
+      </li>
+    )
   const when = now ? noteAge(new Date(item.published_at), now) : null
   const meta = [item.week && `Week ${item.week}`, size, !item.downloaded && when].filter(Boolean).join(' · ')
   return (
@@ -145,6 +165,7 @@ export function LoanRow({
   onRenew: (id: string) => void
   renewing: boolean
 }) {
+  const online = useOnline()
   const due = new Date(item.due_at)
   const author = item.authors[0]?.split(' ').at(-1)
   return (
@@ -166,7 +187,7 @@ export function LoanRow({
         )}
       </div>
       {!item.overdue && item.renewals_left > 0 && (
-        <Button variant="outline" onClick={() => onRenew(item.id)} disabled={renewing}>
+        <Button variant="outline" onClick={() => onRenew(item.id)} disabled={renewing || !online}>
           Renew
         </Button>
       )}

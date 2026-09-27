@@ -1,6 +1,8 @@
 // Fetch wrapper for the FastAPI BFF under /api (docs/10 §10.6). Sends the session cookie and the
 // double-submit CSRF header on state-changing requests.
 
+import { reportReachable } from './offline'
+
 export class ApiError extends Error {
   status: number
   constructor(status: number, message: string) {
@@ -25,13 +27,21 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
     const csrf = readCookie('portal_csrf')
     if (csrf) h.set('X-CSRF-Token', csrf)
   }
-  const res = await fetch(`/api${path}`, {
-    ...rest,
-    method,
-    headers: h,
-    credentials: 'same-origin',
-    body: json === undefined ? rest.body : JSON.stringify(json),
-  })
+  let res: Response
+  try {
+    res = await fetch(`/api${path}`, {
+      ...rest,
+      method,
+      headers: h,
+      credentials: 'same-origin',
+      body: json === undefined ? rest.body : JSON.stringify(json),
+    })
+  } catch (e) {
+    // No response at all (not an aborted request): the portal can't be reached.
+    if (!(e instanceof DOMException && e.name === 'AbortError')) reportReachable(false)
+    throw e
+  }
+  reportReachable(true)
   if (!res.ok) {
     let message = 'Something went wrong. Try again.'
     try {

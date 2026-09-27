@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import { cn } from '@/lib/utils'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { DeskBar, DeskFallback } from './student-desktop'
+import { OfflineBar } from './offline-bar'
 import { BottomNav } from './student-shell'
 
 const CRUMB: Record<string, string> = {
@@ -63,6 +64,7 @@ export function SubPage({
         </Link>
         <span className={cn('truncate font-medium', mono && 'font-mono')}>{title}</span>
       </header>
+      <OfflineBar />
       <div className="mx-auto flex w-full max-w-[640px] grow flex-col">{children}</div>
       {bottomNav && <BottomNav />}
     </div>

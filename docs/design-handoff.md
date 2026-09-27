@@ -80,6 +80,8 @@ Handoff mechanics: desktop creates a short-lived session (15 min) with a 4-char 
 | StudentCard | Offline digital card with barcode | `/card` |
 | AskStart / AskChat / AskHandoff | Assistant: start, answers with sources, hand to Student Affairs | `/ask` |
 | StateLoading / StateOffline / StateEmpty / StateSession / DownloadSheet | Loading, offline, empty, signed out, large download | — |
+|  | StateOffline: on phones only (lab computers are shared), the student's own pages are kept on the device for 7 days and open without signal; "offline" also means the portal can't be reached, since phones often report being online with no data. Notes and renewing wait for the signal (src/lib/offline.ts) | — |
+|  | StateSession: the page stays under the sheet. Sessions end at a fixed time (14 days, 8 hours on a shared computer) or when revoked, not after idle time, so the copy says "Your session ended" rather than "after a while without use"; nothing typed is saved, so the "saved on this phone" line is left out | — |
 
 Amber rule on the dashboard/deadlines: `due - now <= 48h` and not submitted → `urgent` badge with relative time; else muted relative time; submitted → muted "Submitted" with green check.
 

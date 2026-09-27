@@ -23,6 +23,14 @@ export default defineConfig({
         start_url: '/',
         icons: [{ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }],
       },
+      workbox: {
+        // The app shell and fonts open offline (design/StateOffline); data comes from the saved
+        // query cache (src/lib/offline.ts), never from the service worker.
+        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        navigateFallback: '/index.html',
+        // Sign-in goes through the API and Authentik as real page loads: never answer those with the app.
+        navigateFallbackDenylist: [/^\/api\//, /^\/auth\//],
+      },
     }),
   ],
   resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } },

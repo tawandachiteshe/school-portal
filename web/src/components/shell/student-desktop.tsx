@@ -19,6 +19,7 @@ import { useDashboard } from '@/api/generated/student/student'
 import { useMe } from '@/lib/auth'
 import { isUrgent } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { OfflineBar } from './offline-bar'
 import { Initials, Wordmark } from './wordmark'
 
 type Item = { to: string; label: string; icon: LucideIcon; end?: boolean; count?: number; urgent?: boolean }
@@ -92,6 +93,7 @@ export function DesktopStudentShell() {
     <div className="flex min-h-dvh bg-background">
       <Sidebar />
       <div className="flex min-w-0 grow flex-col">
+        <OfflineBar />
         <Outlet />
       </div>
     </div>

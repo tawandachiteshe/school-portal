@@ -10,7 +10,9 @@ import { DeskFallback, DesktopStudentShell, useHasDeskLayout } from './student-d
 import { invalidateStudentData } from '@/lib/student'
 import { dismissUpload, resumeSavedUploads } from '@/lib/uploads'
 import { useQueryClient } from '@tanstack/react-query'
+import { useOnline } from '@/lib/offline'
 import { cn } from '@/lib/utils'
+import { OfflineBar } from './offline-bar'
 import { Initials, Wordmark } from './wordmark'
 
 const NAV = [
@@ -23,18 +25,27 @@ const NAV = [
 
 export function StudentTopBar({ avatar = true }: { avatar?: boolean }) {
   const { data: me } = useMe()
+  const online = useOnline()
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-card pr-2 pl-4">
       <Link to="/" aria-label="TCFL Portal home" className="flex min-h-11 items-center">
         <Wordmark />
       </Link>
       <div className="flex items-center">
-        <Button variant="ghost" asChild>
-          <Link to="/ask">
+        {/* Ask TCFL needs the internet (design/StateOffline). */}
+        {online ? (
+          <Button variant="ghost" asChild>
+            <Link to="/ask">
+              <MessageSquare strokeWidth={1.5} />
+              Ask TCFL
+            </Link>
+          </Button>
+        ) : (
+          <Button variant="ghost" disabled className="bg-transparent disabled:bg-transparent">
             <MessageSquare strokeWidth={1.5} />
             Ask TCFL
-          </Link>
-        </Button>
+          </Button>
+        )}
         {avatar && me && (
           <Link
             to="/more"
@@ -111,6 +122,7 @@ export function StudentShell({ avatar = true }: { avatar?: boolean }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <StudentTopBar avatar={avatar} />
+      <OfflineBar />
       <div className="mx-auto flex w-full max-w-[640px] grow flex-col">
         <Outlet />
       </div>

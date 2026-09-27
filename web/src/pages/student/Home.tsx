@@ -19,6 +19,7 @@ import { invalidateStudentData } from '@/lib/student'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
 import HomeDesk from './HomeDesk'
+import { lastSaved, useOnline } from '@/lib/offline'
 import { DeskFallback } from '@/components/shell/student-desktop'
 
 const list = '[&>li+li]:border-t'
@@ -186,6 +187,7 @@ function DashboardView({
             )}
           </Empty>
         )}
+        <OfflineRoomNote />
       </Section>
 
       <Section id="h-due" title="Due in the next 7 days" link={{ to: '/deadlines', label: 'All deadlines' }}>
@@ -270,4 +272,13 @@ function DashboardView({
       </section>
     </main>
   )
+}
+
+// design/StateOffline: the timetable shown is the saved one.
+function OfflineRoomNote() {
+  const online = useOnline()
+  const qc = useQueryClient()
+  const saved = lastSaved(qc)
+  if (online || !saved) return null
+  return <p className="text-xs text-muted-foreground">Room changes made after {time(saved)} won't show until you're back online.</p>
 }
