@@ -36,5 +36,10 @@ open http://localhost:5173/auth/  # Authentik (admin at /auth/if/admin/)
 open http://localhost:8000/docs   # API docs
 ```
 
-Without Docker: `cd web && bun install && bun run dev` and `cd api && uv sync && uv run uvicorn app.main:app --reload`.
-Tests: `cd web && bun run test`, `cd api && uv run pytest`. Production runs on Dokploy ([docs/06 §6.7](docs/06-running-the-system.md#67-production-deployment-dokploy)).
+Sample data (the people and modules in the designs): `docker compose exec api python -m app.seed`.
+In development `/login` offers a sign-in as any seeded account (`DEV_LOGIN=true`, never in production).
+
+Without Docker: `docker compose up -d postgres`, put `DATABASE_URL=postgresql+psycopg://portal:…@localhost:5432/portal`
+in `api/.env` (set `POSTGRES_PORT` in `.env` if 5432 is taken), then `cd api && uv sync && uv run alembic upgrade head
+&& uv run python -m app.seed && uv run uvicorn app.main:app --reload`, and `cd web && bun install && bun run dev`.
+Tests: `cd web && bun run test`, `cd api && uv run pytest` (needs the Postgres container; creates a `portal_test` database). Production runs on Dokploy ([docs/06 §6.7](docs/06-running-the-system.md#67-production-deployment-dokploy)).

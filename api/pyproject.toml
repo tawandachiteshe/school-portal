@@ -8,7 +8,7 @@ dependencies = [
   "uvicorn[standard]>=0.30",
   "pydantic>=2.8",
   "pydantic-settings>=2.4",
-  "sqlalchemy>=2.0",
+  "sqlalchemy[asyncio]>=2.0",
   "alembic>=1.13",
   "psycopg[binary]>=3.2",
   "pgvector>=0.3",
@@ -20,6 +20,7 @@ dependencies = [
   "anthropic>=0.40",
   "rapidfuzz>=3.9",
   "gunicorn>=26.2.0",
+  "cryptography>=50.0.1",
 ]
 
 [project.optional-dependencies]
@@ -27,7 +28,11 @@ dependencies = [
 ocr = ["paddleocr>=3.0", "opencv-python-headless>=4.10", "pytesseract>=0.3"]
 
 [dependency-groups]
-dev = ["pytest>=8.3", "ruff>=0.6"]
+dev = [
+    "anyio>=4.15.1",
+    "pytest>=8.3",
+    "ruff>=0.6",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -45,3 +50,6 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.File", "fastapi.Form"]
