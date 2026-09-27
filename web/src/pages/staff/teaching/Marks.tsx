@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { CircleAlert, Search } from 'lucide-react'
+import { CircleAlert } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { toast } from 'sonner'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
+import { FilterBar, FilterSearch, FilterSelect } from '@/components/staff/filter-bar'
 import type { MarkIn, MarksSheet } from '@/api/generated/model'
 import {
   getGetMarksQueryKey,
@@ -261,45 +262,30 @@ function MarksTable({ sheet }: { sheet: MarksSheet }) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-b py-3">
-          <div className="relative w-[300px]">
-            <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" strokeWidth={1.5} aria-hidden />
-            <input
-              type="search"
-              aria-label="Find a student"
-              placeholder="Find a student by name or number"
-              value={find}
-              onChange={(e) => setFind(e.target.value)}
-              className="h-9 w-full rounded-sm border border-input bg-card pr-2 pl-8 text-sm"
-            />
-          </div>
-          <select
-            aria-label="Show"
+        <FilterBar
+          className="border-b py-3"
+          shown={visible.length}
+          total={sheet.rows.length}
+          noun="students"
+          active={!!find.trim() || show !== 'all'}
+          onClear={() => {
+            setFind('')
+            setShow('all')
+          }}
+        >
+          <FilterSearch value={find} onChange={setFind} placeholder="Find a student by name or number" />
+          <FilterSelect
+            label="Show"
             value={show}
-            onChange={(e) => setShow(e.target.value as typeof show)}
-            className="h-9 rounded-sm border border-input bg-card px-2 text-sm"
-          >
-            <option value="all">All students</option>
-            <option value="missing">Not entered yet</option>
-            <option value="problems">Marks to fix</option>
-            <option value="absent">Absent</option>
-          </select>
-          {(find || show !== 'all') && (
-            <span className="ml-auto text-sm text-muted-foreground" role="status">
-              {visible.length} of {sheet.rows.length} ·{' '}
-              <button
-                type="button"
-                className="text-primary underline underline-offset-2"
-                onClick={() => {
-                  setFind('')
-                  setShow('all')
-                }}
-              >
-                Clear
-              </button>
-            </span>
-          )}
-        </div>
+            onChange={(v) => setShow(v as typeof show)}
+            options={[
+              { value: 'all', label: 'All students' },
+              { value: 'missing', label: 'Not entered yet' },
+              { value: 'problems', label: 'Marks to fix' },
+              { value: 'absent', label: 'Absent' },
+            ]}
+          />
+        </FilterBar>
         </div>
 
         <Table

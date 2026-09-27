@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Check, Search, Upload } from 'lucide-react'
+import { Check, Upload } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StaffTopBar } from '@/components/shell/staff-shell'
+import { FilterBar, FilterSearch, FilterSelect } from '@/components/staff/filter-bar'
 import type { ClassPage as ClassData } from '@/api/generated/model'
 import { getClassPageQueryKey, getOverviewQueryKey, useClassPage, useUploadNotes } from '@/api/generated/teaching/teaching'
 import { ApiError } from '@/lib/api'
@@ -187,49 +188,6 @@ function UploadDialog({ c, open, onOpenChange }: { c: ClassData; open: boolean; 
   )
 }
 
-function SearchField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  return (
-    <div className="relative w-[300px]">
-      <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" strokeWidth={1.5} aria-hidden />
-      <Input
-        type="search"
-        aria-label={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="h-9 pl-8 text-sm"
-      />
-    </div>
-  )
-}
-
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  options: { value: string; label: string }[]
-}) {
-  return (
-    <select
-      aria-label={label}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-9 rounded-sm border border-input bg-card px-2 text-sm"
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  )
-}
-
 const matches = (q: string, ...fields: (string | null | undefined)[]) => {
   const t = q.trim().toLowerCase()
   return !t || fields.some((f) => f?.toLowerCase().includes(t))
@@ -337,68 +295,66 @@ export default function ClassPage() {
               Assessments <span className="font-mono text-sm">{c.assessments.length}</span>
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-3 border-b py-3">
-          {tab === 'students' && (
-            <>
-              <SearchField value={q} onChange={setQ} placeholder="Search name or student number" />
-              <Select
-                label="Attendance"
-                value={attendance}
-                onChange={setAttendance}
-                options={[
-                  { value: 'all', label: 'Any attendance' },
-                  { value: 'low', label: `Below ${LOW_ATTENDANCE}%` },
-                  { value: 'none', label: 'No registers yet' },
-                ]}
-              />
-            </>
-          )}
-          {tab === 'notes' && (
-            <>
-              <SearchField value={q} onChange={setQ} placeholder="Search notes" />
-              <Select
-                label="Week"
-                value={week}
-                onChange={setWeek}
-                options={[{ value: 'all', label: 'All weeks' }, ...weeks.map((w) => ({ value: String(w), label: `Week ${w}` }))]}
-              />
-            </>
-          )}
-          {tab === 'assessments' && (
-            <>
-              <SearchField value={q} onChange={setQ} placeholder="Search assessments" />
-              <Select
-                label="Type"
-                value={kind}
-                onChange={setKind}
-                options={[{ value: 'all', label: 'All types' }, ...kinds.map((k) => ({ value: k, label: KIND_LABEL[k] }))]}
-              />
-              <Select
-                label="Status"
-                value={status}
-                onChange={setStatus}
-                options={[
-                  { value: 'all', label: 'Any status' },
-                  { value: 'to_mark', label: 'To mark' },
-                  { value: 'published', label: 'Published' },
-                  { value: 'upcoming', label: 'Coming up' },
-                ]}
-              />
-            </>
-          )}
-          <span className="ml-auto text-sm text-muted-foreground" role="status">
-            {filtered ? (
+          <FilterBar
+            className="border-b py-3"
+            shown={shown}
+            total={total}
+            noun={tab}
+            active={filtered}
+            onClear={clear}
+          >
+            {tab === 'students' && (
               <>
-                {shown} of {total} ·{' '}
-                <button type="button" onClick={clear} className="text-primary underline underline-offset-2">
-                  Clear
-                </button>
+                <FilterSearch value={q} onChange={setQ} placeholder="Search name or student number" />
+                <FilterSelect
+                  label="Attendance"
+                  value={attendance}
+                  onChange={setAttendance}
+                  options={[
+                    { value: 'all', label: 'Any attendance' },
+                    { value: 'low', label: `Below ${LOW_ATTENDANCE}%` },
+                    { value: 'none', label: 'No registers yet' },
+                  ]}
+                />
               </>
-            ) : (
-              `${total} ${tab === 'students' ? 'students' : tab === 'notes' ? 'notes' : 'assessments'}`
             )}
-          </span>
-          </div>
+            {tab === 'notes' && (
+              <>
+                <FilterSearch value={q} onChange={setQ} placeholder="Search notes" />
+                <FilterSelect
+                  label="Week"
+                  value={week}
+                  onChange={setWeek}
+                  options={[
+                    { value: 'all', label: 'All weeks' },
+                    ...weeks.map((w) => ({ value: String(w), label: `Week ${w}` })),
+                  ]}
+                />
+              </>
+            )}
+            {tab === 'assessments' && (
+              <>
+                <FilterSearch value={q} onChange={setQ} placeholder="Search assessments" />
+                <FilterSelect
+                  label="Type"
+                  value={kind}
+                  onChange={setKind}
+                  options={[{ value: 'all', label: 'All types' }, ...kinds.map((k) => ({ value: k, label: KIND_LABEL[k] }))]}
+                />
+                <FilterSelect
+                  label="Status"
+                  value={status}
+                  onChange={setStatus}
+                  options={[
+                    { value: 'all', label: 'Any status' },
+                    { value: 'to_mark', label: 'To mark' },
+                    { value: 'published', label: 'Published' },
+                    { value: 'upcoming', label: 'Coming up' },
+                  ]}
+                />
+              </>
+            )}
+          </FilterBar>
         </div>
 
         <main className="px-8 pb-8">
