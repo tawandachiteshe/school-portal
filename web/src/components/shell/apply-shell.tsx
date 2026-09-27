@@ -12,7 +12,7 @@ export const STEPS = ['Programme', 'National ID', 'ZIMSEC results', 'Review', 'S
 // Mobile: "Step 1 of 5 · Programme / Next: National ID" over five 4px segments (design/ProgrammeMobile).
 function MobileSteps({ step }: { step: number }) {
   return (
-    <div className="flex flex-col gap-2 px-4 pt-4">
+    <div className="flex flex-col gap-2 bg-background px-4 pt-4 pb-3">
       <div className="flex justify-between text-sm">
         <span className="font-medium">
           Step {step} of {STEPS.length} · {STEPS[step - 1]}
@@ -89,45 +89,48 @@ export function ApplyShell({
   const inForm = step != null
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <header
-        className={cn(
-          'sticky top-0 z-10 flex shrink-0 items-center justify-between border-b bg-card',
-          desktop ? 'h-16 px-8' : 'h-14 pr-1 pl-4',
-        )}
-      >
-        <div className="flex items-center gap-4">
-          <Wordmark />
-          {desktop && app && (
-            <>
-              <span aria-hidden className="h-5 w-px bg-border" />
-              <span className="text-sm text-muted-foreground">Application · {app.intake}</span>
-            </>
+      {/* The top bar and the steps stay in view while the page scrolls. */}
+      <div className="sticky top-0 z-10 shrink-0">
+        <header
+          className={cn(
+            'flex items-center justify-between border-b bg-card',
+            desktop ? 'h-16 px-8' : 'h-14 pr-1 pl-4',
           )}
-        </div>
-        {inForm ? (
+        >
           <div className="flex items-center gap-4">
-            {desktop && app?.reference && (
-              <span className="text-sm text-muted-foreground">
-                Reference <span className="font-mono text-foreground">{app.reference}</span>
-              </span>
+            <Wordmark />
+            {desktop && app && (
+              <>
+                <span aria-hidden className="h-5 w-px bg-border" />
+                <span className="text-sm text-muted-foreground">Application · {app.intake}</span>
+              </>
             )}
-            <Button variant={desktop ? 'outline' : 'ghost'} size={desktop ? 'sm' : 'default'} onClick={() => void signOut()}>
-              Save and exit
-            </Button>
           </div>
-        ) : (
-          app && (
-            <div className="flex items-center gap-3">
-              {desktop && <span className="text-sm">{app.name}</span>}
-              <Initials initials={app.initials} />
-              <Button variant="ghost" size="sm" onClick={() => void signOut()}>
-                Sign out
+          {inForm ? (
+            <div className="flex items-center gap-4">
+              {desktop && app?.reference && (
+                <span className="text-sm text-muted-foreground">
+                  Reference <span className="font-mono text-foreground">{app.reference}</span>
+                </span>
+              )}
+              <Button variant={desktop ? 'outline' : 'ghost'} size={desktop ? 'sm' : 'default'} onClick={() => void signOut()}>
+                Save and exit
               </Button>
             </div>
-          )
-        )}
-      </header>
-      {inForm && (desktop ? <DesktopSteps step={step} /> : <MobileSteps step={step} />)}
+          ) : (
+            app && (
+              <div className="flex items-center gap-3">
+                {desktop && <span className="text-sm">{app.name}</span>}
+                <Initials initials={app.initials} />
+                <Button variant="ghost" size="sm" onClick={() => void signOut()}>
+                  Sign out
+                </Button>
+              </div>
+            )
+          )}
+        </header>
+        {inForm && (desktop ? <DesktopSteps step={step} /> : <MobileSteps step={step} />)}
+      </div>
       {children}
       {footer && !desktop && (
         <div className="sticky bottom-0 mt-auto flex flex-col gap-2 border-t bg-card px-4 pt-3 pb-4">{footer}</div>
