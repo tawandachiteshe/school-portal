@@ -4067,6 +4067,27 @@
           }
         }
       }
+    },
+    "/apply/review": {
+      "get": {
+        "tags": [
+          "apply review"
+        ],
+        "summary": "Application Review",
+        "operationId": "application_review",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicantReview"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4469,6 +4490,125 @@
           "items"
         ],
         "title": "Announcements"
+      },
+      "ApplicantEligibility": {
+        "properties": {
+          "eligible": {
+            "type": "boolean",
+            "title": "Eligible"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "shortfalls": {
+            "items": {
+              "$ref": "#/components/schemas/Shortfall"
+            },
+            "type": "array",
+            "title": "Shortfalls"
+          },
+          "other_passes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Other Passes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eligible",
+          "summary",
+          "shortfalls",
+          "other_passes"
+        ],
+        "title": "ApplicantEligibility"
+      },
+      "ApplicantReview": {
+        "properties": {
+          "programme": {
+            "$ref": "#/components/schemas/ReviewProgramme"
+          },
+          "national_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "birth_certificate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewBirth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sittings": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewSitting"
+            },
+            "type": "array",
+            "title": "Sittings"
+          },
+          "phone_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Masked"
+          },
+          "eligibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicantEligibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "missing": {
+            "items": {
+              "$ref": "#/components/schemas/ApplyStep"
+            },
+            "type": "array",
+            "title": "Missing"
+          },
+          "admissions_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Admissions Contact"
+          }
+        },
+        "type": "object",
+        "required": [
+          "programme",
+          "national_id",
+          "birth_certificate",
+          "sittings",
+          "phone_masked",
+          "eligibility",
+          "missing",
+          "admissions_contact"
+        ],
+        "title": "ApplicantReview"
       },
       "ApplicationStatus": {
         "type": "string",
@@ -10190,6 +10330,51 @@
         ],
         "title": "Review"
       },
+      "ReviewBirth": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "matches_id": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matches Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "date_of_birth",
+          "matches_id"
+        ],
+        "title": "ReviewBirth"
+      },
       "ReviewEligibility": {
         "properties": {
           "eligible": {
@@ -10215,6 +10400,61 @@
           "rows"
         ],
         "title": "ReviewEligibility"
+      },
+      "ReviewId": {
+        "properties": {
+          "id_number": {
+            "type": "string",
+            "title": "Id Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "registered_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered In"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id_number",
+          "name",
+          "date_of_birth",
+          "registered_in",
+          "origin"
+        ],
+        "title": "ReviewId"
       },
       "ReviewNav": {
         "properties": {
@@ -10261,6 +10501,102 @@
           "next"
         ],
         "title": "ReviewNav"
+      },
+      "ReviewProgramme": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "award": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Award"
+          },
+          "length": {
+            "type": "string",
+            "title": "Length"
+          },
+          "intake": {
+            "type": "string",
+            "title": "Intake"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "award",
+          "length",
+          "intake"
+        ],
+        "title": "ReviewProgramme"
+      },
+      "ReviewSitting": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "centre_number": {
+            "type": "string",
+            "title": "Centre Number"
+          },
+          "candidate_number": {
+            "type": "string",
+            "title": "Candidate Number"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewSubject"
+            },
+            "type": "array",
+            "title": "Subjects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "centre_number",
+          "candidate_number",
+          "subjects"
+        ],
+        "title": "ReviewSitting"
+      },
+      "ReviewSubject": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "grade": {
+            "type": "string",
+            "title": "Grade"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "grade"
+        ],
+        "title": "ReviewSubject"
       },
       "Role": {
         "type": "string",
@@ -10461,6 +10797,37 @@
           "first_material_id"
         ],
         "title": "SharedNote"
+      },
+      "Shortfall": {
+        "properties": {
+          "need": {
+            "type": "string",
+            "title": "Need"
+          },
+          "have": {
+            "type": "string",
+            "title": "Have"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          }
+        },
+        "type": "object",
+        "required": [
+          "need",
+          "have",
+          "subject"
+        ],
+        "title": "Shortfall",
+        "description": "One unmet requirement, in plain words (design/ReviewNotEligible)."
       },
       "Sitting": {
         "properties": {

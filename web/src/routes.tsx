@@ -9,6 +9,7 @@ import StaffPlaceholder from '@/pages/staff/StaffPlaceholder'
 import ApplyIndex from '@/pages/apply/ApplyIndex'
 import ApplyOffer from '@/pages/apply/Offer'
 import ApplyProgramme from '@/pages/apply/Programme'
+import ApplyReview from '@/pages/apply/Review'
 import ApplyStatus from '@/pages/apply/Status'
 import StepPending from '@/pages/apply/StepPending'
 import BirthCertificate from '@/pages/apply/birth/BirthCertificate'
@@ -98,7 +99,7 @@ export const router = createBrowserRouter([
       { path: 'id', element: <NationalId /> },
       { path: 'birth-certificate', element: <BirthCertificate /> },
       { path: 'results', element: <ApplyResults /> },
-      { path: 'review', element: <StepPending step={5} /> },
+      { path: 'review', element: <ApplyReview /> },
       { path: 'submit', element: <StepPending step={6} /> },
       { path: 'status', element: <ApplyStatus /> },
       { path: 'offer', element: <ApplyOffer /> },

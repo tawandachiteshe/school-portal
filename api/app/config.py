@@ -60,6 +60,9 @@ class Settings(BaseSettings):
     registration_time: str = "08:00"  # "Register on Monday 1 February, 08:00"
     registration_location: str = "Block A"
     application_fee_usd: str = "20.00"
+    admissions_contact: str = (
+        ""  # design/ReviewNotEligible "Contact the Admissions Office": phone or email, once confirmed
+    )
 
     ocr_llm_mode: str = "fallback"  # off | fallback | always
     ocr_min_confidence: float = 0.80
