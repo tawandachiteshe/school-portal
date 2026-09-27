@@ -161,6 +161,12 @@ async def _library(ctx: Context, _: NoInput) -> dict:
             "renewals_allowed": s.library_max_renewals,
             "reservation_kept_days": s.library_hold_days,
             "opening_hours": {days[k - 1]: v for k, v in sorted(s.library_hours.items())},
+            # The same rules as renew_loan (app/api/library.py).
+            "renewing": (
+                "Renew on the Library page in the portal. Overdue books can't be renewed online: return "
+                "them to the desk, or ask there. A book someone has reserved can't be renewed. "
+                f"At most {s.library_max_renewals} renewals per loan."
+            ),
         },
     }
 

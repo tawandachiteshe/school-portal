@@ -29,6 +29,8 @@ def _test_url() -> str:
 TEST_URL = _test_url()
 os.environ["DATABASE_URL"] = TEST_URL
 os.environ["APP_ENV"] = "test"
+# Never call real services from tests, whatever .env holds (Ask TCFL tests use a fake Claude).
+os.environ["ANTHROPIC_API_KEY"] = ""
 get_settings.cache_clear()
 
 
