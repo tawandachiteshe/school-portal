@@ -52,14 +52,13 @@ docker compose up -d --build
 docker compose logs -f authentik-worker | grep -i blueprint   # wait for "applied" (Ctrl-C)
 ```
 
-Once the API has migrations and scripts (Phase 1 of the roadmap):
+Then create the tables and buckets, load the sample data, and give every sample account an Authentik sign-in:
 
 ```bash
-docker compose exec api alembic upgrade head                 # create tables
-docker compose exec api python -m app.storage   # create the S3 buckets
-docker compose exec api python -m app.scripts.seed_reference # districts, ZIMSEC subjects, programmes
-docker compose exec api python -m app.scripts.seed_demo      # demo Authentik users + portal data
-docker compose exec api python -m app.scripts.grant_role --email you@tcfl.ac.zw --role admin
+docker compose exec api alembic upgrade head          # create tables
+docker compose exec api python -m app.storage         # create the S3 buckets
+docker compose exec api python -m app.seed            # sample data from the designs (development only; wipes the database)
+docker compose exec api python -m app.authentik_dev   # an Authentik user for each sample account, password tcfl-dev-2027
 ```
 
 Open:
@@ -68,9 +67,7 @@ Open:
 - Authentik: http://localhost:5173/auth/ (admin at `/auth/if/admin/`, user `akadmin`)
 - Object storage (SeaweedFS S3 API): http://localhost:8333
 
-`seed_demo` creates demo accounts **in Authentik** (development only) and adds each one to its group: `student@demo.local`, `lecturer@demo.local`, `admissions@demo.local` and `librarian@demo.local`. Their password is printed in the command output. Staff demo accounts must set up TOTP on first login, because the MFA policy applies to them too.
-
-The first PaddleOCR run downloads its models (~100 MB).
+The sample accounts are test personas, one for each role and application stage: [11-test-personas.md](11-test-personas.md) lists them and what to test with each. Sign in at http://localhost:5173/login, or pick one at http://localhost:5173/login/dev without a password.
 
 ## 6.4 Running without Docker (API/web only)
 
