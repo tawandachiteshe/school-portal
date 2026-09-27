@@ -4,11 +4,13 @@ import { toast } from 'sonner'
 import { useDataSaver } from '@/lib/data-saver'
 import { queueForWifi, shouldAsk, startDownload } from '@/lib/downloads'
 import { invalidateStudentData } from '@/lib/student'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { DownloadSheet, type PendingDownload } from './download-sheet'
 
 // Download a note, asking first when it's large and the phone is saving data.
 export function useNoteDownload() {
   const dataSaver = useDataSaver()
+  const desktop = useIsDesktop()
   const qc = useQueryClient()
   const [pending, setPending] = useState<PendingDownload | null>(null)
 
@@ -19,7 +21,7 @@ export function useNoteDownload() {
   }
 
   const request = (note: Omit<PendingDownload, 'size_bytes'> & { size_bytes: number | null }, opts?: { ask?: boolean }) => {
-    if (opts?.ask !== false && shouldAsk(note.size_bytes, dataSaver)) setPending({ ...note, size_bytes: note.size_bytes! })
+    if (opts?.ask !== false && shouldAsk(note.size_bytes, dataSaver, desktop)) setPending({ ...note, size_bytes: note.size_bytes! })
     else go(note.id)
   }
 

@@ -36,9 +36,11 @@ function save(key: string, value: unknown) {
 export const onMobileData = () => conn()?.type === 'cellular'
 export const canWaitForWifi = () => conn()?.type !== undefined
 
-export function shouldAsk(size: number | null, dataSaver: boolean): boolean {
+// `desktop`: lab PCs and laptops aren't on a phone bundle, so there we ask only when the browser
+// actually reports mobile data (e.g. a laptop tethered to a phone), never because of "Save mobile data".
+export function shouldAsk(size: number | null, dataSaver: boolean, desktop = false): boolean {
   if (!size || size <= WARN_BYTES) return false
-  if (!onMobileData() && !dataSaver && !conn()?.saveData) return false
+  if (desktop ? !onMobileData() : !onMobileData() && !dataSaver && !conn()?.saveData) return false
   if (size < DONT_ASK_LIMIT && store(DONT_ASK_KEY, false)) return false
   return true
 }
