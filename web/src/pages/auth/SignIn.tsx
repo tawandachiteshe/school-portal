@@ -5,7 +5,6 @@ import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Wordmark } from '@/components/shell/wordmark'
 import { useDevAccounts } from '@/api/generated/auth/auth'
 import {
   answer,
@@ -19,6 +18,7 @@ import {
   startFlow,
 } from '@/lib/authentik-flow'
 import { useIsDesktop } from '@/lib/use-desktop'
+import { AUTH_DESKTOP, AuthHeading, AuthLayout, Checklist } from './AuthLayout'
 import { type AuthentikUser, SignedInAs } from './SignedInAs'
 import { cn } from '@/lib/utils'
 
@@ -50,8 +50,7 @@ function Password({ id, value, onChange, error }: { id: string; value: string; o
 
 // design/SignIn (phone) and StaffSignIn (computer): our screen for Authentik's identification stage.
 export default function SignIn() {
-  // StaffSignIn from tablet width up: staff laptops at 125–150% scaling are often under 1024px.
-  const desktop = useIsDesktop('(min-width: 768px)')
+  const desktop = useIsDesktop(AUTH_DESKTOP)
   const [params] = useSearchParams()
   const next = params.get('next') ?? '/'
   const ids = { id: useId(), pw: useId(), shared: useId() }
@@ -173,73 +172,44 @@ export default function SignIn() {
       </Link>
     </p>
   )
-  const heading = (
-    <div className="flex flex-col gap-1">
-      <h1 className={desktop ? 'text-[28px] leading-9 font-semibold tracking-[-0.015em]' : 'text-2xl leading-8 font-semibold tracking-[-0.01em]'}>
-        Sign in
-      </h1>
-      <p className="text-muted-foreground">Students, applicants and staff all sign in here.</p>
-    </div>
+  const apply = (
+    <section aria-labelledby="h-new" className="flex flex-col items-start gap-2 border-t pt-6">
+      <h2 id="h-new" className="font-semibold">
+        Applying to TCFL?
+      </h2>
+      <p className="text-sm text-muted-foreground">Create an account with your mobile number. Have your National ID and ZIMSEC results with you.</p>
+      <Button variant="outline" className="mt-2" asChild>
+        <Link to="/register">Start an application</Link>
+      </Button>
+    </section>
   )
 
-  if (desktop)
-    return (
-      <div className="flex min-h-dvh flex-col bg-background">
-        <header className="flex h-16 shrink-0 items-center border-b bg-card px-8">
-          <Wordmark />
-        </header>
-        <main className="grid grid-cols-[minmax(0,400px)_minmax(0,360px)] items-start gap-12 px-8 py-16 lg:gap-24 lg:px-20">
-          <section className="flex flex-col gap-6">
-            {heading}
-            {signedIn || ((challenge || down) && form)}
-            <p className="text-sm text-muted-foreground">
-              New applicant?{' '}
-              <Link to="/register" className="text-primary underline underline-offset-2">
-                Start an application
-              </Link>
-            </p>
-            {devLink}
-          </section>
-          <aside className="flex flex-col gap-4 pt-[72px]">
-            <h2 className="font-semibold">On a college lab computer?</h2>
-            <ul className="flex flex-col gap-2.5 text-sm">
-              {[
-                "Don't let the browser save your password.",
-                'Sign out from the menu when you’re done.',
-                'Need to scan a document? You can continue on your phone at that step.',
-              ].map((t) => (
-                <li key={t} className="grid grid-cols-[12px_minmax(0,1fr)] gap-2">
-                  <span aria-hidden className="mt-2 size-1 rounded-full bg-foreground" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="border-t pt-4 text-sm text-muted-foreground">Can't sign in? ICT Services, Block C.</p>
-          </aside>
-        </main>
-      </div>
-    )
-
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-background">
-      <header className="flex h-14 shrink-0 items-center px-4">
-        <Wordmark />
-      </header>
-      <main className="flex grow flex-col gap-6 px-4 py-6">
-        {heading}
-        {signedIn || ((challenge || down) && form)}
-        <section aria-labelledby="h-new" className="flex flex-col items-start gap-2 border-t pt-6">
-          <h2 id="h-new" className="font-semibold">
-            Applying to TCFL?
-          </h2>
-          <p className="text-sm text-muted-foreground">Have your National ID and ZIMSEC results with you.</p>
-          <Button variant="outline" className="mt-1" asChild>
-            <Link to="/register">Start an application</Link>
-          </Button>
-        </section>
-        {devLink}
-        <p className="mt-auto text-sm text-muted-foreground">Can't sign in? ICT Services, Block C.</p>
-      </main>
-    </div>
+    <AuthLayout
+      phoneExtra={apply}
+      action={
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/register">Start an application</Link>
+        </Button>
+      }
+      aside={
+        <>
+          <h2 className="text-lg leading-6 font-semibold">On a college lab computer?</h2>
+          <Checklist
+            mark={<span className="size-1 rounded-full bg-foreground" />}
+            items={[
+              'Tick “This is a shared computer”, so you’re signed out when you close the browser.',
+              "Don't let the browser save your password.",
+              'Sign out from the menu when you’re done.',
+              'Need to scan a document? You can continue on your phone at that step.',
+            ]}
+          />
+        </>
+      }
+    >
+      <AuthHeading eyebrow="TelOne Centre for Learning" title="Sign in" lead="Students, applicants and staff all sign in here." />
+      {signedIn || ((challenge || down) && form)}
+      {devLink}
+    </AuthLayout>
   )
 }

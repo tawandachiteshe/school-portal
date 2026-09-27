@@ -1,13 +1,14 @@
-import { ArrowLeft, CircleAlert } from 'lucide-react'
+import { Check, CircleAlert } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Wordmark } from '@/components/shell/wordmark'
 import { answer, authentikUser, type Challenge, e164, fallbackUrl, fieldError, finishSignIn, generalError, startFlow } from '@/lib/authentik-flow'
+import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
+import { AUTH_DESKTOP, AuthHeading, AuthLayout, Checklist } from './AuthLayout'
 import { type AuthentikUser, SignedInAs } from './SignedInAs'
 
 const FLOW = 'tcfl-enrollment'
@@ -15,17 +16,26 @@ const RESEND_AFTER = 60
 
 const masked = (p: string) => `${p.slice(0, 4)} ${p.slice(4, 6)} ••• ${p.slice(-4)}`
 
-function Shell({ onBack, children }: { onBack: () => void; children: React.ReactNode }) {
+// design/Landing "Have these ready", with the birth certificate the application now asks for.
+const READY = [
+  'Your National ID, metal or plastic',
+  'Your birth certificate',
+  'Your ZIMSEC O-Level result slip or certificate',
+  'A phone with a camera, or scans of your documents',
+  'The application fee, paid at the end',
+]
+
+function Ready({ card }: { card: boolean }) {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[480px] flex-col bg-background">
-      <header className="flex h-14 shrink-0 items-center gap-1 border-b bg-card pr-4 pl-1">
-        <button type="button" aria-label="Back" onClick={onBack} className="inline-flex size-11 items-center justify-center">
-          <ArrowLeft className="size-5" strokeWidth={1.5} />
-        </button>
-        <Wordmark />
-      </header>
-      <main className="flex grow flex-col gap-6 px-4 py-6">{children}</main>
-    </div>
+    <section aria-labelledby="h-ready" className={card ? 'flex flex-col gap-4' : 'flex flex-col gap-3 border-t pt-6'}>
+      <h2 id="h-ready" className={card ? 'text-lg leading-6 font-semibold' : 'font-semibold'}>
+        Have these ready
+      </h2>
+      <Checklist items={READY} mark={<Check className="size-5 text-success" strokeWidth={1.5} />} />
+      <p className={cn('text-sm text-muted-foreground', card && 'border-t pt-3')}>
+        No smartphone? Use a college lab computer and upload scans, or ask at the Admissions Office in Block A.
+      </p>
+    </section>
   )
 }
 
@@ -125,12 +135,15 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
           </a>
         </div>
       )}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Check your phone</h1>
-        <p className="text-muted-foreground">
-          We sent a 6-digit code to <span className="font-mono whitespace-nowrap text-foreground">{masked(phone)}</span>.
-        </p>
-      </div>
+      <AuthHeading
+        eyebrow="Start an application"
+        title="Check your phone"
+        lead={
+          <>
+            We sent a 6-digit code to <span className="font-mono whitespace-nowrap text-foreground">{masked(phone)}</span>.
+          </>
+        }
+      />
       <fieldset id="code" className="flex flex-col gap-2">
         <legend className="mb-2 text-sm font-medium">Code from the SMS</legend>
         {failed && wrong && <span className="font-medium text-destructive">Check the code and try again</span>}
@@ -164,6 +177,7 @@ function Verify({ phone, challenge, onAnswer, onChangeNumber }: { phone: string;
 // Applicant sign-up (no design: in the style of design/SignIn), then design/VerifyPhone.
 export default function Register() {
   const navigate = useNavigate()
+  const desktop = useIsDesktop(AUTH_DESKTOP)
   const ids = { name: useId(), mobile: useId(), pw: useId(), pw2: useId() }
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [down, setDown] = useState<string | null>(null)
@@ -218,22 +232,35 @@ export default function Register() {
     }
   }
 
+  const frame = (onBack: () => void, children: React.ReactNode) => (
+    <AuthLayout
+      onBack={onBack}
+      action={
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/login">Sign in</Link>
+        </Button>
+      }
+      aside={<Ready card />}
+      phoneExtra={<Ready card={false} />}
+    >
+      {children}
+    </AuthLayout>
+  )
+
   if (challenge?.component === 'ak-stage-authenticator-sms' && phone)
-    return (
-      <Shell onBack={restart}>
-        <Verify phone={phone} challenge={challenge} onAnswer={(c) => void handle(c)} onChangeNumber={restart} />
-      </Shell>
-    )
+    return frame(restart, <Verify phone={phone} challenge={challenge} onAnswer={(c) => void handle(c)} onChangeNumber={restart} />)
 
   const denied = challenge?.component === 'ak-stage-access-denied'
   const err = (k: string) => fieldError(challenge, k)
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }))
-  return (
-    <Shell onBack={() => navigate('/login')}>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Start an application</h1>
-        <p className="text-muted-foreground">Create an account with your mobile number. You'll sign in with it.</p>
-      </div>
+  return frame(
+    () => navigate('/login'),
+    <>
+      <AuthHeading
+        eyebrow="New applicants"
+        title="Start an application"
+        lead="Create an account with your mobile number. You'll sign in with it, and can leave and come back to your application at any time."
+      />
       {already && (
         <SignedInAs
           user={already}
@@ -284,17 +311,26 @@ export default function Register() {
             <Label htmlFor={ids.pw2}>Password again</Label>
             <Input id={ids.pw2} type="password" value={form.repeat} autoComplete="new-password" onChange={set('repeat')} />
           </div>
-          <Button type="submit" block disabled={busy || !challenge || !form.name || !form.mobile || !form.password}>
-            Continue
-          </Button>
-          <p className="text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary underline underline-offset-2">
-              Sign in
-            </Link>
-          </p>
+          <div>
+            <Button
+              type="submit"
+              block={!desktop}
+              className={desktop ? 'min-w-40' : undefined}
+              disabled={busy || !challenge || !form.name || !form.mobile || !form.password}
+            >
+              Create account
+            </Button>
+          </div>
+          {!desktop && (
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link to="/login" className="text-primary underline underline-offset-2">
+                Sign in
+              </Link>
+            </p>
+          )}
         </form>
       )}
-    </Shell>
+    </>,
   )
 }
