@@ -198,6 +198,7 @@ Dokploy's own **Volume backups** can additionally snapshot the named volumes (`p
 | Many ID check-letter failures | Blurry photos, glare | Tighten quality gate; improve capture guidance |
 | `401` from Claude | Missing/invalid `ANTHROPIC_API_KEY` | Fix key; or set `OCR_LLM_MODE=off`, `ASSISTANT_ENABLED=false` |
 | Assistant says "I don't know" a lot | Content not indexed | `python -m app.scripts.reindex_kb`; check notes were published |
+| Production API restarts with `password authentication failed for user "portal"` at a `10.0.1.x` address | The API is on `dokploy-network` to receive traffic, and another Dokploy app there also has a service named `postgres` (the same can happen with `redis`, `s3`, `api`) | `docker-compose.prod.yml` gives the stack's services `tcfl-*` names (`tcfl-postgres`, `tcfl-redis`, `tcfl-s3`, `tcfl-api`, `tcfl-authentik`) and sets the internal URLs itself; never point an internal URL at a plain service name |
 | `extension "vector" does not exist` | Wrong Postgres image | Use `pgvector/pgvector:pg16` |
 | CORS errors in browser | Frontend calling `http://api:8000` directly instead of `/api` | Keep `VITE_API_URL=/api` and rebuild the web image. Only set `ALLOWED_ORIGINS` if the API is deliberately put on a separate domain. |
 | Authentik error "redirect URI mismatch" | Callback URL not in the provider's list | Add the exact URL (scheme, host, port, path) to `redirect_uris` in the blueprint |

@@ -5,16 +5,26 @@
 # http (SSL mode Flexible) and https with Traefik's own certificate (SSL mode Full, which encrypts
 # Cloudflare to the server too). Either way the apps are told the visitor came over https:
 #   https://${APP_HOST}/       → web:80
-#   https://${APP_HOST}/api    → api:8000              (/api stripped)
-#   https://${APP_HOST}/auth   → authentik-server:9000 (Authentik serves under /auth/)
-#   https://${ID_HOST}/        → authentik-server:9000 (the admin console; / goes to /auth/if/admin/)
+#   https://${APP_HOST}/api    → tcfl-api:8000         (/api stripped)
+#   https://${APP_HOST}/auth   → tcfl-authentik:9000   (Authentik serves under /auth/)
+#   https://${ID_HOST}/        → tcfl-authentik:9000   (the admin console; / goes to /auth/if/admin/)
 # Environment variables are set in Dokploy's Environment tab (template: .env.production.example).
 # Stops the deploy with a clear message when the hosts aren't set (Compose checks extension fields too).
 x-required-hosts:
   - "${APP_HOST:?APP_HOST is missing - paste .env.production into Dokploy's Environment tab}"
   - "${ID_HOST:?ID_HOST is missing - paste .env.production into Dokploy's Environment tab}"
+# Addresses of the stack's own services. Every service on dokploy-network is visible to every other
+# Dokploy app, so a plain name like `postgres` can reach another app's database. These tcfl-* names
+# exist only on this stack's network and override whatever the Environment tab says.
+x-internal: &internal
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@tcfl-postgres:5432/${POSTGRES_DB}
+  REDIS_URL: redis://tcfl-redis:6379/0
+  S3_ENDPOINT: http://tcfl-s3:8333
+  OIDC_INTERNAL_BASE_URL: http://tcfl-authentik:9000
+  AUTHENTIK_API_URL: http://tcfl-authentik:9000/auth/api/v3/
 services:
   postgres:
+    networks: { default: { aliases: [tcfl-postgres] } }
     image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is missing - paste .env.production into Dokploy's Environment tab}
@@ -26,11 +36,13 @@ services:
 
   redis:
     image: redis:7-alpine
+    networks: { default: { aliases: [tcfl-redis] } }
     restart: unless-stopped
 
   # S3-compatible object storage (SeaweedFS). MinIO no longer publishes free images; the API
   # only speaks S3, so any S3 store works (S3_ENDPOINT). Credentials come from S3_ACCESS_KEY/S3_SECRET_KEY.
   s3:
+    networks: { default: { aliases: [tcfl-s3] } }
     image: chrislusf/seaweedfs:${SEAWEEDFS_TAG:-latest}
     entrypoint: ["/bin/sh", "-c"]
     command:
@@ -52,13 +64,14 @@ services:
       sh -c "alembic upgrade head && python -m app.storage &&
       exec gunicorn -k uvicorn.workers.UvicornWorker -w $${WEB_CONCURRENCY:-2} -b 0.0.0.0:8000 app.main:app"
     environment:
+      <<: *internal
       # Only Traefik reaches the API: trust its X-Forwarded-For, so audit logs keep the visitor's IP.
       FORWARDED_ALLOW_IPS: "*"
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }
     restart: unless-stopped
-    networks: [default, dokploy-network]
+    networks: { default: { aliases: [tcfl-api] }, dokploy-network: {} }
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
@@ -79,6 +92,7 @@ services:
     build: { context: ./api, target: prod }
     env_file: .env
     command: celery -A app.worker worker -B --loglevel=info
+    environment: *internal
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }
@@ -105,6 +119,7 @@ services:
 
   authentik-db:
     image: postgres:16-alpine
+    networks: { default: { aliases: [tcfl-authentik-db] } }
     environment:
       POSTGRES_DB: authentik
       POSTGRES_USER: authentik
@@ -118,11 +133,13 @@ services:
     command: server
     env_file: .env
     environment: &authentik-env
-      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__HOST: tcfl-authentik-db
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS:?AUTHENTIK_PG_PASS is missing - paste .env.production into Dokploy's Environment tab}
       AUTHENTIK_WEB__PATH: /auth/
+      # SMS codes go to the portal API (app/api/sms.py), on this stack's network only.
+      PORTAL_SMS_WEBHOOK_URL: http://tcfl-api:8000/internal/sms
     volumes:
       - authentik-data:/data
       - ./infra/authentik/blueprints:/blueprints/custom:ro
@@ -130,7 +147,7 @@ services:
     shm_size: 512mb
     depends_on: { authentik-db: { condition: service_healthy } }
     restart: unless-stopped
-    networks: [default, dokploy-network]
+    networks: { default: { aliases: [tcfl-authentik] }, dokploy-network: {} }
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
