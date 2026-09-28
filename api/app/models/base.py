@@ -34,6 +34,5 @@ ROLES = (
     "student_affairs",
     "accounts",
 )
-STAFF_ROLES = frozenset(ROLES) - {"applicant", "student"}
 USER_ROLE = pg_enum("user_role", *ROLES)
 STUDY_MODE = pg_enum("study_mode", "full_time", "part_time", "block_release", "online")

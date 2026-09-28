@@ -3,7 +3,6 @@ applicant confirms; they're compared with the National ID for Admissions. No des
 screens follow the National ID step. Not read by OCR: layouts vary too much to be worth it."""
 
 import hashlib
-import re
 import uuid
 from datetime import date, datetime
 from enum import StrEnum
@@ -21,6 +20,7 @@ from app.config import get_settings
 from app.db import get_db
 from app.models import Application, ApplicationEvent, ApplicationFlag, DeviceHandoff, Document, DocumentField
 from app.services import clock
+from app.services.names import name_words
 
 router = APIRouter(tags=["apply birth certificate"])
 KIND = "birth_certificate"
@@ -48,15 +48,11 @@ def _latest(a: Application) -> Document | None:
     return max(docs, key=lambda d: d.created_at) if docs else None
 
 
-def _tokens(s: str | None) -> set[str]:
-    return set(re.sub(r"[^A-Z ]", " ", (s or "").upper()).split())
-
-
 def _matches(a: Application, name: str, dob: date) -> bool | None:
     p = a.person
     if p.national_id_enc is None:
         return None
-    return _tokens(name) == _tokens(f"{p.first_names} {p.surname}") and dob == p.date_of_birth
+    return name_words(name) == name_words(f"{p.first_names} {p.surname}") and dob == p.date_of_birth
 
 
 async def birth_state(db: AsyncSession, a: Application) -> BirthCertificateState:

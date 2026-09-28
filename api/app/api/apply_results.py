@@ -6,7 +6,6 @@ keeps how it was read (document_fields) for Admissions.
 """
 
 import hashlib
-import re
 import uuid
 from datetime import datetime
 from enum import StrEnum
@@ -36,6 +35,7 @@ from app.models import (
 )
 from app.ocr.zimsec import GRADES_A, GRADES_O, read_slip
 from app.services import clock
+from app.services.names import name_words
 
 router = APIRouter(tags=["apply results"])
 KIND = "zimsec_o_slip"
@@ -404,10 +404,6 @@ class SaveResultsIn(BaseModel):
     sittings: list[SittingIn] = Field(min_length=1, max_length=4)
 
 
-def _tokens(s: str | None) -> set[str]:
-    return set(re.sub(r"[^A-Z ]", " ", (s or "").upper()).split())
-
-
 async def _save(db: AsyncSession, a: Application, body: SaveResultsIn, actor: uuid.UUID | None) -> None:
     _require_draft(a)
     if len({(s.level, s.session, s.year) for s in body.sittings}) != len(body.sittings):
@@ -483,7 +479,7 @@ async def _save(db: AsyncSession, a: Application, body: SaveResultsIn, actor: uu
             d.status = "confirmed"
             d.extracted = {**d.extracted, "status": "saved"}
         # Signals for Admissions: the name on the slip, and the same candidate on another application.
-        if p.national_id_enc and not _tokens(sitting.candidate_name) >= _tokens(
+        if p.national_id_enc and not name_words(sitting.candidate_name) >= name_words(
             f"{p.first_names} {p.surname}"
         ):
             if not any(f.code == "NAME_MISMATCH" and not f.resolved_at for f in a.flags):

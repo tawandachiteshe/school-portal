@@ -357,7 +357,6 @@ TOOLS: list[Tool] = [
         _handoff,
     ),
 ]
-BY_NAME = {t.name: t for t in TOOLS}
 
 
 def allowed(roles: set[str], has_student: bool) -> list[Tool]:

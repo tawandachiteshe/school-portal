@@ -30,6 +30,7 @@ from app.models import (
     User,
 )
 from app.services import audit, clock, eligibility, phones
+from app.services.names import name_words
 
 router = APIRouter(prefix="/staff/admissions", tags=["admissions"])
 officer = require_role("admissions", "admin")
@@ -443,10 +444,6 @@ class Review(BaseModel):
     activity: list[Activity]
 
 
-def _norm_name(s: str | None) -> list[str]:
-    return sorted(re.sub(r"[^A-Z ]", "", (s or "").upper()).split())
-
-
 FIELD_LABELS = {
     "national_id": "ID number",
     "surname": "surname",
@@ -504,7 +501,7 @@ async def _identity(db: AsyncSession, a: Application, people: dict[uuid.UUID, Pe
         check_letter_valid=p.national_id_valid,
         name_on_id=on_id.upper() if on_id else None,
         name_on_slip=slip.upper() if slip else None,
-        names_match=_norm_name(on_id) == _norm_name(slip) if on_id and slip else None,
+        names_match=name_words(on_id) == name_words(slip) if on_id and slip else None,
         date_of_birth=dob,
         age_at_intake=age,
         registered_in=district(p.id_reg_district),
