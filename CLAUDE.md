@@ -77,6 +77,8 @@ for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns
   then Orval generates typed TanStack Query hooks into `src/api/generated/`; never hand-write API types or hooks,
   and rerun it after any API change: an API test fails when the committed spec is stale).
 - API (in `api/`): `uv sync`, `uv run uvicorn app.main:app --reload`, `uv run pytest`, `uv run ruff check . && uv run ruff format .`
+- API code follows the official FastAPI skill (`.claude/skills/fastapi/`, copied from fastapi/fastapi), except: keep
+  SQLAlchemy (not SQLModel), and the web app is served by Traefik (not `app.frontend()`).
 - Full stack: `cp .env.example .env && docker compose up -d --build`.
 - Adding a shadcn component: `bunx --bun shadcn@latest add <name>`, then fix the import to `@/lib/utils` and strip
   shadows / `ring-[3px]` / `outline-none` to match the rules above.
