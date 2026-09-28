@@ -764,7 +764,7 @@ class Seeder:
                 pdf = make_pdf(
                     title, [f"{code} · Week {week}", "Sample course note for the development seed."], size
                 )
-                storage.put(bucket, key, pdf, "application/pdf")
+                storage.put_sync(bucket, key, pdf, "application/pdf")
             targets = [offerings[code]]
             # design/LecturerHome: Eng. Chikore shares most DCN201 notes with both classes.
             if code == "DCN201" and title not in self.DIT_ONLY:

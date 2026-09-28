@@ -82,8 +82,8 @@ def test_parse_certificate_layout():
 @pytest.fixture(autouse=True)
 def fakes(monkeypatch):
     blobs: dict[str, bytes] = {}
-    monkeypatch.setattr(storage, "put", lambda bucket, key, data, ct: blobs.__setitem__(key, data))
-    monkeypatch.setattr(storage, "get", lambda bucket, key: blobs[key])
+    monkeypatch.setattr(storage, "put_sync", lambda bucket, key, data, ct: blobs.__setitem__(key, data))
+    monkeypatch.setattr(storage, "get_sync", lambda bucket, key: blobs[key])
 
     def read(data: bytes, mime: str, subjects) -> SlipRead:
         return SlipRead(

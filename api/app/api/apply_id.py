@@ -9,6 +9,7 @@ import uuid
 from datetime import date, datetime, timedelta
 from enum import StrEnum
 
+from asyncer import asyncify
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, Response, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -193,8 +194,9 @@ async def _read_document(document_id: uuid.UUID) -> None:
         doc.status = "processing"
         await db.commit()
         try:
-            data = storage.get(get_settings().s3_bucket_documents, doc.object_key)
-            r = read_national_id(data, doc.mime_type, allow_llm=a.consent_ai_at is not None)
+            data = await storage.get(get_settings().s3_bucket_documents, doc.object_key)
+            # Tesseract and Claude block: read in a worker thread so other requests carry on.
+            r = await asyncify(read_national_id)(data, doc.mime_type, allow_llm=a.consent_ai_at is not None)
         except Exception as e:  # storage or OCR failure: the applicant types the details instead
             doc.status, doc.error = "failed", f"We couldn't read this photo ({e.__class__.__name__})."
             await db.commit()
@@ -248,7 +250,7 @@ async def _upload(
             413, f"That file is bigger than {limit} MB. Take a new photo, or send a smaller file."
         )
     key = f"applications/{a.id}/national-id-{uuid.uuid4().hex[:12]}.{ACCEPTED[mime]}"
-    storage.put(get_settings().s3_bucket_documents, key, data, mime)
+    await storage.put(get_settings().s3_bucket_documents, key, data, mime)
     kind, what = device_of(user_agent)
     doc = Document(
         application_id=a.id,

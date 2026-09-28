@@ -366,7 +366,7 @@ class AdmissionsSeed:
 
     def put(self, key: str, data: bytes) -> None:
         if self.upload:
-            storage.put(get_settings().s3_bucket_documents, key, data, "image/svg+xml")
+            storage.put_sync(get_settings().s3_bucket_documents, key, data, "image/svg+xml")
 
     def reference_data(self) -> None:
         self.db.add_all(DistrictCode(code=c, district=d, province=p) for c, (d, p) in DISTRICTS.items())

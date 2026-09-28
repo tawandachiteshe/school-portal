@@ -391,7 +391,7 @@ async def upload_proof(
     if not data or len(data) > get_settings().document_max_mb * 1024 * 1024:
         raise HTTPException(413, f"Use a file up to {get_settings().document_max_mb} MB.")
     key = f"applications/{a.id}/payment-proof-{uuid.uuid4().hex[:12]}.{ACCEPTED[mime]}"
-    storage.put(get_settings().s3_bucket_documents, key, data, mime)
+    await storage.put(get_settings().s3_bucket_documents, key, data, mime)
     d = Document(
         application_id=a.id,
         kind="payment_proof",
@@ -498,7 +498,7 @@ async def payment_proof(
     p = await db.get(ApplicationPayment, payment_id)
     d = await db.get(Document, p.proof_document_id) if p and p.proof_document_id else None
     bucket = get_settings().s3_bucket_documents
-    if d is None or storage.size(bucket, d.object_key) is None:
+    if d is None or await storage.size(bucket, d.object_key) is None:
         raise HTTPException(404, "There's no proof of payment for this.")
     await audit.record(db, cu, request, "document.view", "document", str(d.id), {"kind": d.kind})
     await db.commit()

@@ -359,7 +359,7 @@ async def upload_chunk(
     data = await request.body()
     if not data or len(data) > CHUNK_BYTES or offset + len(data) > up.size_bytes:
         raise HTTPException(422, "Bad chunk size.")
-    storage.put(
+    await storage.put(
         get_settings().s3_bucket_content,
         f"{_chunk_prefix(up.id)}{offset:012d}",
         data,
@@ -393,13 +393,15 @@ async def complete_upload(
         raise HTTPException(409, reason or "You can't submit this online.")
 
     bucket = get_settings().s3_bucket_content
-    data = b"".join(storage.get(bucket, k) for k in storage.list_keys(bucket, _chunk_prefix(up.id)))
+    data = b"".join(
+        [await storage.get(bucket, k) for k in await storage.list_keys(bucket, _chunk_prefix(up.id))]
+    )
     if len(data) != up.size_bytes:
         raise HTTPException(409, "Part of the file is missing. Try again.")
     digest = hashlib.sha256(data).digest()
     key = f"submissions/{a.id}/{student.id}/{up.id}{_ext(up.filename)}"
-    storage.put(bucket, key, data, up.mime_type)
-    storage.delete_prefix(bucket, _chunk_prefix(up.id))
+    await storage.put(bucket, key, data, up.mime_type)
+    await storage.delete_prefix(bucket, _chunk_prefix(up.id))
 
     if sub is None:
         sub = Submission(assessment_id=a.id, student_id=student.id)
@@ -435,4 +437,4 @@ async def cancel_upload(
     if up.completed_at is None:
         up.cancelled_at = clock.now()
         await db.commit()
-        storage.delete_prefix(get_settings().s3_bucket_content, _chunk_prefix(up.id))
+        await storage.delete_prefix(get_settings().s3_bucket_content, _chunk_prefix(up.id))

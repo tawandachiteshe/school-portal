@@ -16,8 +16,8 @@ CARD = "REPUBLIC OF ZIMBABWE\n63-2047823 C 29\nSURNAME\nMOYO\nFIRST NAME\nTARIRO
 @pytest.fixture(autouse=True)
 def fake_storage_and_ocr(monkeypatch):
     blobs: dict[str, bytes] = {}
-    monkeypatch.setattr(storage, "put", lambda bucket, key, data, ct: blobs.__setitem__(key, data))
-    monkeypatch.setattr(storage, "get", lambda bucket, key: blobs[key])
+    monkeypatch.setattr(storage, "put_sync", lambda bucket, key, data, ct: blobs.__setitem__(key, data))
+    monkeypatch.setattr(storage, "get_sync", lambda bucket, key: blobs[key])
 
     def read(data: bytes, mime: str, *, allow_llm: bool) -> IdReading:
         return parse(data.decode(), 0.9) if data.startswith(b"REPUBLIC") else IdReading()

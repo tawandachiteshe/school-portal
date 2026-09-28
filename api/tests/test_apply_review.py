@@ -9,7 +9,7 @@ NEW = "263772345678"
 
 @pytest.fixture(autouse=True)
 def fake_storage(monkeypatch):
-    monkeypatch.setattr(storage, "put", lambda *a: None)
+    monkeypatch.setattr(storage, "put_sync", lambda *a: None)
 
 
 def sitting(maths: str, year: int = 2022, session: str = "NOVEMBER") -> dict:

@@ -23,6 +23,7 @@ dependencies = [
   "python-multipart>=0.0.32",
   "pillow>=11",
   "joserfc>=1.7",
+  "asyncer>=0.0.18",
 ]
 
 [dependency-groups]

@@ -648,7 +648,9 @@ async def upload_notes(
     name = re.sub(r"[^\w.\- ]+", "_", (file.filename or "notes").rsplit("/", 1)[-1])
     ext = name.rsplit(".", 1)[-1].lower() if "." in name else "bin"
     key = f"materials/{hashlib.sha256(data).hexdigest()[:16]}/{uuid.uuid4().hex}.{ext}"
-    storage.put(get_settings().s3_bucket_content, key, data, file.content_type or "application/octet-stream")
+    await storage.put(
+        get_settings().s3_bucket_content, key, data, file.content_type or "application/octet-stream"
+    )
     now = clock.now()
     ids = []
     for oid in offering_ids:

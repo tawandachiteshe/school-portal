@@ -104,7 +104,7 @@ async def _upload(
             413, f"That file is bigger than {limit} MB. Take a new photo, or send a smaller file."
         )
     key = f"applications/{a.id}/birth-certificate-{uuid.uuid4().hex[:12]}.{ACCEPTED[mime]}"
-    storage.put(get_settings().s3_bucket_documents, key, data, mime)
+    await storage.put(get_settings().s3_bucket_documents, key, data, mime)
     kind, what = device_of(user_agent)
     db.add(
         Document(

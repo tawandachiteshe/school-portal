@@ -850,7 +850,7 @@ async def document_file(
 ) -> StreamingResponse:
     d = await db.get(Document, document_id)
     bucket = get_settings().s3_bucket_documents
-    if d is None or storage.size(bucket, d.object_key) is None:
+    if d is None or await storage.size(bucket, d.object_key) is None:
         raise HTTPException(404, "This document is missing.")
     await audit.record(db, cu, request, "document.view", "document", str(d.id), {"kind": d.kind})
     await db.commit()

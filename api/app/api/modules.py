@@ -356,7 +356,7 @@ async def download_material(
     ):
         raise HTTPException(404, "This file isn't available.")
     bucket = get_settings().s3_bucket_content
-    size = storage.size(bucket, m.object_key)
+    size = await storage.size(bucket, m.object_key)
     if size is None:
         raise HTTPException(404, "This file is missing. Tell your lecturer.")
 

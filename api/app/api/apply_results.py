@@ -10,6 +10,7 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
+from asyncer import asyncify
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -250,9 +251,8 @@ async def _read_scan(application_id: uuid.UUID, scan: str) -> None:
         confs = []
         for d in pages:
             try:
-                r = read_slip(
-                    storage.get(get_settings().s3_bucket_documents, d.object_key), d.mime_type, subjects
-                )
+                data = await storage.get(get_settings().s3_bucket_documents, d.object_key)
+                r = await asyncify(read_slip)(data, d.mime_type, subjects)  # Tesseract blocks
             except Exception:
                 continue
             for k in ("level", "session", "year", "centre_number", "candidate_number", "candidate_name"):
@@ -328,7 +328,7 @@ async def _add_page(
             422, f"A slip can have up to {PAGES_MAX} pages. Add another sitting for other results."
         )
     key = f"applications/{a.id}/zimsec-{scan[:8]}-{len(pages) + 1}-{uuid.uuid4().hex[:6]}.{ACCEPTED[mime]}"
-    storage.put(get_settings().s3_bucket_documents, key, data, mime)
+    await storage.put(get_settings().s3_bucket_documents, key, data, mime)
     kind, what = device_of(user_agent)
     db.add(
         Document(
@@ -535,7 +535,7 @@ async def _save(db: AsyncSession, a: Application, body: SaveResultsIn, actor: uu
 async def _file(a: Application, document_id: uuid.UUID) -> StreamingResponse:
     d = next((d for d in a.documents if d.id == document_id), None)
     bucket = get_settings().s3_bucket_documents
-    if d is None or storage.size(bucket, d.object_key) is None:
+    if d is None or await storage.size(bucket, d.object_key) is None:
         raise HTTPException(404, "This file is missing.")
     return StreamingResponse(
         storage.stream(bucket, d.object_key),
