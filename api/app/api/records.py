@@ -4,7 +4,7 @@ import uuid
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.me import term_info
 from app.api.types import AssessmentKind, ClassKind
-from app.auth.deps import CurrentUser, current_user
+from app.auth.deps import CurrentUserDep
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     AcademicTerm,
     Assessment,
@@ -29,7 +29,7 @@ from app.models import (
 from app.pdf import make_pdf
 from app.services import clock, timetable
 from app.services.announcements import visible
-from app.services.students import current_offerings, current_student
+from app.services.students import StudentDep, current_offerings
 
 router = APIRouter(prefix="/student", tags=["records"])
 
@@ -85,10 +85,10 @@ class Week(BaseModel):
 
 @router.get("/timetable")
 async def week_timetable(
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
     start: date | None = Query(default=None, description="Any date in the week; defaults to this week"),
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
 ) -> Week:
     today = clock.today()
     # At the weekend, "this week" is over: open next week unless a week was asked for.
@@ -195,9 +195,7 @@ def _ics_escape(s: str) -> str:
 
 
 @router.get("/timetable.ics")
-async def timetable_ics(
-    student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> Response:
+async def timetable_ics(student: StudentDep, db: DbDep) -> Response:
     """The rest of this term as a calendar file ("Add this timetable to my phone calendar")."""
     offerings = await current_offerings(db, student)
     if not offerings:
@@ -321,14 +319,12 @@ async def _results(db: AsyncSession, student: Student) -> Results:
 
 
 @router.get("/results")
-async def results(student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)) -> Results:
+async def results(student: StudentDep, db: DbDep) -> Results:
     return await _results(db, student)
 
 
 @router.get("/results/{term_code}/slip.pdf")
-async def results_slip(
-    term_code: str, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> Response:
+async def results_slip(term_code: str, student: StudentDep, db: DbDep) -> Response:
     t = next((t for t in (await _results(db, student)).terms if t.term_code == term_code), None)
     if t is None:
         raise HTTPException(404, "No published results for that semester.")
@@ -359,9 +355,7 @@ class RemarkIn(BaseModel):
 
 
 @router.post("/results/remarks", status_code=201)
-async def request_remark(
-    body: RemarkIn, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> dict[str, str]:
+async def request_remark(body: RemarkIn, student: StudentDep, db: DbDep) -> dict[str, str]:
     res = await _results(db, student)
     term = next((t for t in res.terms for m in t.modules if m.offering_id == body.offering_id), None)
     if term is None:
@@ -457,14 +451,12 @@ async def _fees(db: AsyncSession, student: Student) -> Fees:
 
 
 @router.get("/fees")
-async def fees(student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)) -> Fees:
+async def fees(student: StudentDep, db: DbDep) -> Fees:
     return await _fees(db, student)
 
 
 @router.get("/fees/statement.pdf")
-async def fee_statement(
-    student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> Response:
+async def fee_statement(student: StudentDep, db: DbDep) -> Response:
     f = await _fees(db, student)
     lines = [
         f"{student.person.full_name} · {student.student_number}",
@@ -496,9 +488,7 @@ class Card(BaseModel):
 
 
 @router.get("/card")
-async def student_card(
-    student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> Card:
+async def student_card(student: StudentDep, db: DbDep) -> Card:
     offerings = await current_offerings(db, student)
     term = offerings[0].term if offerings else None
     # Valid to the end of the academic year the current term belongs to (design: 31 December 2027).

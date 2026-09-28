@@ -3,19 +3,20 @@ class, and what they have out from the library. Not the National ID, date of bir
 those stay on the pages that need them. Each profile view is written to the audit log."""
 
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.db import DbDep
 from app.models import LibraryLoan, Person, Student
 from app.services import audit, clock
 
 router = APIRouter(prefix="/staff/students", tags=["students"])
 staff = require_role("admissions", "student_affairs", "registry", "admin")
+StaffDep = Annotated[CurrentUser, Depends(staff)]
 
 
 class StudentRow(BaseModel):
@@ -32,9 +33,9 @@ def _name(p: Person) -> str:
 
 @router.get("")
 async def find_students(
+    _: StaffDep,
+    db: DbDep,
     q: str = Query(min_length=2, max_length=60),
-    _: CurrentUser = Depends(staff),
-    db: AsyncSession = Depends(get_db),
 ) -> list[StudentRow]:
     """Student number (all or part), or any part of the name."""
     words = [w for w in q.strip().split() if w]
@@ -89,9 +90,7 @@ class StudentProfile(BaseModel):
 
 
 @router.get("/{number:path}")
-async def student_profile(
-    number: str, request: Request, cu: CurrentUser = Depends(staff), db: AsyncSession = Depends(get_db)
-) -> StudentProfile:
+async def student_profile(number: str, request: Request, cu: StaffDep, db: DbDep) -> StudentProfile:
     s = (
         await db.execute(select(Student).where(Student.student_number == number.upper()))
     ).scalar_one_or_none()

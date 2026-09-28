@@ -3,28 +3,27 @@
 import uuid
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.types import AssessmentKind, ClassKind, SubmissionMode
-from app.auth.deps import CurrentUser, current_user
+from app.auth.deps import CurrentUserDep
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     AnnouncementRead,
     Assessment,
     CourseMaterial,
     LibraryLoan,
-    Student,
     Submission,
     Venue,
 )
 from app.services import announcements as ann
 from app.services import clock, timetable
-from app.services.students import current_offerings, current_student, offering_ids
+from app.services.students import StudentDep, current_offerings, offering_ids
 
 router = APIRouter(prefix="/student", tags=["student"])
 
@@ -144,9 +143,9 @@ def _loan_items(loans: list[LibraryLoan], max_renewals: int) -> list[LoanItem]:
 
 @router.get("/dashboard")
 async def dashboard(
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
 ) -> Dashboard:
     now = clock.now()
     offerings = await current_offerings(db, student)
@@ -295,9 +294,9 @@ class AnnouncementDetail(BaseModel):
 
 @router.get("/announcements")
 async def list_announcements(
-    cu: CurrentUser = Depends(current_user),
-    _: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    _: StudentDep,
+    db: DbDep,
 ) -> Announcements:
     return await _announcements(db, cu.user.id, None)
 
@@ -305,9 +304,9 @@ async def list_announcements(
 @router.get("/announcements/{announcement_id}")
 async def announcement_detail(
     announcement_id: uuid.UUID,
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
 ) -> AnnouncementDetail:
     a = next((x for x in await ann.visible(db, cu.user.id) if x.id == announcement_id), None)
     if a is None:
@@ -383,10 +382,10 @@ class StudentSearchResults(BaseModel):
 
 @router.get("/search")
 async def search_student(
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
     q: str = Query(min_length=2, max_length=100),
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
 ) -> StudentSearchResults:
     term = q.strip().lower()
     now = clock.now()

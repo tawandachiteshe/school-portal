@@ -3,13 +3,13 @@
 import uuid
 from datetime import date, datetime, time, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     LibraryCopy,
     LibraryItem,
@@ -19,7 +19,7 @@ from app.models import (
     Student,
 )
 from app.services import clock
-from app.services.students import current_offerings, current_student
+from app.services.students import StudentDep, current_offerings
 
 router = APIRouter(prefix="/library", tags=["library"])
 
@@ -205,9 +205,7 @@ async def _books(db: AsyncSession, student: Student, items: list[LibraryItem], n
 
 
 @router.get("/home")
-async def library_home(
-    student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> LibraryHome:
+async def library_home(student: StudentDep, db: DbDep) -> LibraryHome:
     loans = (
         (
             await db.execute(
@@ -255,9 +253,7 @@ class ReadingList(BaseModel):
 
 
 @router.get("/reading-lists/{code}")
-async def reading_list(
-    code: str, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> ReadingList:
+async def reading_list(code: str, student: StudentDep, db: DbDep) -> ReadingList:
     o = next((o for o in await current_offerings(db, student) if o.module.code == code.upper()), None)
     if o is None:
         raise HTTPException(404, "You're not taking this module this semester.")
@@ -284,9 +280,9 @@ class CatalogueResults(BaseModel):
 
 @router.get("/search")
 async def search_catalogue(
+    student: StudentDep,
+    db: DbDep,
     q: str = Query(min_length=2, max_length=100),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
 ) -> CatalogueResults:
     term = q.strip()
     like = f"%{term}%"
@@ -320,9 +316,7 @@ async def search_catalogue(
 
 
 @router.post("/items/{item_id}/reservations", status_code=201)
-async def reserve_book(
-    item_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> ReservationOut:
+async def reserve_book(item_id: uuid.UUID, student: StudentDep, db: DbDep) -> ReservationOut:
     item = await db.get(LibraryItem, item_id)
     if item is None:
         raise HTTPException(404, "This book isn't in the catalogue.")
@@ -351,9 +345,7 @@ async def reserve_book(
 
 
 @router.delete("/reservations/{reservation_id}", status_code=204)
-async def cancel_reservation(
-    reservation_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> None:
+async def cancel_reservation(reservation_id: uuid.UUID, student: StudentDep, db: DbDep) -> None:
     r = await db.get(LibraryReservation, reservation_id)
     if r is None or r.person_id != student.person_id or r.status not in OPEN:
         raise HTTPException(404, "This reservation isn't on your account.")
@@ -368,9 +360,7 @@ class RenewOut(BaseModel):
 
 
 @router.post("/loans/{loan_id}/renew")
-async def renew_loan(
-    loan_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> RenewOut:
+async def renew_loan(loan_id: uuid.UUID, student: StudentDep, db: DbDep) -> RenewOut:
     s = get_settings()
     loan = await db.get(LibraryLoan, loan_id)
     if loan is None or loan.person_id != student.person_id or loan.returned_at is not None:

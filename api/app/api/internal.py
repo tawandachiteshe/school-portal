@@ -4,12 +4,11 @@ import hmac
 import logging
 import re
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import SmsOutbox
 
 router = APIRouter(prefix="/internal", tags=["internal"], include_in_schema=False)
@@ -21,9 +20,7 @@ class Queued(BaseModel):
 
 
 @router.post("/sms")
-async def authentik_sms(
-    request: Request, authorization: str = Header(default=""), db: AsyncSession = Depends(get_db)
-) -> Queued:
+async def authentik_sms(request: Request, db: DbDep, authorization: str = Header(default="")) -> Queued:
     """Authentik's generic SMS provider (sign-up phone check, password reset) posts
     {"From", "To", "Body"} here. The text joins the SMS queue that the SMS worker sends once a
     provider is configured (SMS_PROVIDER)."""

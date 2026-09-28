@@ -3,20 +3,21 @@
 
 import uuid
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.db import DbDep
 from app.models import AskQuestion, SmsOutbox, User
 from app.services import clock
 from app.services.students import active_student
 
 router = APIRouter(prefix="/staff/ask-questions", tags=["assistant"])
 student_affairs = require_role("student_affairs", "admin")
+StudentAffairsDep = Annotated[CurrentUser, Depends(student_affairs)]
 
 
 class InboxQuestion(BaseModel):
@@ -33,9 +34,7 @@ class InboxQuestion(BaseModel):
 
 
 @router.get("")
-async def ask_questions_inbox(
-    _: CurrentUser = Depends(student_affairs), db: AsyncSession = Depends(get_db)
-) -> list[InboxQuestion]:
+async def ask_questions_inbox(_: StudentAffairsDep, db: DbDep) -> list[InboxQuestion]:
     rows = (
         await db.execute(
             select(AskQuestion, User)
@@ -73,8 +72,8 @@ class AskReplyIn(BaseModel):
 async def reply_to_question(
     question_id: uuid.UUID,
     body: AskReplyIn,
-    cu: CurrentUser = Depends(student_affairs),
-    db: AsyncSession = Depends(get_db),
+    cu: StudentAffairsDep,
+    db: DbDep,
 ) -> InboxQuestion:
     q = await db.get(AskQuestion, question_id)
     if q is None:

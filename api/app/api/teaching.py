@@ -5,6 +5,7 @@ import re
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -18,7 +19,7 @@ from app.api.modules import WeeklySlot
 from app.api.types import AssessmentKind, ClassKind
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     AcademicTerm,
     Assessment,
@@ -39,6 +40,7 @@ from app.services import clock, timetable
 
 router = APIRouter(prefix="/staff/teaching", tags=["teaching"])
 _lecturer_role = require_role("lecturer")
+_LecturerRoleDep = Annotated[CurrentUser, Depends(_lecturer_role)]
 
 
 class Lecturer:
@@ -47,9 +49,7 @@ class Lecturer:
         self.staff = staff
 
 
-async def current_lecturer(
-    cu: CurrentUser = Depends(_lecturer_role), db: AsyncSession = Depends(get_db)
-) -> Lecturer:
+async def current_lecturer(cu: _LecturerRoleDep, db: DbDep) -> Lecturer:
     person = cu.user.person
     staff = (
         (await db.execute(select(Staff).where(Staff.person_id == person.id))).scalar_one_or_none()
@@ -59,6 +59,9 @@ async def current_lecturer(
     if staff is None:
         raise HTTPException(403, "No staff record for this account")
     return Lecturer(cu, staff)
+
+
+LecturerDep = Annotated[Lecturer, Depends(current_lecturer)]
 
 
 async def my_offerings(db: AsyncSession, lec: Lecturer) -> list[ModuleOffering]:
@@ -254,7 +257,7 @@ async def _shared_notes(db: AsyncSession, offerings: list[ModuleOffering], count
 
 
 @router.get("/overview")
-async def overview(lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)) -> Overview:
+async def overview(lec: LecturerDep, db: DbDep) -> Overview:
     now = clock.now()
     offerings = await my_offerings(db, lec)
     students = await roster(db, [o.id for o in offerings])
@@ -308,9 +311,7 @@ async def overview(lec: Lecturer = Depends(current_lecturer), db: AsyncSession =
 
 
 @router.get("/marking")
-async def marking(
-    lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> list[MarkingItem]:
+async def marking(lec: LecturerDep, db: DbDep) -> list[MarkingItem]:
     offerings = await my_offerings(db, lec)
     counts = {oid: len(v) for oid, v in (await roster(db, [o.id for o in offerings])).items()}
     return await _marking(db, offerings, counts, include_released=True)
@@ -392,9 +393,7 @@ async def _sheet(db: AsyncSession, a: Assessment) -> MarksSheet:
 
 
 @router.get("/assessments/{assessment_id}/marks")
-async def get_marks(
-    assessment_id: uuid.UUID, lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> MarksSheet:
+async def get_marks(assessment_id: uuid.UUID, lec: LecturerDep, db: DbDep) -> MarksSheet:
     return await _sheet(db, await _assessment(db, lec, assessment_id))
 
 
@@ -414,8 +413,8 @@ class MarksIn(BaseModel):
 async def save_marks(
     assessment_id: uuid.UUID,
     body: MarksIn,
-    lec: Lecturer = Depends(current_lecturer),
-    db: AsyncSession = Depends(get_db),
+    lec: LecturerDep,
+    db: DbDep,
 ) -> MarksSheet:
     """Save a draft (students see marks only after publishing). Rows not sent are left as they are."""
     a = await _assessment(db, lec, assessment_id)
@@ -451,9 +450,7 @@ async def save_marks(
 
 
 @router.post("/assessments/{assessment_id}/publish")
-async def publish_marks(
-    assessment_id: uuid.UUID, lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> MarksSheet:
+async def publish_marks(assessment_id: uuid.UUID, lec: LecturerDep, db: DbDep) -> MarksSheet:
     a = await _assessment(db, lec, assessment_id)
     sheet = await _sheet(db, a)
     missing = [r for r in sheet.rows if r.mark is None and not r.is_absent]
@@ -516,9 +513,7 @@ class ClassPage(BaseModel):
 
 
 @router.get("/classes/{offering_id}")
-async def class_page(
-    offering_id: uuid.UUID, lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> ClassPage:
+async def class_page(offering_id: uuid.UUID, lec: LecturerDep, db: DbDep) -> ClassPage:
     o = await _offering(db, lec, offering_id)
     offerings = await my_offerings(db, lec)
     all_students = await roster(db, [x.id for x in offerings])
@@ -630,12 +625,12 @@ class Shared(BaseModel):
 
 @router.post("/materials", status_code=201)
 async def upload_notes(
+    lec: LecturerDep,
+    db: DbDep,
     file: UploadFile = File(...),
     title: str = Form(min_length=1, max_length=200),
     week: int | None = Form(default=None, ge=1, le=52),
     offering_ids: list[uuid.UUID] = Form(...),
-    lec: Lecturer = Depends(current_lecturer),
-    db: AsyncSession = Depends(get_db),
 ) -> Shared:
     mine = {o.id: o for o in await my_offerings(db, lec)}
     if not offering_ids or any(i not in mine for i in offering_ids):
@@ -758,8 +753,8 @@ async def _session_for(db: AsyncSession, lec: Lecturer, slot_id: uuid.UUID, on_d
 async def open_register(
     slot_id: uuid.UUID,
     on_date: date,
-    lec: Lecturer = Depends(current_lecturer),
-    db: AsyncSession = Depends(get_db),
+    lec: LecturerDep,
+    db: DbDep,
 ) -> Register:
     if abs((on_date - clock.today()).days) > 7:
         raise HTTPException(409, "Registers can be taken within a week of the class.")
@@ -784,8 +779,8 @@ async def mark_attendance(
     session_id: uuid.UUID,
     student_id: uuid.UUID,
     body: MarkAttendance,
-    lec: Lecturer = Depends(current_lecturer),
-    db: AsyncSession = Depends(get_db),
+    lec: LecturerDep,
+    db: DbDep,
 ) -> None:
     s = await _own_session(db, lec, session_id)
     if student_id not in {st.id for st in (await roster(db, [s.offering_id]))[s.offering_id]}:
@@ -800,9 +795,7 @@ async def mark_attendance(
 
 
 @router.post("/register/{session_id}/rest-present", status_code=204)
-async def mark_rest_present(
-    session_id: uuid.UUID, lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> None:
+async def mark_rest_present(session_id: uuid.UUID, lec: LecturerDep, db: DbDep) -> None:
     s = await _own_session(db, lec, session_id)
     done = set(
         (await db.execute(select(Attendance.student_id).where(Attendance.session_id == s.id))).scalars()
@@ -814,9 +807,7 @@ async def mark_rest_present(
 
 
 @router.post("/register/{session_id}/finish")
-async def finish_register(
-    session_id: uuid.UUID, lec: Lecturer = Depends(current_lecturer), db: AsyncSession = Depends(get_db)
-) -> dict[str, int]:
+async def finish_register(session_id: uuid.UUID, lec: LecturerDep, db: DbDep) -> dict[str, int]:
     s = await _own_session(db, lec, session_id)
     students = (await roster(db, [s.offering_id]))[s.offering_id]
     marks = {

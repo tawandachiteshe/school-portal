@@ -10,7 +10,7 @@ import re
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,10 +19,10 @@ from app import storage
 from app.api.me import term_info
 from app.api.types import AssessmentKind, SubmissionMode, SubmissionStatus
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import Assessment, Student, Submission, SubmissionFile, UploadSession
 from app.services import clock
-from app.services.students import current_offerings, current_student
+from app.services.students import StudentDep, current_offerings
 
 router = APIRouter(prefix="/student", tags=["deadlines"])
 
@@ -58,9 +58,7 @@ def _released(a: Assessment, now: datetime) -> bool:
 
 
 @router.get("/deadlines")
-async def deadlines(
-    student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> Deadlines:
+async def deadlines(student: StudentDep, db: DbDep) -> Deadlines:
     now = clock.now()
     offerings = await current_offerings(db, student)
     rows = (
@@ -207,9 +205,7 @@ def _submission_out(sub: Submission | None) -> SubmissionOut | None:
 
 
 @router.get("/assessments/{assessment_id}")
-async def assessment_detail(
-    assessment_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> AssessmentOut:
+async def assessment_detail(assessment_id: uuid.UUID, student: StudentDep, db: DbDep) -> AssessmentOut:
     a = await _assessment(db, student, assessment_id)
     sub = await _submission(db, student, a)
     can, reason = _window(a, sub, clock.now())
@@ -289,8 +285,8 @@ def _chunk_prefix(upload_id: uuid.UUID) -> str:
 async def start_upload(
     assessment_id: uuid.UUID,
     body: UploadIn,
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    student: StudentDep,
+    db: DbDep,
 ) -> UploadOut:
     a = await _assessment(db, student, assessment_id)
     can, reason = _window(a, await _submission(db, student, a), clock.now())
@@ -333,9 +329,7 @@ async def _upload(db: AsyncSession, student: Student, upload_id: uuid.UUID) -> U
 
 
 @router.get("/uploads/{upload_id}")
-async def upload_status(
-    upload_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> UploadOut:
+async def upload_status(upload_id: uuid.UUID, student: StudentDep, db: DbDep) -> UploadOut:
     up = await _upload(db, student, upload_id)
     return UploadOut(id=up.id, received_bytes=up.received_bytes, size_bytes=up.size_bytes)
 
@@ -344,9 +338,9 @@ async def upload_status(
 async def upload_chunk(
     upload_id: uuid.UUID,
     request: Request,
+    student: StudentDep,
+    db: DbDep,
     offset: int = Query(ge=0),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
 ) -> UploadOut:
     up = await _upload(db, student, upload_id)
     if up.completed_at:
@@ -379,8 +373,8 @@ class CompleteIn(BaseModel):
 async def complete_upload(
     upload_id: uuid.UUID,
     body: CompleteIn,
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    student: StudentDep,
+    db: DbDep,
 ) -> SubmissionOut:
     up = await _upload(db, student, upload_id)
     if up.received_bytes != up.size_bytes:
@@ -430,9 +424,7 @@ async def complete_upload(
 
 
 @router.delete("/uploads/{upload_id}", status_code=204)
-async def cancel_upload(
-    upload_id: uuid.UUID, student: Student = Depends(current_student), db: AsyncSession = Depends(get_db)
-) -> None:
+async def cancel_upload(upload_id: uuid.UUID, student: StudentDep, db: DbDep) -> None:
     up = await _upload(db, student, upload_id)
     if up.completed_at is None:
         up.cancelled_at = clock.now()

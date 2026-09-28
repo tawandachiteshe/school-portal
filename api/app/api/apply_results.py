@@ -11,18 +11,17 @@ from datetime import datetime
 from enum import StrEnum
 
 from asyncer import asyncify
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import storage
-from app.api.apply import applicant
-from app.api.apply_id import ACCEPTED, _draft, device_of, phone_session
-from app.auth.deps import CurrentUser
+from app.api.apply import ApplicantDep
+from app.api.apply_id import ACCEPTED, PhoneDep, _draft, device_of
 from app.config import get_settings
-from app.db import get_db, get_sessionmaker
+from app.db import DbDep, get_sessionmaker
 from app.models import (
     Application,
     ApplicationEvent,
@@ -553,20 +552,18 @@ async def _fresh(db: AsyncSession, a: Application) -> ResultsState:
 
 
 @router.get("/apply/results")
-async def application_results(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def application_results(cu: ApplicantDep, db: DbDep) -> ResultsState:
     return await results_state(db, await _draft(db, cu))
 
 
 @router.post("/apply/results/pages")
 async def add_results_page(
     request: Request,
+    cu: ApplicantDep,
+    db: DbDep,
     file: UploadFile = File(...),
     scan: str | None = Form(default=None),
     quality: str | None = Form(default=None),
-    cu: CurrentUser = Depends(applicant),
-    db: AsyncSession = Depends(get_db),
 ) -> ResultsState:
     a = await _draft(db, cu)
     await _add_page(db, a, file, scan, quality, request.headers.get("user-agent"), None)
@@ -574,9 +571,7 @@ async def add_results_page(
 
 
 @router.delete("/apply/results/pages/{document_id}")
-async def remove_results_page(
-    document_id: uuid.UUID, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def remove_results_page(document_id: uuid.UUID, cu: ApplicantDep, db: DbDep) -> ResultsState:
     a = await _draft(db, cu)
     await _remove_page(db, a, document_id)
     return await _fresh(db, a)
@@ -586,8 +581,8 @@ async def remove_results_page(
 async def read_results_scan(
     scan: str,
     background: BackgroundTasks,
-    cu: CurrentUser = Depends(applicant),
-    db: AsyncSession = Depends(get_db),
+    cu: ApplicantDep,
+    db: DbDep,
 ) -> ResultsState:
     a = await _draft(db, cu)
     _start_read(a, scan)
@@ -597,18 +592,14 @@ async def read_results_scan(
 
 
 @router.put("/apply/results")
-async def save_results(
-    body: SaveResultsIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def save_results(body: SaveResultsIn, cu: ApplicantDep, db: DbDep) -> ResultsState:
     a = await _draft(db, cu)
     await _save(db, a, body, cu.user.id)
     return await _fresh(db, a)
 
 
 @router.get("/apply/documents/{document_id}/file", response_class=StreamingResponse)
-async def my_document_file(
-    document_id: uuid.UUID, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> StreamingResponse:
+async def my_document_file(document_id: uuid.UUID, cu: ApplicantDep, db: DbDep) -> StreamingResponse:
     return await _file(await _draft(db, cu), document_id)
 
 
@@ -616,29 +607,25 @@ async def my_document_file(
 
 
 @router.get("/handoff/session/results")
-async def phone_results(
-    h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def phone_results(h: PhoneDep, db: DbDep) -> ResultsState:
     return await _fresh(db, h.application)
 
 
 @router.post("/handoff/session/results/pages")
 async def phone_add_results_page(
     request: Request,
+    h: PhoneDep,
+    db: DbDep,
     file: UploadFile = File(...),
     scan: str | None = Form(default=None),
     quality: str | None = Form(default=None),
-    h: DeviceHandoff = Depends(phone_session),
-    db: AsyncSession = Depends(get_db),
 ) -> ResultsState:
     await _add_page(db, h.application, file, scan, quality, request.headers.get("user-agent"), h)
     return await _fresh(db, h.application)
 
 
 @router.delete("/handoff/session/results/pages/{document_id}")
-async def phone_remove_results_page(
-    document_id: uuid.UUID, h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def phone_remove_results_page(document_id: uuid.UUID, h: PhoneDep, db: DbDep) -> ResultsState:
     await _remove_page(db, h.application, document_id)
     return await _fresh(db, h.application)
 
@@ -647,8 +634,8 @@ async def phone_remove_results_page(
 async def phone_read_results_scan(
     scan: str,
     background: BackgroundTasks,
-    h: DeviceHandoff = Depends(phone_session),
-    db: AsyncSession = Depends(get_db),
+    h: PhoneDep,
+    db: DbDep,
 ) -> ResultsState:
     _start_read(h.application, scan)
     await db.commit()
@@ -657,16 +644,12 @@ async def phone_read_results_scan(
 
 
 @router.put("/handoff/session/results")
-async def phone_save_results(
-    body: SaveResultsIn, h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> ResultsState:
+async def phone_save_results(body: SaveResultsIn, h: PhoneDep, db: DbDep) -> ResultsState:
     await _save(db, h.application, body, None)
     return await _fresh(db, h.application)
 
 
 @router.get("/handoff/session/documents/{document_id}/file", response_class=StreamingResponse)
-async def phone_document_file(
-    document_id: uuid.UUID, h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> StreamingResponse:
+async def phone_document_file(document_id: uuid.UUID, h: PhoneDep, db: DbDep) -> StreamingResponse:
     await db.refresh(h.application, ["documents"])
     return await _file(h.application, document_id)

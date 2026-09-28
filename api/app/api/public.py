@@ -2,14 +2,13 @@
 
 from datetime import date, datetime, time
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.apply import _years, entry_text
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import Intake, Programme
 from app.services import clock
 
@@ -44,7 +43,7 @@ class PublicHome(BaseModel):
 
 
 @router.get("/home")
-async def public_home(db: AsyncSession = Depends(get_db)) -> PublicHome:
+async def public_home(db: DbDep) -> PublicHome:
     s = get_settings()
     now = clock.now()
     intake = (

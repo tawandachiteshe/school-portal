@@ -6,12 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import oidc, sessions, sync
 from app.config import get_settings
 from app.crypto import decrypt
-from app.db import get_db
+from app.db import DbDep
 from app.models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -40,7 +39,7 @@ class LogoutOut(BaseModel):
 
 
 @router.post("/logout")
-async def logout(request: Request, response: Response, db: AsyncSession = Depends(get_db)) -> LogoutOut:
+async def logout(request: Request, response: Response, db: DbDep) -> LogoutOut:
     """Ends the portal session, and Authentik's too (RP-initiated logout) when it signed the user in."""
     ws = await sessions.revoke(db, request.cookies.get(sessions.COOKIE))
     response.delete_cookie(sessions.COOKIE, path="/")
@@ -79,10 +78,10 @@ async def oidc_login(next: str = "/", shared: bool = False) -> RedirectResponse:
 @router.get("/callback", response_class=RedirectResponse, status_code=302)
 async def oidc_callback(
     request: Request,
+    db: DbDep,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
-    db: AsyncSession = Depends(get_db),
 ) -> RedirectResponse:
     saved = oidc.read_state(request.cookies.get(oidc.STATE_COOKIE))
     if error or not code or not saved or state != saved["state"]:
@@ -139,7 +138,7 @@ class DevAccount(BaseModel):
 
 
 @router.get("/dev-accounts", dependencies=[Depends(_require_dev_login)])
-async def dev_accounts(db: AsyncSession = Depends(get_db)) -> list[DevAccount]:
+async def dev_accounts(db: DbDep) -> list[DevAccount]:
     users = (await db.execute(select(User).where(User.is_active).order_by(User.display_name))).scalars()
     return [
         DevAccount(
@@ -157,9 +156,7 @@ class DevLoginIn(BaseModel):
 
 
 @router.post("/dev-login", dependencies=[Depends(_require_dev_login)])
-async def dev_login(
-    body: DevLoginIn, request: Request, response: Response, db: AsyncSession = Depends(get_db)
-) -> dict[str, bool]:
+async def dev_login(body: DevLoginIn, request: Request, response: Response, db: DbDep) -> dict[str, bool]:
     user = (await db.execute(select(User).where(User.username == body.username))).scalar_one_or_none()
     if user is None or not user.is_active:
         raise HTTPException(404, "No such account")

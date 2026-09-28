@@ -4,13 +4,13 @@ catalogue in the portal"). Students see the same books through app/api/library.p
 import re
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.api.library_desk import LibrarianDep
+from app.db import DbDep
 from app.models import (
     AcademicTerm,
     LibraryCopy,
@@ -22,7 +22,6 @@ from app.models import (
 )
 
 router = APIRouter(prefix="/staff/library", tags=["library catalogue"])
-librarian = require_role("librarian")
 
 BARCODE = re.compile(r"^[A-Z0-9][A-Z0-9-]{2,39}$")
 
@@ -92,9 +91,9 @@ async def _items(db: AsyncSession, items: list[LibraryItem]) -> list[CatalogueIt
 
 @router.get("/catalogue")
 async def catalogue(
+    _: LibrarianDep,
+    db: DbDep,
     q: str | None = Query(default=None, max_length=100),
-    _: CurrentUser = Depends(librarian),
-    db: AsyncSession = Depends(get_db),
 ) -> list[CatalogueItem]:
     """Title, author, subject, ISBN, call number or a copy's barcode; everything (A–Z) without a query."""
     stmt = select(LibraryItem).order_by(LibraryItem.title).limit(100)
@@ -152,9 +151,7 @@ async def _add_copies(db: AsyncSession, item_id: uuid.UUID, copies: list[CopyIn]
 
 
 @router.post("/catalogue", status_code=201)
-async def add_book(
-    body: BookIn, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> CatalogueItem:
+async def add_book(body: BookIn, _: LibrarianDep, db: DbDep) -> CatalogueItem:
     item = LibraryItem(
         title=body.title.strip(),
         authors=[a.strip() for a in body.authors if a.strip()],
@@ -173,9 +170,7 @@ async def add_book(
 
 
 @router.post("/catalogue/{item_id}/copies", status_code=201)
-async def add_copy(
-    item_id: uuid.UUID, body: CopyIn, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> CatalogueItem:
+async def add_copy(item_id: uuid.UUID, body: CopyIn, _: LibrarianDep, db: DbDep) -> CatalogueItem:
     item = await db.get(LibraryItem, item_id)
     if item is None:
         raise HTTPException(404, "Book not found")
@@ -256,9 +251,7 @@ async def _lists(db: AsyncSession) -> list[ModuleReadingList]:
 
 
 @router.get("/reading-lists")
-async def reading_lists(
-    _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> list[ModuleReadingList]:
+async def reading_lists(_: LibrarianDep, db: DbDep) -> list[ModuleReadingList]:
     return await _lists(db)
 
 
@@ -272,8 +265,8 @@ class ListedIn(BaseModel):
 async def add_to_reading_list(
     offering_id: uuid.UUID,
     body: ListedIn,
-    _: CurrentUser = Depends(librarian),
-    db: AsyncSession = Depends(get_db),
+    _: LibrarianDep,
+    db: DbDep,
 ) -> list[ModuleReadingList]:
     if await db.get(ModuleOffering, offering_id) is None or await db.get(LibraryItem, body.item_id) is None:
         raise HTTPException(404, "Module or book not found")
@@ -303,8 +296,8 @@ async def add_to_reading_list(
 async def remove_from_reading_list(
     offering_id: uuid.UUID,
     item_id: uuid.UUID,
-    _: CurrentUser = Depends(librarian),
-    db: AsyncSession = Depends(get_db),
+    _: LibrarianDep,
+    db: DbDep,
 ) -> list[ModuleReadingList]:
     row = await db.get(ReadingListItem, (offering_id, item_id))
     if row is None:

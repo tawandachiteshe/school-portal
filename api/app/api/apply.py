@@ -3,6 +3,7 @@
 import uuid
 from datetime import date, datetime, time, timedelta
 from enum import StrEnum
+from typing import Annotated
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,13 +15,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.admissions import ApplicationStatus
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import Application, ApplicationEvent, ApplicationPayment, Intake, Person, Programme
 from app.pdf import make_pdf
 from app.services import clock, phones
 
 router = APIRouter(prefix="/apply", tags=["apply"])
 applicant = require_role("applicant")
+ApplicantDep = Annotated[CurrentUser, Depends(applicant)]
 
 OPEN = ("submitted", "in_review", "more_info")
 
@@ -124,9 +126,7 @@ class ProgrammeChoice(BaseModel):
 
 
 @router.get("/programmes")
-async def programmes(
-    _: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> list[ProgrammeChoice]:
+async def programmes(_: ApplicantDep, db: DbDep) -> list[ProgrammeChoice]:
     rows = (
         await db.execute(
             select(Programme)
@@ -307,9 +307,7 @@ async def _out(db: AsyncSession, a: Application) -> MyApplication:
 
 
 @router.get("/application")
-async def my_application(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> MyApplication | None:
+async def my_application(cu: ApplicantDep, db: DbDep) -> MyApplication | None:
     a = await _current(db, await _person(db, cu))
     await db.commit()
     return await _out(db, a) if a else None
@@ -320,9 +318,7 @@ class ProgrammeIn(BaseModel):
 
 
 @router.put("/application/programme")
-async def choose_programme(
-    body: ProgrammeIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> MyApplication:
+async def choose_programme(body: ProgrammeIn, cu: ApplicantDep, db: DbDep) -> MyApplication:
     """Starts the application on first choice; the programme can change until it's submitted."""
     prog = await db.get(Programme, body.programme_id)
     if prog is None or not prog.is_accepting_applications:
@@ -359,7 +355,7 @@ async def choose_programme(
 
 
 @router.post("/application/withdraw")
-async def withdraw(cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)) -> MyApplication:
+async def withdraw(cu: ApplicantDep, db: DbDep) -> MyApplication:
     a = await _current(db, await _person(db, cu))
     if a is None or a.status not in (*OPEN, "draft"):
         raise HTTPException(409, "There's no application to withdraw.")
@@ -390,9 +386,7 @@ class OfferIn(BaseModel):
 
 
 @router.post("/offer")
-async def answer_offer(
-    body: OfferIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> MyApplication:
+async def answer_offer(body: OfferIn, cu: ApplicantDep, db: DbDep) -> MyApplication:
     a = await _current(db, await _person(db, cu))
     if a is None or a.status != "accepted":
         raise HTTPException(409, "There's no offer to answer.")
@@ -418,7 +412,7 @@ async def answer_offer(
 
 
 @router.get("/offer/letter.pdf", response_class=Response)
-async def offer_letter(cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)) -> Response:
+async def offer_letter(cu: ApplicantDep, db: DbDep) -> Response:
     a = await _current(db, await _person(db, cu))
     if a is None or a.status != "accepted":
         raise HTTPException(404, "There's no offer letter.")

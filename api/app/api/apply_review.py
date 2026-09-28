@@ -3,17 +3,15 @@ entered, and whether it meets the programme's entry requirements, explained in t
 
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crypto
-from app.api.apply import ApplyStep, _out, _years, applicant
+from app.api.apply import ApplicantDep, ApplyStep, _out, _years
 from app.api.apply_birth import birth_state
 from app.api.apply_id import _draft, id_state
-from app.auth.deps import CurrentUser
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import Application
 from app.services import eligibility
 
@@ -143,9 +141,7 @@ def explain(a: Application) -> ApplicantEligibility | None:
 
 
 @router.get("/apply/review")
-async def application_review(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> ApplicantReview:
+async def application_review(cu: ApplicantDep, db: DbDep) -> ApplicantReview:
     a = await _draft(db, cu)
     out = await _out(db, a)
     idn = await id_state(db, a)

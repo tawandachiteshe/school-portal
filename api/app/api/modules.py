@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import func, select
@@ -14,9 +14,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import storage
 from app.api.me import term_info
 from app.api.types import AssessmentKind, ClassKind, SubmissionMode, SubmissionStatus
-from app.auth.deps import CurrentUser, current_user
+from app.auth.deps import CurrentUserDep
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     Assessment,
     CourseMaterial,
@@ -27,7 +27,7 @@ from app.models import (
     TimetableSlot,
 )
 from app.services import clock, timetable
-from app.services.students import current_offerings, current_student
+from app.services.students import StudentDep, current_offerings
 
 router = APIRouter(prefix="/student", tags=["modules"])
 
@@ -144,9 +144,9 @@ def _published(now: datetime):
 
 @router.get("/modules")
 async def list_modules(
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
 ) -> ModuleList:
     now = clock.now()
     offerings = await current_offerings(db, student)
@@ -196,9 +196,9 @@ async def _offering_for(db: AsyncSession, student: Student, code: str) -> Module
 @router.get("/modules/{code}")
 async def module_detail(
     code: str,
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
 ) -> ModuleDetail:
     now = clock.now()
     o = await _offering_for(db, student, code)
@@ -340,9 +340,9 @@ EXT = {"application/pdf": "pdf"}
 @router.get("/materials/{material_id}/download")
 async def download_material(
     material_id: uuid.UUID,
-    cu: CurrentUser = Depends(current_user),
-    student: Student = Depends(current_student),
-    db: AsyncSession = Depends(get_db),
+    cu: CurrentUserDep,
+    student: StudentDep,
+    db: DbDep,
 ) -> StreamingResponse:
     m = await db.get(CourseMaterial, material_id)
     now = clock.now()

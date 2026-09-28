@@ -1,14 +1,14 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.types import Role
-from app.auth.deps import CurrentUser, current_user
-from app.db import get_db
+from app.auth.deps import CurrentUser, CurrentUserDep
+from app.db import DbDep
 from app.models import AcademicTerm, NotificationPreference, Staff, Student
 
 router = APIRouter(tags=["me"])
@@ -55,7 +55,7 @@ def term_info(term: AcademicTerm, today: date) -> TermInfo:
 
 
 @router.get("/me")
-async def me(cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends(get_db)) -> MeOut:
+async def me(cu: CurrentUserDep, db: DbDep) -> MeOut:
     user, person = cu.user, cu.user.person
     student = staff = None
     if person:
@@ -101,16 +101,12 @@ async def _sms_reminders(db: AsyncSession, cu: CurrentUser) -> bool:
 
 
 @router.get("/me/settings")
-async def get_my_settings(
-    cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends(get_db)
-) -> SettingsOut:
+async def get_my_settings(cu: CurrentUserDep, db: DbDep) -> SettingsOut:
     return SettingsOut(sms_reminders=await _sms_reminders(db, cu))
 
 
 @router.patch("/me/settings")
-async def update_my_settings(
-    body: SettingsIn, cu: CurrentUser = Depends(current_user), db: AsyncSession = Depends(get_db)
-) -> SettingsOut:
+async def update_my_settings(body: SettingsIn, cu: CurrentUserDep, db: DbDep) -> SettingsOut:
     if body.sms_reminders is not None:
         stmt = insert(NotificationPreference).values(
             user_id=cu.user.id, category="deadline", channel="sms", enabled=body.sms_reminders

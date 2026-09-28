@@ -8,6 +8,7 @@ import secrets
 import uuid
 from datetime import date, datetime, timedelta
 from enum import StrEnum
+from typing import Annotated
 
 from asyncer import asyncify
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, Response, UploadFile
@@ -16,10 +17,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crypto, storage
-from app.api.apply import _current, _person, applicant
+from app.api.apply import ApplicantDep, _current, _person
 from app.auth.deps import CurrentUser
 from app.config import get_settings
-from app.db import get_db, get_sessionmaker
+from app.db import DbDep, get_sessionmaker
 from app.models import (
     Application,
     ApplicationEvent,
@@ -346,9 +347,7 @@ async def _draft(db: AsyncSession, cu: CurrentUser) -> Application:
 
 
 @router.get("/apply/national-id")
-async def national_id(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> NationalIdState:
+async def national_id(cu: ApplicantDep, db: DbDep) -> NationalIdState:
     return await id_state(db, await _draft(db, cu))
 
 
@@ -356,9 +355,9 @@ async def national_id(
 async def upload_national_id(
     request: Request,
     background: BackgroundTasks,
+    cu: ApplicantDep,
+    db: DbDep,
     file: UploadFile = File(...),
-    cu: CurrentUser = Depends(applicant),
-    db: AsyncSession = Depends(get_db),
 ) -> NationalIdState:
     a = await _draft(db, cu)
     doc = await _upload(db, a, file, request.headers.get("user-agent"), None)
@@ -368,9 +367,7 @@ async def upload_national_id(
 
 
 @router.put("/apply/national-id")
-async def confirm_national_id(
-    body: ConfirmIdIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> NationalIdState:
+async def confirm_national_id(body: ConfirmIdIn, cu: ApplicantDep, db: DbDep) -> NationalIdState:
     a = await _draft(db, cu)
     await _confirm(db, a, body)
     await db.refresh(a, ["documents", "person"])
@@ -451,9 +448,7 @@ class StartHandoffIn(BaseModel):
 
 
 @router.post("/apply/handoffs")
-async def start_handoff(
-    body: StartHandoffIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> NewHandoff:
+async def start_handoff(body: StartHandoffIn, cu: ApplicantDep, db: DbDep) -> NewHandoff:
     """A new link; any earlier one stops working."""
     a = await _draft(db, cu)
     if a.status != "draft":
@@ -483,9 +478,7 @@ async def start_handoff(
 
 
 @router.get("/apply/handoffs/current")
-async def current_handoff(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> HandoffOut | None:
+async def current_handoff(cu: ApplicantDep, db: DbDep) -> HandoffOut | None:
     """Polled by the computer while the phone works (design/HandoffWaiting)."""
     h = await _latest_handoff(db, await _draft(db, cu))
     return await _handoff_out(db, h) if h else None
@@ -500,9 +493,7 @@ class LinkSent(BaseModel):
 
 
 @router.post("/apply/handoffs/current/sms")
-async def send_handoff_link(
-    body: SendLinkIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> LinkSent:
+async def send_handoff_link(body: SendLinkIn, cu: ApplicantDep, db: DbDep) -> LinkSent:
     h = await _latest_handoff(db, await _draft(db, cu))
     if h is None or _state(h, clock.now()) != HandoffState.waiting or h.short_code_hash != _hash(body.code):
         raise HTTPException(409, "This link has expired. Create a new one.")
@@ -525,9 +516,7 @@ async def send_handoff_link(
 
 
 @router.post("/apply/handoffs/current/disconnect")
-async def disconnect_handoff(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> HandoffOut:
+async def disconnect_handoff(cu: ApplicantDep, db: DbDep) -> HandoffOut:
     h = await _latest_handoff(db, await _draft(db, cu))
     if h is None:
         raise HTTPException(404, "There's no phone linked.")
@@ -583,7 +572,7 @@ STEP_LABEL = {
 
 
 @router.get("/handoff/{code}")
-async def handoff_landing(code: str, request: Request, db: AsyncSession = Depends(get_db)) -> HandoffLanding:
+async def handoff_landing(code: str, request: Request, db: DbDep) -> HandoffLanding:
     h = await _by_code(db, code)
     now = clock.now()
     s = _state(h, now)
@@ -609,9 +598,7 @@ class Claimed(BaseModel):
 
 
 @router.post("/handoff/{code}/claim")
-async def claim_handoff(
-    code: str, request: Request, response: Response, db: AsyncSession = Depends(get_db)
-) -> Claimed:
+async def claim_handoff(code: str, request: Request, response: Response, db: DbDep) -> Claimed:
     h = await _by_code(db, code)
     now = clock.now()
     if _mine(h, request) and _state(h, now) == HandoffState.connected:
@@ -641,7 +628,7 @@ async def claim_handoff(
 
 
 @router.post("/handoff/{code}/mismatch")
-async def report_mismatch(code: str, db: AsyncSession = Depends(get_db)) -> Claimed:
+async def report_mismatch(code: str, db: DbDep) -> Claimed:
     """The codes didn't match: close the link so nothing can be added through it (design/CodesMismatch)."""
     h = await _by_code(db, code)
     now = clock.now()
@@ -659,7 +646,7 @@ async def report_mismatch(code: str, db: AsyncSession = Depends(get_db)) -> Clai
     return Claimed(ok=True)
 
 
-async def phone_session(request: Request, db: AsyncSession = Depends(get_db)) -> DeviceHandoff:
+async def phone_session(request: Request, db: DbDep) -> DeviceHandoff:
     cookie = request.cookies.get(HANDOFF_COOKIE)
     h = None
     if cookie:
@@ -671,6 +658,9 @@ async def phone_session(request: Request, db: AsyncSession = Depends(get_db)) ->
     return h
 
 
+PhoneDep = Annotated[DeviceHandoff, Depends(phone_session)]
+
+
 class PhoneSession(BaseModel):
     first_name: str
     programme: str
@@ -680,9 +670,7 @@ class PhoneSession(BaseModel):
 
 
 @router.get("/handoff/session/current")
-async def phone_state(
-    h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> PhoneSession:
+async def phone_state(h: PhoneDep, db: DbDep) -> PhoneSession:
     out = await _handoff_out(db, h)
     a = h.application
     return PhoneSession(
@@ -698,9 +686,9 @@ async def phone_state(
 async def phone_upload_national_id(
     request: Request,
     background: BackgroundTasks,
+    h: PhoneDep,
+    db: DbDep,
     file: UploadFile = File(...),
-    h: DeviceHandoff = Depends(phone_session),
-    db: AsyncSession = Depends(get_db),
 ) -> NationalIdState:
     a = h.application
     doc = await _upload(db, a, file, request.headers.get("user-agent"), h)
@@ -710,9 +698,7 @@ async def phone_upload_national_id(
 
 
 @router.put("/handoff/session/national-id")
-async def phone_confirm_national_id(
-    body: ConfirmIdIn, h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> NationalIdState:
+async def phone_confirm_national_id(body: ConfirmIdIn, h: PhoneDep, db: DbDep) -> NationalIdState:
     a = h.application
     await _confirm(db, a, body)
     await db.refresh(a, ["documents", "person"])

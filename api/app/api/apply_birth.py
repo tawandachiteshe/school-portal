@@ -7,17 +7,16 @@ import uuid
 from datetime import date, datetime
 from enum import StrEnum
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import storage
-from app.api.apply import applicant
-from app.api.apply_id import ACCEPTED, _draft, device_of, phone_session
-from app.auth.deps import CurrentUser
+from app.api.apply import ApplicantDep
+from app.api.apply_id import ACCEPTED, PhoneDep, _draft, device_of
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import Application, ApplicationEvent, ApplicationFlag, DeviceHandoff, Document, DocumentField
 from app.services import clock
 from app.services.names import name_words
@@ -186,18 +185,16 @@ async def _fresh(db: AsyncSession, a: Application) -> BirthCertificateState:
 
 
 @router.get("/apply/birth-certificate")
-async def birth_certificate(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> BirthCertificateState:
+async def birth_certificate(cu: ApplicantDep, db: DbDep) -> BirthCertificateState:
     return await birth_state(db, await _draft(db, cu))
 
 
 @router.post("/apply/birth-certificate")
 async def upload_birth_certificate(
     request: Request,
+    cu: ApplicantDep,
+    db: DbDep,
     file: UploadFile = File(...),
-    cu: CurrentUser = Depends(applicant),
-    db: AsyncSession = Depends(get_db),
 ) -> BirthCertificateState:
     a = await _draft(db, cu)
     await _upload(db, a, file, request.headers.get("user-agent"), None)
@@ -206,7 +203,7 @@ async def upload_birth_certificate(
 
 @router.put("/apply/birth-certificate")
 async def confirm_birth_certificate(
-    body: ConfirmBirthIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
+    body: ConfirmBirthIn, cu: ApplicantDep, db: DbDep
 ) -> BirthCertificateState:
     a = await _draft(db, cu)
     await _confirm(db, a, body)
@@ -217,18 +214,16 @@ async def confirm_birth_certificate(
 
 
 @router.get("/handoff/session/birth-certificate")
-async def phone_birth_certificate(
-    h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
-) -> BirthCertificateState:
+async def phone_birth_certificate(h: PhoneDep, db: DbDep) -> BirthCertificateState:
     return await _fresh(db, h.application)
 
 
 @router.post("/handoff/session/birth-certificate")
 async def phone_upload_birth_certificate(
     request: Request,
+    h: PhoneDep,
+    db: DbDep,
     file: UploadFile = File(...),
-    h: DeviceHandoff = Depends(phone_session),
-    db: AsyncSession = Depends(get_db),
 ) -> BirthCertificateState:
     await _upload(db, h.application, file, request.headers.get("user-agent"), h)
     return await _fresh(db, h.application)
@@ -236,7 +231,7 @@ async def phone_upload_birth_certificate(
 
 @router.put("/handoff/session/birth-certificate")
 async def phone_confirm_birth_certificate(
-    body: ConfirmBirthIn, h: DeviceHandoff = Depends(phone_session), db: AsyncSession = Depends(get_db)
+    body: ConfirmBirthIn, h: PhoneDep, db: DbDep
 ) -> BirthCertificateState:
     await db.refresh(h.application, ["documents", "person", "flags"])
     await _confirm(db, h.application, body)

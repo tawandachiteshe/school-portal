@@ -6,6 +6,7 @@ import re
 import uuid
 from datetime import date, datetime
 from enum import StrEnum
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
@@ -16,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crypto, storage
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     Application,
     ApplicationEvent,
@@ -34,6 +35,7 @@ from app.services.names import name_words
 
 router = APIRouter(prefix="/staff/admissions", tags=["admissions"])
 officer = require_role("admissions", "admin")
+OfficerDep = Annotated[CurrentUser, Depends(officer)]
 
 UNCLEAR = 0.8  # below this, a read value was shown to the applicant to confirm
 OPEN = ("submitted", "in_review")
@@ -228,9 +230,7 @@ class QueueRow(BaseModel):
 
 
 @router.get("/summary")
-async def queue_summary(
-    _: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> QueueSummary:
+async def queue_summary(_: OfficerDep, db: DbDep) -> QueueSummary:
     apps = await _applications(db)
     tabs = [tab_of(a) for a in apps]
     count = lambda t: tabs.count(t)  # noqa: E731
@@ -284,16 +284,12 @@ async def _rows(db: AsyncSession, cu: CurrentUser, tab: QueueTab) -> list[QueueR
 
 
 @router.get("/applications")
-async def queue(
-    tab: QueueTab = QueueTab.to_review, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> list[QueueRow]:
+async def queue(cu: OfficerDep, db: DbDep, tab: QueueTab = QueueTab.to_review) -> list[QueueRow]:
     return await _rows(db, cu, tab)
 
 
 @router.get("/applications.csv", response_class=Response)
-async def queue_csv(
-    tab: QueueTab = QueueTab.to_review, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Response:
+async def queue_csv(cu: OfficerDep, db: DbDep, tab: QueueTab = QueueTab.to_review) -> Response:
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(
@@ -636,9 +632,7 @@ async def _review(db: AsyncSession, cu: CurrentUser, a: Application) -> Review:
 
 
 @router.get("/applications/{reference}")
-async def review(
-    reference: str, request: Request, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Review:
+async def review(reference: str, request: Request, cu: OfficerDep, db: DbDep) -> Review:
     a = await _get(db, reference)
     # The review shows the National ID number, date of birth and results (docs/07: audited).
     await audit.record(db, cu, request, "application.view", "application", a.reference)
@@ -647,9 +641,7 @@ async def review(
 
 
 @router.post("/applications/{reference}/assign")
-async def assign_to_me(
-    reference: str, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Review:
+async def assign_to_me(reference: str, cu: OfficerDep, db: DbDep) -> Review:
     """Opening an unassigned application takes it: it moves to "In review" under your name."""
     a = await _get(db, reference)
     if a.status not in OPEN:
@@ -671,9 +663,7 @@ def _require_open(a: Application) -> None:
 
 
 @router.post("/applications/{reference}/identity-checked")
-async def mark_identity_checked(
-    reference: str, request: Request, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Review:
+async def mark_identity_checked(reference: str, request: Request, cu: OfficerDep, db: DbDep) -> Review:
     a = await _get(db, reference)
     await audit.record(db, cu, request, "application.identity_checked", "application", a.reference)
     doc = next((d for d in a.documents if d.kind == "national_id"), None)
@@ -692,8 +682,8 @@ async def mark_zimsec_verified(
     reference: str,
     sitting_id: uuid.UUID,
     request: Request,
-    cu: CurrentUser = Depends(officer),
-    db: AsyncSession = Depends(get_db),
+    cu: OfficerDep,
+    db: DbDep,
 ) -> Review:
     a = await _get(db, reference)
     await audit.record(db, cu, request, "application.zimsec_verified", "application", a.reference)
@@ -723,8 +713,8 @@ async def resolve_flag(
     reference: str,
     flag_id: int,
     body: ResolveIn,
-    cu: CurrentUser = Depends(officer),
-    db: AsyncSession = Depends(get_db),
+    cu: OfficerDep,
+    db: DbDep,
 ) -> Review:
     a = await _get(db, reference)
     f = next((f for f in a.flags if f.id == flag_id), None)
@@ -744,9 +734,7 @@ class NoteIn(BaseModel):
 
 
 @router.post("/applications/{reference}/notes")
-async def add_note(
-    reference: str, body: NoteIn, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Review:
+async def add_note(reference: str, body: NoteIn, cu: OfficerDep, db: DbDep) -> Review:
     a = await _get(db, reference)
     _event(db, a, cu, "note", body.text.strip())
     await db.commit()
@@ -778,9 +766,7 @@ class Sent(BaseModel):
 
 
 @router.post("/applications/{reference}/message")
-async def send_message(
-    reference: str, body: MessageIn, cu: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> Sent:
+async def send_message(reference: str, body: MessageIn, cu: OfficerDep, db: DbDep) -> Sent:
     a = await _get(db, reference)
     if not (a.person.user and a.person.user.phone):
         raise HTTPException(409, "This applicant has no phone number.")
@@ -808,8 +794,8 @@ async def decide(
     reference: str,
     body: DecisionIn,
     request: Request,
-    cu: CurrentUser = Depends(officer),
-    db: AsyncSession = Depends(get_db),
+    cu: OfficerDep,
+    db: DbDep,
 ) -> Review:
     a = await _get(db, reference)
     _require_open(a)
@@ -845,8 +831,8 @@ async def decide(
 async def document_file(
     document_id: uuid.UUID,
     request: Request,
-    cu: CurrentUser = Depends(officer),
-    db: AsyncSession = Depends(get_db),
+    cu: OfficerDep,
+    db: DbDep,
 ) -> StreamingResponse:
     d = await db.get(Document, document_id)
     bucket = get_settings().s3_bucket_documents

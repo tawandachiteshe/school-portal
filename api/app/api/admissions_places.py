@@ -4,18 +4,17 @@ made and accepted. Admissions sets the numbers; until then a programme shows "No
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.api.admissions import OfficerDep
+from app.db import DbDep
 from app.models import Application, Intake, IntakePlace, Programme
 from app.services import clock
 
 router = APIRouter(prefix="/staff/admissions/places", tags=["admissions"])
-officer = require_role("admissions", "admin")
 
 
 class ProgrammePlaces(BaseModel):
@@ -102,9 +101,7 @@ async def _places(db: AsyncSession) -> IntakePlaces:
 
 
 @router.get("")
-async def intake_places(
-    _: CurrentUser = Depends(officer), db: AsyncSession = Depends(get_db)
-) -> IntakePlaces:
+async def intake_places(_: OfficerDep, db: DbDep) -> IntakePlaces:
     return await _places(db)
 
 
@@ -116,8 +113,8 @@ class PlacesIn(BaseModel):
 async def set_intake_places(
     programme_id: uuid.UUID,
     body: PlacesIn,
-    cu: CurrentUser = Depends(officer),
-    db: AsyncSession = Depends(get_db),
+    cu: OfficerDep,
+    db: DbDep,
 ) -> IntakePlaces:
     intake = await _intake(db)
     if intake is None or await db.get(Programme, programme_id) is None:

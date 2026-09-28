@@ -6,7 +6,7 @@ import logging
 import uuid
 from collections.abc import AsyncIterator
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -20,7 +20,7 @@ from app.assistant.sandbox import read_only_session
 from app.assistant.tools import Context, Source, allowed
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db, get_sessionmaker
+from app.db import DbDep, get_sessionmaker
 from app.models import AskQuestion, ChatMessage, ChatSession, User
 from app.services import clock, phones
 from app.services.students import active_student
@@ -28,6 +28,7 @@ from app.services.students import active_student
 router = APIRouter(prefix="/assistant", tags=["assistant"])
 log = logging.getLogger("tcfl.assistant")
 asker = require_role("student", "applicant")
+AskerDep = Annotated[CurrentUser, Depends(asker)]
 
 NOT_SET_UP = (
     "Ask TCFL isn't set up yet, so it can't answer questions. You can send your question to Student "
@@ -73,9 +74,7 @@ class AssistantHome(BaseModel):
 
 
 @router.get("", dependencies=[Depends(_enabled)])
-async def assistant_home(
-    cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
-) -> AssistantHome:
+async def assistant_home(cu: AskerDep, db: DbDep) -> AssistantHome:
     sent = (
         (
             await db.execute(
@@ -169,9 +168,7 @@ def _sse(event: AskEvent) -> str:
     response_model=AskEvent,
     responses={200: {"description": "text/event-stream of AskEvent", "model": AskEvent}},
 )
-async def ask(
-    body: AskIn, request: Request, cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
-) -> StreamingResponse:
+async def ask(body: AskIn, request: Request, cu: AskerDep, db: DbDep) -> StreamingResponse:
     await _rate_limit(db, cu.user.id)
     if body.session_id:
         session = await db.get(ChatSession, body.session_id)
@@ -301,8 +298,8 @@ class AnswerFeedbackOut(BaseModel):
 async def answer_feedback(
     message_id: int,
     body: AnswerFeedbackIn,
-    cu: CurrentUser = Depends(asker),
-    db: AsyncSession = Depends(get_db),
+    cu: AskerDep,
+    db: DbDep,
 ) -> AnswerFeedbackOut:
     m = (
         await db.execute(
@@ -345,9 +342,7 @@ class AskHandoffPreview(BaseModel):
 
 
 @router.get("/handoff", dependencies=[Depends(_enabled)])
-async def handoff_preview(
-    cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
-) -> AskHandoffPreview:
+async def handoff_preview(cu: AskerDep, db: DbDep) -> AskHandoffPreview:
     s = await active_student(db, cu.user)
     return AskHandoffPreview(
         name=cu.user.display_name or "",
@@ -358,9 +353,7 @@ async def handoff_preview(
 
 
 @router.post("/handoff", status_code=201, dependencies=[Depends(_enabled)])
-async def send_to_student_affairs(
-    body: AskHandoffIn, cu: CurrentUser = Depends(asker), db: AsyncSession = Depends(get_db)
-) -> AskHandoffOut:
+async def send_to_student_affairs(body: AskHandoffIn, cu: AskerDep, db: DbDep) -> AskHandoffOut:
     if body.session_id:
         session = await db.get(ChatSession, body.session_id)
         if session is None or session.user_id != cu.user.id:

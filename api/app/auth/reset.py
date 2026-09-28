@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import mail
 from app.config import get_settings
 from app.crypto import keyed_hash
-from app.db import get_db
+from app.db import DbDep
 from app.models import PasswordReset, SmsOutbox, User
 
 router = APIRouter(prefix="/auth/reset", tags=["auth"])
@@ -119,7 +119,7 @@ class ResetStarted(BaseModel):
 
 
 @router.post("/start")
-async def reset_start(body: ResetStartIn, db: AsyncSession = Depends(get_db)) -> ResetStarted:
+async def reset_start(body: ResetStartIn, db: DbDep) -> ResetStarted:
     found = await _find(db, body.identifier)
     if found is None:
         return ResetStarted(minutes=CODE_MINUTES)
@@ -170,7 +170,7 @@ class ResetDone(BaseModel):
 
 
 @router.post("/finish")
-async def reset_finish(body: ResetFinishIn, db: AsyncSession = Depends(get_db)) -> ResetDone:
+async def reset_finish(body: ResetFinishIn, db: DbDep) -> ResetDone:
     wrong = HTTPException(422, "That code isn't right, or it has expired. Ask for a new one.")
     found = await _find(db, body.identifier)
     if found is None:

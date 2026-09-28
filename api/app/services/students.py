@@ -1,14 +1,16 @@
 import uuid
+from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.db import DbDep
 from app.models import Enrolment, ModuleOffering, Student, User
 
 _student_role = require_role("student")
+_StudentRoleDep = Annotated[CurrentUser, Depends(_student_role)]
 
 
 async def active_student(db: AsyncSession, user: User) -> Student | None:
@@ -19,13 +21,14 @@ async def active_student(db: AsyncSession, user: User) -> Student | None:
     return s if s and s.status == "active" else None
 
 
-async def current_student(
-    cu: CurrentUser = Depends(_student_role), db: AsyncSession = Depends(get_db)
-) -> Student:
+async def current_student(cu: _StudentRoleDep, db: DbDep) -> Student:
     student = await active_student(db, cu.user)
     if student is None:
         raise HTTPException(403, "No active student record for this account")
     return student
+
+
+StudentDep = Annotated[Student, Depends(current_student)]
 
 
 async def current_offerings(db: AsyncSession, student: Student) -> list[ModuleOffering]:

@@ -4,6 +4,7 @@ scheduling and publishing for Student Affairs and administrators."""
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -11,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import CurrentUser, require_role
-from app.db import get_db
+from app.db import DbDep
 from app.models import Announcement, AnnouncementRead, AnnouncementTarget, Person, Programme, Staff
 from app.services import announcements as ann
 from app.services import clock
@@ -20,7 +21,9 @@ router = APIRouter(prefix="/staff/announcements", tags=["staff announcements"])
 STAFF = ("lecturer", "admissions", "registry", "librarian", "admin", "student_affairs", "accounts")
 WRITERS = ("student_affairs", "admin")
 staff = require_role(*STAFF)
+StaffDep = Annotated[CurrentUser, Depends(staff)]
 writer = require_role(*WRITERS)
+WriterDep = Annotated[CurrentUser, Depends(writer)]
 
 TITLE_FITS = 90  # design: "Titles over 90 characters get cut off on small phones."
 SMS_MAX = 160
@@ -167,9 +170,7 @@ async def _from_label(db: AsyncSession, cu: CurrentUser) -> str:
 
 
 @router.get("")
-async def list_staff_announcements(
-    cu: CurrentUser = Depends(staff), db: AsyncSession = Depends(get_db)
-) -> list[StaffAnnouncement]:
+async def list_staff_announcements(cu: StaffDep, db: DbDep) -> list[StaffAnnouncement]:
     """Newest first. Drafts only for the people who can write announcements."""
     q = select(Announcement).order_by(Announcement.publish_at.desc())
     if not cu.roles & set(WRITERS):
@@ -203,9 +204,7 @@ async def list_staff_announcements(
 
 
 @router.get("/options")
-async def compose_options(
-    cu: CurrentUser = Depends(writer), db: AsyncSession = Depends(get_db)
-) -> ComposeOptions:
+async def compose_options(cu: WriterDep, db: DbDep) -> ComposeOptions:
     progs = (await db.execute(select(Programme).order_by(Programme.name))).scalars().all()
     return ComposeOptions(
         from_label=await _from_label(db, cu),
@@ -219,9 +218,7 @@ async def compose_options(
 
 
 @router.post("/reach")
-async def audience_reach(
-    body: Audience, _: CurrentUser = Depends(writer), db: AsyncSession = Depends(get_db)
-) -> Reach:
+async def audience_reach(body: Audience, _: WriterDep, db: DbDep) -> Reach:
     students, staff_n, phones = await ann.reach(db, _targets(body))
     return Reach(students=students, staff=staff_n, phones=phones)
 
@@ -249,9 +246,7 @@ def _form(a: Announcement) -> AnnouncementForm:
 
 
 @router.get("/{announcement_id}")
-async def get_staff_announcement(
-    announcement_id: uuid.UUID, _: CurrentUser = Depends(writer), db: AsyncSession = Depends(get_db)
-) -> AnnouncementForm:
+async def get_staff_announcement(announcement_id: uuid.UUID, _: WriterDep, db: DbDep) -> AnnouncementForm:
     return _form(await _get(db, announcement_id))
 
 
@@ -300,9 +295,7 @@ async def _save(db: AsyncSession, a: Announcement, body: AnnouncementIn) -> Anno
 
 
 @router.post("")
-async def create_announcement(
-    body: AnnouncementIn, cu: CurrentUser = Depends(writer), db: AsyncSession = Depends(get_db)
-) -> AnnouncementForm:
+async def create_announcement(body: AnnouncementIn, cu: WriterDep, db: DbDep) -> AnnouncementForm:
     a = Announcement(author_id=cu.user.id, from_label=await _from_label(db, cu), title="", body_md="")
     db.add(a)
     return await _save(db, a, body)
@@ -312,8 +305,8 @@ async def create_announcement(
 async def update_announcement(
     announcement_id: uuid.UUID,
     body: AnnouncementIn,
-    _: CurrentUser = Depends(writer),
-    db: AsyncSession = Depends(get_db),
+    _: WriterDep,
+    db: DbDep,
 ) -> AnnouncementForm:
     return await _save(db, await _get(db, announcement_id), body)
 
@@ -323,9 +316,7 @@ class Deleted(BaseModel):
 
 
 @router.delete("/{announcement_id}")
-async def delete_announcement(
-    announcement_id: uuid.UUID, _: CurrentUser = Depends(writer), db: AsyncSession = Depends(get_db)
-) -> Deleted:
+async def delete_announcement(announcement_id: uuid.UUID, _: WriterDep, db: DbDep) -> Deleted:
     a = await _get(db, announcement_id)
     if a.dispatched_at:
         raise HTTPException(409, "Published announcements can't be deleted.")

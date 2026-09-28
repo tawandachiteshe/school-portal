@@ -6,6 +6,7 @@ import io
 import re
 import uuid
 from datetime import date, datetime, time, timedelta
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
@@ -16,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.library import hours_today
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     LibraryCopy,
     LibraryLoan,
@@ -32,6 +33,7 @@ from app.services import clock
 
 router = APIRouter(prefix="/staff/library", tags=["library desk"])
 librarian = require_role("librarian")
+LibrarianDep = Annotated[CurrentUser, Depends(librarian)]
 
 
 def _due_for_new_loan() -> datetime:
@@ -76,7 +78,7 @@ class DeskToday(BaseModel):
 
 
 @router.get("/today")
-async def desk_today(_: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)) -> DeskToday:
+async def desk_today(_: LibrarianDep, db: DbDep) -> DeskToday:
     start = clock.at(clock.today(), time(0, 0))
     now = clock.now()
     count = lambda q: db.scalar(select(func.count()).select_from(LibraryLoan).where(q))  # noqa: E731
@@ -211,9 +213,7 @@ async def _borrower(db: AsyncSession, person: Person, number: str, programme, cl
 
 
 @router.get("/borrowers/{number:path}")
-async def find_borrower(
-    number: str, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> Borrower:
+async def find_borrower(number: str, _: LibrarianDep, db: DbDep) -> Borrower:
     n = normalise_number(number)
     st = (
         await db.execute(select(Student).where(func.upper(Student.student_number) == n))
@@ -243,9 +243,7 @@ class DeskCopy(BaseModel):
 
 
 @router.get("/copies/{barcode}")
-async def find_copy(
-    barcode: str, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> DeskCopy:
+async def find_copy(barcode: str, _: LibrarianDep, db: DbDep) -> DeskCopy:
     c = (
         await db.execute(
             select(LibraryCopy).where(func.upper(LibraryCopy.barcode) == barcode.strip().upper())
@@ -305,9 +303,7 @@ class Issued(BaseModel):
 
 
 @router.post("/loans", status_code=201)
-async def issue_book(
-    body: IssueIn, cu: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> Issued:
+async def issue_book(body: IssueIn, cu: LibrarianDep, db: DbDep) -> Issued:
     person = await db.get(Person, body.person_id)
     if person is None:
         raise HTTPException(404, "No such borrower.")
@@ -386,9 +382,7 @@ class Returned(BaseModel):
 
 
 @router.post("/returns")
-async def return_book(
-    body: ReturnIn, cu: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> Returned:
+async def return_book(body: ReturnIn, cu: LibrarianDep, db: DbDep) -> Returned:
     c = (
         await db.execute(
             select(LibraryCopy).where(func.upper(LibraryCopy.barcode) == body.barcode.strip().upper())
@@ -457,9 +451,7 @@ class RenewedOut(BaseModel):
 
 
 @router.post("/loans/{loan_id}/renew")
-async def desk_renew(
-    loan_id: uuid.UUID, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> RenewedOut:
+async def desk_renew(loan_id: uuid.UUID, _: LibrarianDep, db: DbDep) -> RenewedOut:
     s = get_settings()
     loan = await db.get(LibraryLoan, loan_id)
     if loan is None or loan.returned_at is not None:
@@ -552,7 +544,7 @@ async def _overdue(db: AsyncSession) -> list[OverdueLoan]:
 
 
 @router.get("/overdue")
-async def overdue(_: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)) -> OverdueList:
+async def overdue(_: LibrarianDep, db: DbDep) -> OverdueList:
     loans = await _overdue(db)
     return OverdueList(
         loans=loans,
@@ -562,7 +554,7 @@ async def overdue(_: CurrentUser = Depends(librarian), db: AsyncSession = Depend
 
 
 @router.get("/overdue.csv")
-async def overdue_csv(_: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)) -> Response:
+async def overdue_csv(_: LibrarianDep, db: DbDep) -> Response:
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(["Student", "Number", "Class", "Book", "Author", "Due", "Days late", "Last reminder"])
@@ -597,9 +589,7 @@ class Reminded(BaseModel):
 
 
 @router.post("/overdue/remind")
-async def remind(
-    body: RemindIn, _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> Reminded:
+async def remind(body: RemindIn, _: LibrarianDep, db: DbDep) -> Reminded:
     loans = (
         (
             await db.execute(
@@ -652,9 +642,7 @@ class DeskReservation(BaseModel):
 
 
 @router.get("/reservations")
-async def reservations(
-    _: CurrentUser = Depends(librarian), db: AsyncSession = Depends(get_db)
-) -> list[DeskReservation]:
+async def reservations(_: LibrarianDep, db: DbDep) -> list[DeskReservation]:
     rows = (
         (
             await db.execute(

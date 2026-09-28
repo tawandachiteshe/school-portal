@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
+from typing import Annotated
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
@@ -15,12 +16,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crypto, storage
-from app.api.apply import _out, add_working_days, applicant
+from app.api.apply import ApplicantDep, _out, add_working_days
 from app.api.apply_id import ACCEPTED, _draft
 from app.api.apply_review import explain
 from app.auth.deps import CurrentUser, require_role
 from app.config import get_settings
-from app.db import get_db
+from app.db import DbDep
 from app.models import (
     Application,
     ApplicationEvent,
@@ -38,6 +39,7 @@ router = APIRouter(tags=["apply submit"])
 staff_router = APIRouter(prefix="/staff/accounts", tags=["accounts"])
 # Accounts match bank transfers and cash against the statement and cash book.
 accounts = require_role("accounts", "admin")
+AccountsDep = Annotated[CurrentUser, Depends(accounts)]
 SESSION = {"JUNE": "June", "NOVEMBER": "November"}
 
 
@@ -287,9 +289,7 @@ async def _refresh_mobile(db: AsyncSession, a: Application, p: ApplicationPaymen
 
 
 @router.get("/apply/submit")
-async def submit_state(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> SubmitState:
+async def submit_state(cu: ApplicantDep, db: DbDep) -> SubmitState:
     a = await _draft(db, cu)
     await _refresh_mobile(db, a, await _latest_payment(db, a))
     await db.refresh(a)
@@ -301,9 +301,7 @@ class DeclarationIn(BaseModel):
 
 
 @router.post("/apply/declaration")
-async def declare(
-    body: DeclarationIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> SubmitState:
+async def declare(body: DeclarationIn, cu: ApplicantDep, db: DbDep) -> SubmitState:
     a = await _draft(db, cu)
     if a.status != "draft":
         raise HTTPException(409, "Your application has already been submitted.")
@@ -322,9 +320,7 @@ class PayIn(BaseModel):
 
 
 @router.post("/apply/payments")
-async def start_payment(
-    body: PayIn, cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> SubmitState:
+async def start_payment(body: PayIn, cu: ApplicantDep, db: DbDep) -> SubmitState:
     """Mobile money: send the prompt. Bank or cash: "I've paid", for Accounts to confirm."""
     a = await _draft(db, cu)
     if a.status != "draft":
@@ -364,9 +360,7 @@ async def start_payment(
 
 
 @router.post("/apply/payments/current/cancel")
-async def cancel_payment(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> SubmitState:
+async def cancel_payment(cu: ApplicantDep, db: DbDep) -> SubmitState:
     """ "Pay another way": stop waiting for this prompt."""
     a = await _draft(db, cu)
     p = await _latest_payment(db, a)
@@ -377,9 +371,7 @@ async def cancel_payment(
 
 
 @router.post("/apply/payments/current/proof")
-async def upload_proof(
-    file: UploadFile = File(...), cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> SubmitState:
+async def upload_proof(cu: ApplicantDep, db: DbDep, file: UploadFile = File(...)) -> SubmitState:
     a = await _draft(db, cu)
     p = await _latest_payment(db, a)
     if p is None or p.status != "awaiting_confirmation" or p.method != "bank":
@@ -409,9 +401,7 @@ async def upload_proof(
 
 
 @router.get("/apply/application.pdf", response_class=Response)
-async def application_copy(
-    cu: CurrentUser = Depends(applicant), db: AsyncSession = Depends(get_db)
-) -> Response:
+async def application_copy(cu: ApplicantDep, db: DbDep) -> Response:
     """design/Submitted "Download a copy"."""
     a = await _draft(db, cu)
     p = a.person
@@ -453,9 +443,7 @@ class PaymentToConfirm(BaseModel):
 
 
 @staff_router.get("/payments")
-async def payments_to_confirm(
-    _: CurrentUser = Depends(accounts), db: AsyncSession = Depends(get_db)
-) -> list[PaymentToConfirm]:
+async def payments_to_confirm(_: AccountsDep, db: DbDep) -> list[PaymentToConfirm]:
     rows = (
         (
             await db.execute(
@@ -492,8 +480,8 @@ async def payments_to_confirm(
 async def payment_proof(
     payment_id: uuid.UUID,
     request: Request,
-    cu: CurrentUser = Depends(accounts),
-    db: AsyncSession = Depends(get_db),
+    cu: AccountsDep,
+    db: DbDep,
 ) -> StreamingResponse:
     p = await db.get(ApplicationPayment, payment_id)
     d = await db.get(Document, p.proof_document_id) if p and p.proof_document_id else None
@@ -525,8 +513,8 @@ async def confirm_payment(
     payment_id: uuid.UUID,
     body: ConfirmPaymentIn,
     request: Request,
-    cu: CurrentUser = Depends(accounts),
-    db: AsyncSession = Depends(get_db),
+    cu: AccountsDep,
+    db: DbDep,
 ) -> list[PaymentToConfirm]:
     p, a = await _payment(db, payment_id)
     await audit.record(
@@ -543,8 +531,8 @@ async def reject_payment(
     payment_id: uuid.UUID,
     body: RejectPaymentIn,
     request: Request,
-    cu: CurrentUser = Depends(accounts),
-    db: AsyncSession = Depends(get_db),
+    cu: AccountsDep,
+    db: DbDep,
 ) -> list[PaymentToConfirm]:
     p, a = await _payment(db, payment_id)
     await audit.record(db, cu, request, "payment.reject", "payment", str(p.id))
