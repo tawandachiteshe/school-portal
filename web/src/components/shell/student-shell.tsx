@@ -24,7 +24,7 @@ const NAV = [
   { to: '/more', label: 'More', icon: Menu },
 ]
 
-export function StudentTopBar({ avatar = true }: { avatar?: boolean }) {
+function StudentTopBar({ avatar = true }: { avatar?: boolean }) {
   const { data: me } = useMe()
   const online = useOnline()
   return (

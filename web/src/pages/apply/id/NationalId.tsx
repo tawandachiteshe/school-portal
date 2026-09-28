@@ -22,6 +22,7 @@ import {
   useStartHandoff,
 } from '@/api/generated/apply-id/apply-id'
 import { errorMessage } from '@/lib/api'
+import { dateWithYear, onDay, time, titleCase } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, STEP_PATH } from '../common'
@@ -29,9 +30,6 @@ import { asFile, compressImage } from './compress'
 import { IdCheck } from './IdCheck'
 import { PhoneFlow } from './PhoneFlow'
 
-const hm = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Africa/Harare' })
-const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-const title = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
 const h1 = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
 export const LINK_KEY = 'tcfl-handoff' // the link is shown once: keep it for this tab only
 
@@ -50,10 +48,10 @@ function IdDetails({ s }: { s: NationalIdState }) {
       </dd>
       <dt className="pt-0.5 text-sm text-muted-foreground">Name</dt>
       <dd>
-        {title(f.first_names)} {title(f.surname)}
+        {titleCase(f.first_names)} {titleCase(f.surname)}
       </dd>
       <dt className="pt-0.5 text-sm text-muted-foreground">Date of birth</dt>
-      <dd>{f.date_of_birth ? longDob.format(new Date(`${f.date_of_birth}T12:00:00`)) : '—'}</dd>
+      <dd>{f.date_of_birth ? dateWithYear(onDay(f.date_of_birth)) : '—'}</dd>
       {registration(s) && (
         <>
           <dt className="pt-0.5 text-sm text-muted-foreground">Registration</dt>
@@ -362,9 +360,9 @@ function Connected({ h, onContinue }: { h: HandoffOut; onContinue: () => void })
                     {id.status === 'none'
                       ? 'Waiting for the photo'
                       : id.status === 'reading'
-                        ? `Received ${hm.format(new Date(id.received_at!))}, reading…`
+                        ? `Received ${time(new Date(id.received_at!))}, reading…`
                         : id.status === 'confirmed'
-                          ? `Saved${id.read_at ? ` ${hm.format(new Date(id.read_at))}` : ''}`
+                          ? `Saved${id.read_at ? ` ${time(new Date(id.read_at))}` : ''}`
                           : 'Read, checking on the phone'}
                   </span>
                 </div>

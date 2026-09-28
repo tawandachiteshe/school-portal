@@ -26,7 +26,7 @@ import {
   useSendMessage,
 } from '@/api/generated/admissions/admissions'
 import { errorMessage } from '@/lib/api'
-import { shortDateTime } from '@/lib/format'
+import { dateWithYear, onDay, shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
@@ -60,7 +60,6 @@ const dayMonthTime = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
   timeZone: 'Africa/Harare',
 })
-const longDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 // "Mon 12 Oct 2026, 14:05"
 const sep = (s: string) => s.replace('Sept', 'Sep')
 const submittedText = (d: Date) => sep(withYear.format(d).replace(/,/g, '').replace(/ (\d\d:\d\d)$/, ', $1'))
@@ -523,7 +522,7 @@ function ReviewView({ r }: { r: ReviewData }) {
                   </dd>
                   <dt className="text-muted-foreground">Date of birth</dt>
                   <dd>
-                    {idn.date_of_birth ? longDate.format(new Date(`${idn.date_of_birth}T12:00:00`)) : '—'}
+                    {idn.date_of_birth ? dateWithYear(onDay(idn.date_of_birth)) : '—'}
                     {idn.age_at_intake != null && <span className="text-muted-foreground"> · {idn.age_at_intake} at intake</span>}
                   </dd>
                   <dt className="text-muted-foreground">Registration</dt>
@@ -537,7 +536,7 @@ function ReviewView({ r }: { r: ReviewData }) {
                     {idn.birth_certificate_id ? (
                       <span className="flex flex-wrap items-center gap-x-2">
                         {idn.birth_name}
-                        {idn.birth_date_of_birth && ` · ${longDate.format(new Date(`${idn.birth_date_of_birth}T12:00:00`))}`}
+                        {idn.birth_date_of_birth && ` · ${dateWithYear(onDay(idn.birth_date_of_birth))}`}
                         {idn.name_on_id && idn.birth_name && (
                           birthMatches(idn) ? (
                             <span className="inline-flex items-center gap-1 text-success">

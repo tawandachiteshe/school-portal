@@ -7,9 +7,8 @@ import { Empty } from '@/components/student/section'
 import type { Fees as FeesData } from '@/api/generated/model'
 import { useFees } from '@/api/generated/records/records'
 import { ClassContext, DeskBar } from '@/components/shell/student-desktop'
+import { formatLongDate, money, onDay, shortDate } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
-import { formatLongDate, shortDate } from '@/lib/format'
-import { money, onDay } from '@/lib/records'
 import { cn } from '@/lib/utils'
 
 async function copy(ref: string) {

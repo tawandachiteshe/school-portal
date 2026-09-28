@@ -15,12 +15,11 @@ import {
   useRemind,
 } from '@/api/generated/library-desk/library-desk'
 import { errorMessage } from '@/lib/api'
-import { formatLongDate, shortDate } from '@/lib/format'
+import { formatLongDate, plural, shortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
 const PAGE = 25
-const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
 const box = 'size-4 cursor-pointer accent-primary'
 
 // design/LibraryOverdue

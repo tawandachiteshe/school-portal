@@ -9,12 +9,12 @@ import type { ApplicantReview, ApplyStep, MyApplication } from '@/api/generated/
 import { useMyApplication } from '@/api/generated/apply/apply'
 import { useApplicationReview } from '@/api/generated/apply-review/apply-review'
 import { useSignOut } from '@/lib/auth'
+import { dateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { applyHome, STEP_PATH } from './common'
 
-const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-const dob = (d?: string | null) => (d ? longDob.format(new Date(`${d}T12:00:00`)) : '—')
+const dob = (d?: string | null) => (d ? dateWithYear(onDay(d)) : '—')
 const MISSING: Record<string, string> = {
   national_id: 'Add your National ID',
   birth_certificate: 'Add your birth certificate',

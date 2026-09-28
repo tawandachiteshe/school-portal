@@ -49,10 +49,6 @@ export function homeFor(me: Me): string {
   return '/staff'
 }
 
-export function isStaff(me: Me): boolean {
-  return me.roles.some((r) => r !== 'student' && r !== 'applicant')
-}
-
 export function useSignOut() {
   const qc = useQueryClient()
   return async () => {

@@ -12,9 +12,10 @@ import { ApplyShell } from '@/components/shell/apply-shell'
 import type { MyApplication } from '@/api/generated/model'
 import { getMyApplicationQueryKey, useMyApplication, useWithdraw } from '@/api/generated/apply/apply'
 import { errorMessage } from '@/lib/api'
+import { dayDateTimeWithYear, dayDateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
-import { applyHome, dateOnly, dayText, dayTimeText } from './common'
+import { applyHome } from './common'
 
 type State = 'done' | 'current' | 'todo'
 type Item = { title: string; state: State; meta?: string; body?: React.ReactNode; now?: boolean }
@@ -23,7 +24,7 @@ function timeline(a: MyApplication): Item[] {
   const submitted: Item = {
     title: 'Submitted',
     state: 'done',
-    meta: a.submitted_at ? dayTimeText(new Date(a.submitted_at)) : undefined,
+    meta: a.submitted_at ? dayDateTimeWithYear(new Date(a.submitted_at)) : undefined,
     body: a.phone_masked && (
       <>
         A copy was sent to <span className="font-mono">{a.phone_masked}</span>.
@@ -37,21 +38,21 @@ function timeline(a: MyApplication): Item[] {
           title: 'We need more information',
           state: 'current',
           now: true,
-          meta: a.requests.length ? `Since ${dayText(new Date(a.requests[a.requests.length - 1].at))}` : undefined,
+          meta: a.requests.length ? `Since ${dayDateWithYear(new Date(a.requests[a.requests.length - 1].at))}` : undefined,
           body: 'Admissions sent you a message. Your application waits until you reply.',
         }
       : {
           title: 'In review',
           state: decided ? 'done' : a.review_started_at ? 'current' : 'todo',
           now: !decided && !!a.review_started_at,
-          meta: a.review_started_at ? `Since ${dayText(new Date(a.review_started_at))}` : 'Waiting for an admissions officer',
+          meta: a.review_started_at ? `Since ${dayDateWithYear(new Date(a.review_started_at))}` : 'Waiting for an admissions officer',
           body: !decided && 'An admissions officer is checking your ID and your results against ZIMSEC records.',
         }
   const decision: Item = decided
     ? {
         title: a.status === 'accepted' ? 'Offered a place' : 'Not successful',
         state: 'done',
-        meta: a.decided_at ? dayText(new Date(a.decided_at)) : undefined,
+        meta: a.decided_at ? dayDateWithYear(new Date(a.decided_at)) : undefined,
         body:
           a.status === 'accepted' ? (
             <Link to="/apply/offer" className="font-medium text-primary underline underline-offset-2">
@@ -64,7 +65,7 @@ function timeline(a: MyApplication): Item[] {
     : {
         title: 'Decision',
         state: 'todo',
-        meta: a.decision_expected_by ? `Expected by ${dayText(dateOnly(a.decision_expected_by))}` : undefined,
+        meta: a.decision_expected_by ? `Expected by ${dayDateWithYear(onDay(a.decision_expected_by))}` : undefined,
       }
   return [submitted, review, decision]
 }
@@ -155,7 +156,7 @@ export default function Status() {
     <Alert variant="info">
       <Info strokeWidth={1.5} />
       <div className="flex flex-col gap-1">
-        <p className="font-semibold">Message from Admissions, {dayText(new Date(a.requests[a.requests.length - 1].at))}</p>
+        <p className="font-semibold">Message from Admissions, {dayDateWithYear(new Date(a.requests[a.requests.length - 1].at))}</p>
         <p>{a.requests[a.requests.length - 1].message}</p>
       </div>
     </Alert>

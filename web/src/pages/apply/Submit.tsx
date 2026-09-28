@@ -21,9 +21,10 @@ import {
 } from '@/api/generated/apply-submit/apply-submit'
 import { errorMessage } from '@/lib/api'
 import { useSignOut } from '@/lib/auth'
+import { dayDateTimeWithYear } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
-import { applyHome, dayTimeText, STEP_PATH } from './common'
+import { applyHome, STEP_PATH } from './common'
 
 const LABEL: Record<PayMethod, string> = { ecocash: 'EcoCash', onemoney: 'OneMoney', bank: 'Bank transfer', cash: 'Cash at the Accounts Office' }
 const h1Class = (desktop: boolean) =>
@@ -533,7 +534,7 @@ export function Submitted() {
           <h1 className={h1Class(desktop)}>Application submitted</h1>
           <p className="text-muted-foreground">
             {app.programme}
-            {app.submitted_at && ` · ${dayTimeText(new Date(app.submitted_at))}`}
+            {app.submitted_at && ` · ${dayDateTimeWithYear(new Date(app.submitted_at))}`}
           </p>
         </div>
         <div className="flex flex-col gap-1 border-y py-5">

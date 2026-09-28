@@ -7,7 +7,7 @@ import { TextLink } from '@/components/student/section'
 import type { Card } from '@/api/generated/model'
 import { getStudentCardQueryKey, studentCard } from '@/api/generated/records/records'
 import { code128 } from '@/lib/code128'
-import { onDay } from '@/lib/records'
+import { dateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { DeskPage, deskH1 } from '@/components/shell/student-desktop'
 
@@ -23,8 +23,6 @@ function cached(): Card | undefined {
     return undefined
   }
 }
-
-const validDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Harare' })
 
 // The card itself keeps fixed light colours in both themes so scanners read it (design/StudentCard).
 export default function StudentCard() {
@@ -115,7 +113,7 @@ export default function StudentCard() {
             </div>
             <div className="flex justify-between border-t border-[#E2DFD9] px-4 py-2.5 text-sm">
               <span className="text-[#5E5A53]">Valid until</span>
-              <span className="font-semibold">{validDate.format(onDay(card.valid_until))}</span>
+              <span className="font-semibold">{dateWithYear(onDay(card.valid_until))}</span>
             </div>
           </section>
         )}

@@ -13,8 +13,17 @@ import { Empty } from '@/components/student/section'
 import { errorMessage } from '@/lib/api'
 import { useAssessmentDetail } from '@/api/generated/deadlines/deadlines'
 import type { AssessmentOut as AssessmentDetail } from '@/api/generated/model'
-import { acceptedText } from '@/lib/deadlines'
-import { calendarDaysBetween, fileKind, fileSize, isUrgent, relativeDue, shortDate, shortDateTime, time } from '@/lib/format'
+import {
+  acceptedText,
+  calendarDaysBetween,
+  fileKind,
+  fileSize,
+  isUrgent,
+  relativeDue,
+  shortDate,
+  shortDateTime,
+  time,
+} from '@/lib/format'
 import { KIND_LABEL } from '@/lib/student'
 import { cancelUpload, retryUpload, startUpload, useUpload, type UploadState } from '@/lib/uploads'
 import { useNow } from '@/lib/use-now'

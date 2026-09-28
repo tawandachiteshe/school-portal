@@ -9,13 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ApplyShell } from '@/components/shell/apply-shell'
 import { getMyApplicationQueryKey, getOfferLetterUrl, useAnswerOffer, useMyApplication } from '@/api/generated/apply/apply'
 import { errorMessage } from '@/lib/api'
+import { dayDateWithYear, dayMonthLong, formatLongDate, longDateWithYear, onDay, time } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
-import { applyHome, dateOnly, dayText, longDayText } from './common'
-
-const hm = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Africa/Harare' })
-const dayMonth = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long' })
-const weekdayDayMonth = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Africa/Harare' })
+import { applyHome } from './common'
 
 // design/OfferReceived
 export default function Offer() {
@@ -36,8 +33,8 @@ export default function Offer() {
   if (isPending) return <Skeleton className="m-4 h-96" />
   if (!a || a.status !== 'accepted' || !a.offer) return <Navigate to={applyHome(a)} replace />
   const o = a.offer
-  const acceptBy = dateOnly(o.accept_by)
-  const starts = o.starts_on ? dateOnly(o.starts_on) : null
+  const acceptBy = onDay(o.accept_by)
+  const starts = o.starts_on ? onDay(o.starts_on) : null
   const reg = o.registration_at ? new Date(o.registration_at) : null
   const accepted = !!o.accepted_at
   const declined = !!o.declined_at
@@ -45,7 +42,7 @@ export default function Offer() {
   const steps = [
     {
       title: 'Accept the offer',
-      body: accepted ? `Accepted ${dayText(new Date(o.accepted_at!))}` : `Here, before ${dayMonth.format(acceptBy)}`,
+      body: accepted ? `Accepted ${dayDateWithYear(new Date(o.accepted_at!))}` : `Here, before ${dayMonthLong(acceptBy)}`,
       done: accepted,
     },
     {
@@ -58,7 +55,7 @@ export default function Offer() {
       ),
     },
     {
-      title: reg ? `Register on ${weekdayDayMonth.format(reg).replace(',', '')}, ${hm.format(reg)}` : 'Register',
+      title: reg ? `Register on ${formatLongDate(reg)}, ${time(reg)}` : 'Register',
       body: `${o.registration_place}. Bring your original National ID and ZIMSEC certificate. You'll get your student number and card.`,
     },
   ]
@@ -72,11 +69,11 @@ export default function Offer() {
           </h1>
           <p>
             {a.programme}
-            {starts && `, starting ${longDayText(starts)}`}.
+            {starts && `, starting ${longDateWithYear(starts)}`}.
           </p>
           <p className="text-sm text-muted-foreground">
             Reference <span className="font-mono text-foreground">{a.reference}</span>
-            {a.decided_at && ` · decided ${dayText(new Date(a.decided_at))}`}
+            {a.decided_at && ` · decided ${dayDateWithYear(new Date(a.decided_at))}`}
           </p>
         </div>
 
@@ -85,7 +82,7 @@ export default function Offer() {
             {!accepted && (
               <div className="flex items-center justify-between border-y py-3.5">
                 <span>Accept by</span>
-                <span className="font-semibold">{longDayText(acceptBy)}</span>
+                <span className="font-semibold">{longDateWithYear(acceptBy)}</span>
               </div>
             )}
             <section aria-labelledby="h-steps" className="flex flex-col gap-2">

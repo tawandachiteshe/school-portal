@@ -8,7 +8,7 @@ import { StaffTopBar } from '@/components/shell/staff-shell'
 import { FilterBar, FilterSearch, FilterSelect } from '@/components/staff/filter-bar'
 import type { QueueRow, QueueTab } from '@/api/generated/model'
 import { getQueueCsvUrl, useQueue, useQueueSummary } from '@/api/generated/admissions/admissions'
-import { shortDateTime } from '@/lib/format'
+import { dayDate, shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
@@ -19,12 +19,6 @@ const TABS: { value: QueueTab; label: string }[] = [
   { value: 'waiting', label: 'Waiting for applicant' },
   { value: 'decided', label: 'Decided' },
 ]
-const today = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'long',
-  timeZone: 'Africa/Harare',
-})
 
 function Owner({ r }: { r: QueueRow }) {
   if (!r.owner_initials) return <span className="text-muted-foreground">—</span>
@@ -125,7 +119,7 @@ export default function Queue({ decided = false }: { decided?: boolean }) {
         left={`Admissions${summary?.intake ? ` · ${summary.intake}` : ''}`}
         right={
           <>
-            {today.format(new Date()).replace(',', '')}
+            {dayDate(new Date())}
             {summary?.oldest_waiting_days != null &&
               ` · oldest application waiting ${summary.oldest_waiting_days} ${summary.oldest_waiting_days === 1 ? 'day' : 'days'}`}
           </>

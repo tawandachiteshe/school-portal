@@ -8,7 +8,7 @@ type Connection = EventTarget & { type?: string; saveData?: boolean; effectiveTy
 
 const conn = (): Connection | undefined => (navigator as Navigator & { connection?: Connection }).connection
 
-export const WARN_BYTES = 1_000_000 // ask before anything over 1 MB
+const WARN_BYTES = 1_000_000 // ask before anything over 1 MB
 export const DONT_ASK_LIMIT = 10_000_000 // "Don't ask again for files under 10 MB"
 
 const DONT_ASK_KEY = 'tcfl-dl-dont-ask-under-10mb'
@@ -49,7 +49,7 @@ export function setDontAskUnder10MB(on: boolean) {
   save(DONT_ASK_KEY, on)
 }
 
-export const downloadUrl = (id: string) => `/api/student/materials/${id}/download`
+const downloadUrl = (id: string) => `/api/student/materials/${id}/download`
 
 export function startDownload(id: string) {
   const a = document.createElement('a')
@@ -62,7 +62,7 @@ export function startDownload(id: string) {
 
 type Queued = { id: string; title: string }
 
-export function queuedForWifi(): Queued[] {
+function queuedForWifi(): Queued[] {
   return store<Queued[]>(QUEUE_KEY, [])
 }
 

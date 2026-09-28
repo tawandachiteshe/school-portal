@@ -1,4 +1,4 @@
-# TelOne Better Portal
+# TCFL Portal
 
 A modern student onboarding and student-life portal for TelOne Centre for Learning (TCFL).
 
@@ -9,7 +9,7 @@ It replaces the manual, paper-heavy onboarding process with:
 - **A student dashboard.** It shows results, current modules and their lecturers, upcoming tests, assignments due, lecture notes, library information and announcements.
 - **An AI assistant.** A chat helper answers questions about the student's own timetable, deadlines, notes and college policies, using only portal data the student is allowed to see.
 
-> **Status:** project scaffolded. The design is final ([design/](design/), [docs/design-handoff.md](docs/design-handoff.md)). The web app has the design theme and restyled shadcn/ui primitives (Foundations page), and the API has health and national-ID decoding with tests. Next: app shells and the Authentik sign-in screens (build order in the handoff doc).
+> **Status:** every screen in [design/](design/) is built: the public landing page, sign-in and sign-up through Authentik, the applicant steps (programme, national ID, birth certificate, ZIMSEC results, review, payment, status, offer), the student app (home, modules, deadlines, timetable, results, fees, library, announcements, student card, Ask TCFL), and the staff pages for admissions, lecturers, Accounts, the library desk and Student Affairs. What still needs a provider, a detail from the college or a decision (SMS, email, payments, retention, the Ask TCFL policy index) is listed in [docs/12](docs/12-status-and-gaps.md).
 
 ## Documentation
 
@@ -25,13 +25,15 @@ It replaces the manual, paper-heavy onboarding process with:
 | 8 | [Roadmap](docs/08-roadmap.md) | Phased delivery plan, pilot, success metrics |
 | 9 | [Database design](docs/09-database-design.md) | ER diagram, every table by domain, audience/access rules, indexes, security, retention. Full DDL in [docs/database/schema.sql](docs/database/schema.sql) |
 | 10 | [Authentication](docs/10-authentication.md) | Authentik as the identity provider: OIDC backend-for-frontend login, groups → roles, sign-up/MFA/recovery flows, account lifecycle, blueprints, hardening |
+| 11 | [Test personas](docs/11-test-personas.md) | The seventeen seeded accounts, one per role and application stage, and how to sign in as each |
+| 12 | [Status and gaps](docs/12-status-and-gaps.md) | What isn't finished, what needs details or a decision from the college, and known limits |
 
 ## Quick start
 
 ```bash
 cp .env.example .env              # replace every change-me (see docs/06)
 docker compose up -d --build      # postgres, redis, s3 (SeaweedFS), authentik, api, web
-open http://localhost:5173        # portal (Foundations page for now)
+open http://localhost:5173        # portal (landing page; sign in at /login)
 open http://localhost:5173/auth/  # Authentik (admin at /auth/if/admin/)
 open http://localhost:8000/docs   # API docs
 ```

@@ -22,11 +22,9 @@ import {
   useReturnBook,
 } from '@/api/generated/library-desk/library-desk'
 import { errorMessage } from '@/lib/api'
-import { formatLongDate, shortDate } from '@/lib/format'
+import { dayDate, formatLongDate, shortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
-
-const dueDate = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'long', timeZone: 'Africa/Harare' })
 
 function useRefreshDesk() {
   const qc = useQueryClient()
@@ -258,7 +256,7 @@ function IssueCard({ b, onIssued }: { b: Borrower; onIssued: () => void }) {
             <dt className="text-muted-foreground">Loan period</dt>
             <dd>{weeks === Math.round(weeks) ? `${weeks} ${weeks === 1 ? 'week' : 'weeks'}` : `${today?.loan_days} days`}</dd>
             <dt className="text-muted-foreground">Due back</dt>
-            <dd className="font-medium">{dueDate.format(due).replace(',', '')}</dd>
+            <dd className="font-medium">{dayDate(due)}</dd>
           </dl>
         </>
       )}

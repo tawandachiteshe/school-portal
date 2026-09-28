@@ -20,6 +20,7 @@ import {
 import { getCurrentHandoffQueryKey, useCurrentHandoff, useStartHandoff } from '@/api/generated/apply-id/apply-id'
 import { getMyDocumentFileUrl } from '@/api/generated/apply-results/apply-results'
 import { errorMessage } from '@/lib/api'
+import { dateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { applyHome, STEP_PATH } from '../common'
 import { asFile, compressImage } from '../id/compress'
@@ -28,7 +29,6 @@ import { LINK_KEY, LinkGone, LinkPanel } from '../id/NationalId'
 import { Reading } from '../results/ResultsFlow'
 
 const h1Desk = 'text-[28px] leading-9 font-semibold tracking-[-0.015em]'
-const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const pad = (n: number) => String(n).padStart(2, '0')
 const myFile = (id: string) => `/api${getMyDocumentFileUrl(id)}`
 
@@ -40,7 +40,7 @@ export type BirthApi = {
 }
 
 // Name and date of birth exactly as printed (no design: in the style of design/PhoneCheck).
-export function BirthCheck({ s, fileUrl, onSave, onRetake }: { s: BirthCertificateState; fileUrl: (id: string) => string; onSave: (b: ConfirmBirthIn) => Promise<unknown>; onRetake: () => void }) {
+function BirthCheck({ s, fileUrl, onSave, onRetake }: { s: BirthCertificateState; fileUrl: (id: string) => string; onSave: (b: ConfirmBirthIn) => Promise<unknown>; onRetake: () => void }) {
   const ids = { nm: useId(), dd: useId(), mm: useId(), yy: useId() }
   const dob = s.date_of_birth ? new Date(`${s.date_of_birth}T12:00:00`) : null
   const [name, setName] = useState(s.name ?? '')
@@ -139,7 +139,7 @@ function Added({ s, onChange, onContinue }: { s: BirthCertificateState; onChange
         </div>
         <div className="flex justify-between gap-4 py-3">
           <dt className="text-muted-foreground">Date of birth</dt>
-          <dd>{s.date_of_birth ? longDob.format(new Date(`${s.date_of_birth}T12:00:00`)) : '—'}</dd>
+          <dd>{s.date_of_birth ? dateWithYear(onDay(s.date_of_birth)) : '—'}</dd>
         </div>
       </dl>
       {s.matches_id === false && (

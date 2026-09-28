@@ -18,6 +18,7 @@ import {
   useReportMismatch,
 } from '@/api/generated/apply-id/apply-id'
 import { ApiError, errorMessage } from '@/lib/api'
+import { dateWithYear, onDay, titleCase } from '@/lib/format'
 import {
   getPhoneDocumentFileUrl,
   getPhoneResultsQueryKey,
@@ -38,8 +39,6 @@ import { ResultsFlow } from '../results/ResultsFlow'
 import { PhoneFlow } from './PhoneFlow'
 
 const PHONE_PATH: Record<string, string> = { national_id: 'id', birth_certificate: 'birth-certificate', results: 'results' }
-const longDob = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-const title = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
 
 // A phone joined to a computer: no sign-in, only this application's ID and results (docs/10 §10.10).
 function PhoneFrame({ code, linked = true, children }: { code?: string; linked?: boolean; children: React.ReactNode }) {
@@ -212,8 +211,8 @@ function Done({ code, id, onMore }: { code: string; id: NationalIdState; onMore:
         {(
           [
             ['ID number', f.id_number, true],
-            ['Name', `${title(f.first_names)} ${title(f.surname)}`, false],
-            ['Date of birth', f.date_of_birth ? longDob.format(new Date(`${f.date_of_birth}T12:00:00`)) : '—', false],
+            ['Name', `${titleCase(f.first_names)} ${titleCase(f.surname)}`, false],
+            ['Date of birth', f.date_of_birth ? dateWithYear(onDay(f.date_of_birth)) : '—', false],
           ] as const
         ).map(([k, v, mono]) => (
           <div key={k} className="flex justify-between gap-4 py-3">

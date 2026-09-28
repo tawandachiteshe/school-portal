@@ -30,7 +30,7 @@ import {
   useGetStaffAnnouncement,
 } from '@/api/generated/staff-announcements/staff-announcements'
 import { errorMessage } from '@/lib/api'
-import { shortDateTime, time } from '@/lib/format'
+import { plural, shortDateTime, time } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1 } from '../teaching/staff-ui'
 
@@ -95,8 +95,6 @@ function groupLabel(g: AudienceGroup, opts: ComposeOptions) {
   const p = opts.programmes.find((x) => x.id === g.programme_id)
   return `${g.year ? `Year ${g.year}` : 'All years'} · ${p ? p.code : 'all programmes'}`
 }
-
-const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
 
 function reachText(r: { students: number; staff: number }, kind: AudienceKind) {
   if (kind === 'everyone') return `${plural(r.students, 'student')} and ${plural(r.staff, 'staff member')}`

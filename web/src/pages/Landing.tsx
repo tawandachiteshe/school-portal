@@ -6,17 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Wordmark } from '@/components/shell/wordmark'
 import { usePublicHome } from '@/api/generated/public/public'
 import type { PublicHome } from '@/api/generated/model'
-import { TZ } from '@/lib/format'
+import { longDateWithYear, onDay, time } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
 
 // design/Landing (computer) and LandingPhone: what the college offers, how applying works, and the
 // way in for students. Shown at / to anyone signed out. Facts come from GET /public/home.
-
-const dateLongFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: TZ })
-// "Thursday 26 November 2026" (Intl adds a comma after the weekday).
-const dateLong = { format: (d: Date) => dateLongFmt.format(d).replace(',', '') }
-const hm = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: TZ })
 
 const NAV = [
   { href: '#programmes', label: 'Programmes' },
@@ -112,11 +107,11 @@ function Closing({ home, className }: { home?: PublicHome; className?: string })
         {intake.open ? (
           <>
             Applications for the {intake.name} are open. They close on{' '}
-            <span className="font-semibold">{dateLong.format(new Date(intake.closes_at))}</span>.
+            <span className="font-semibold">{longDateWithYear(new Date(intake.closes_at))}</span>.
           </>
         ) : (
           <>
-            Applications for the {intake.name} open on <span className="font-semibold">{dateLong.format(new Date(intake.opens_at))}</span>.
+            Applications for the {intake.name} open on <span className="font-semibold">{longDateWithYear(new Date(intake.opens_at))}</span>.
           </>
         )}
       </p>
@@ -162,13 +157,13 @@ function Ready({ home }: { home?: PublicHome }) {
 function KeyDates({ home }: { home?: PublicHome }) {
   const now = useNow().getTime()
   const rows: [string, string][] = []
-  if (home?.intake) rows.push(['Applications close', dateLong.format(new Date(home.intake.closes_at))])
+  if (home?.intake) rows.push(['Applications close', longDateWithYear(new Date(home.intake.closes_at))])
   if (home) rows.push(['Decisions sent', `Within ${home.decision_working_days} working days of applying`])
   // Past dates belong to an intake that has started: leave them off.
   if (home?.registration_at && new Date(home.registration_at).getTime() > now)
-    rows.push(['Registration', `${dateLong.format(new Date(home.registration_at))}, ${hm.format(new Date(home.registration_at))}`])
+    rows.push(['Registration', `${longDateWithYear(new Date(home.registration_at))}, ${time(new Date(home.registration_at))}`])
   if (home?.classes_start && new Date(`${home.classes_start}T23:59:59`).getTime() > now)
-    rows.push(['Classes start', dateLong.format(new Date(`${home.classes_start}T12:00:00`))])
+    rows.push(['Classes start', longDateWithYear(onDay(home.classes_start))])
   if (rows.length === 0) return null
   return (
     <section aria-labelledby="h-dates" className="flex flex-col gap-4">

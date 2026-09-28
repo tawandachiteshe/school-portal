@@ -26,7 +26,13 @@ const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-GB
 const hm = fmt({ hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 const shortDay = fmt({ weekday: 'short', day: 'numeric', month: 'short' })
 const dayMonth = fmt({ day: 'numeric', month: 'short' })
+const dayMonthLongFmt = fmt({ day: 'numeric', month: 'long' })
 const weekdayLong = fmt({ weekday: 'long' })
+const dayNum = fmt({ day: 'numeric' })
+const dayDM = fmt({ weekday: 'short', day: 'numeric', month: 'long' })
+const dmy = fmt({ day: 'numeric', month: 'long', year: 'numeric' })
+const dayDmy = fmt({ weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+const longDmy = fmt({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 const ymd = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' })
 
 // Calendar date in Harare as YYYY-MM-DD, for day comparisons.
@@ -45,6 +51,25 @@ const threeLetter = (s: string) => s.replace('Sept', 'Sep')
 export const shortDate = (d: Date) => threeLetter(shortDay.format(d).replace(',', '')) // "Thu 11 Mar"
 export const shortDateTime = (d: Date) => `${shortDate(d)}, ${time(d)}` // "Thu 11 Mar, 10:00"
 export const weekday = (d: Date) => weekdayLong.format(d) // "Monday"
+export const dayOfMonth = (d: Date) => dayNum.format(d) // "11"
+export const dayMonthLong = (d: Date) => dayMonthLongFmt.format(d) // "11 March"
+export const shortDayMonth = (d: Date) => threeLetter(dayMonth.format(d)) // "11 Mar"
+export const dayDate = (d: Date) => dayDM.format(d).replace(',', '') // "Thu 11 March"
+// Intl puts a comma after the weekday once there is a year; the designs don't.
+export const dateWithYear = (d: Date) => dmy.format(d) // "11 March 2027"
+export const dayDateWithYear = (d: Date) => dayDmy.format(d).replace(',', '') // "Thu 11 March 2027"
+export const dayDateTimeWithYear = (d: Date) => `${dayDateWithYear(d)}, ${time(d)}` // "Thu 11 March 2027, 10:00"
+export const longDateWithYear = (d: Date) => longDmy.format(d).replace(',', '') // "Thursday 11 March 2027"
+
+// A calendar date string ("2027-03-31") as a Date at noon in Harare, safe from timezone drift.
+export const onDay = (ymd: string) => new Date(`${ymd}T12:00:00+02:00`)
+
+// "8–12 March", "29 September – 3 October"
+export function weekRange(a: Date, b: Date): string {
+  const [da, ma] = dayMonthLongFmt.format(a).split(' ')
+  const [db, mb] = dayMonthLongFmt.format(b).split(' ')
+  return ma === mb ? `${da}–${db} ${ma}` : `${da} ${ma} – ${db} ${mb}`
+}
 
 // "in 20 min", "today", "tomorrow", "in 4 days" (design/Main, Deadlines).
 export function relativeDue(due: Date, now: Date): string {
@@ -69,7 +94,7 @@ export function postedAt(d: Date, now: Date): string {
   const days = calendarDaysBetween(d, now)
   if (days === 0) return `Today, ${time(d)}`
   if (days === 1) return 'Yesterday'
-  return threeLetter(dayMonth.format(d))
+  return shortDayMonth(d)
 }
 
 // "1.2 MB", "640 KB"
@@ -88,4 +113,25 @@ const MIME_LABEL: Record<string, string> = {
 
 export function fileKind(mime: string | null): string {
   return (mime && MIME_LABEL[mime]) || 'FILE'
+}
+
+// Money as the design writes it: "310.00", "−310.00" (true minus sign).
+export function money(amount: string | number): string {
+  const n = Number(amount)
+  const s = Math.abs(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return n < 0 ? `−${s}` : s
+}
+
+// "1 student", "3 students"
+export const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
+
+// Names as printed on an ID ("TARIRO MOYO") in title case ("Tariro Moyo").
+export const titleCase = (s?: string | null) => (s ?? '').toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
+
+// [".c", ".pdf"] → "a .c file or PDF" (design/Deadlines: "upload a .c file or PDF")
+export function acceptedText(exts: string[] | null | undefined): string | null {
+  if (!exts?.length) return null
+  const words = exts.map((e) => (e === '.pdf' ? 'PDF' : `a ${e} file`))
+  if (words[0] === 'PDF') words[0] = 'a PDF'
+  return words.join(' or ')
 }

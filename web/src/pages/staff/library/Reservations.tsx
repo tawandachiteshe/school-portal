@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StaffTopBar } from '@/components/shell/staff-shell'
 import { useReservations } from '@/api/generated/library-desk/library-desk'
-import { formatLongDate, shortDate } from '@/lib/format'
+import { formatLongDate, onDay, shortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
@@ -48,7 +48,7 @@ export default function Reservations() {
                   <td className={td}>
                     {r.status === 'ready' ? (
                       <Badge variant="info">
-                        Ready{r.collect_by && `, collect by ${shortDate(new Date(`${r.collect_by}T12:00:00`))}`}
+                        Ready{r.collect_by && `, collect by ${shortDate(onDay(r.collect_by))}`}
                       </Badge>
                     ) : (
                       <Badge>Waiting</Badge>

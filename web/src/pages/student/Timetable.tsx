@@ -4,29 +4,19 @@ import { Alert } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SubPage } from '@/components/shell/sub-page'
 import { Empty } from '@/components/student/section'
-import { calendarDaysBetween, time, weekday } from '@/lib/format'
 import type { Slot } from '@/api/generated/model'
 import { useWeekTimetable } from '@/api/generated/records/records'
-import { onDay } from '@/lib/records'
+import { calendarDaysBetween, dayOfMonth, onDay, time, weekday, weekRange } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { useNow } from '@/lib/use-now'
 import { DeskFallback } from '@/components/shell/student-desktop'
 import TimetableDesk from './TimetableDesk'
 import { cn } from '@/lib/utils'
 
-const monthDay = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'Africa/Harare' })
-const dayNum = (d: Date) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', timeZone: 'Africa/Harare' }).format(d)
 const addDays = (ymd: string, n: number) => {
   const d = onDay(ymd)
   d.setUTCDate(d.getUTCDate() + n)
   return d.toISOString().slice(0, 10)
-}
-
-// "8–12 March", "29 September – 3 October"
-function range(a: Date, b: Date) {
-  const [da, ma] = monthDay.format(a).split(' ')
-  const [db, mb] = monthDay.format(b).split(' ')
-  return ma === mb ? `${da}–${db} ${ma}` : `${da} ${ma} – ${db} ${mb}`
 }
 
 const shortAssessment = (t: string) => t.split(':')[0]
@@ -110,7 +100,7 @@ export default function Timetable() {
               <>
                 <h1 className="text-lg leading-6 font-semibold">
                   {w.week ? `Week ${w.week} · ` : ''}
-                  {range(onDay(w.starts_on), onDay(w.ends_on))}
+                  {weekRange(onDay(w.starts_on), onDay(w.ends_on))}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   {w.class_group && <span className="font-mono">{w.class_group}</span>}
@@ -153,7 +143,7 @@ export default function Timetable() {
                     key={d.date}
                     role="tab"
                     aria-selected={on}
-                    aria-label={`${weekday(date)} ${dayNum(date)}${today ? ', today' : ''}`}
+                    aria-label={`${weekday(date)} ${dayOfMonth(date)}${today ? ', today' : ''}`}
                     onClick={() => setPicked(d.date)}
                     className={cn(
                       'flex h-14 flex-col items-center justify-center rounded-md border bg-card text-muted-foreground',
@@ -161,7 +151,7 @@ export default function Timetable() {
                     )}
                   >
                     <span className="text-xs">{today ? 'Today' : weekday(date).slice(0, 3)}</span>
-                    <span className={cn('font-mono', on ? 'font-semibold' : 'font-medium')}>{dayNum(date)}</span>
+                    <span className={cn('font-mono', on ? 'font-semibold' : 'font-medium')}>{dayOfMonth(date)}</span>
                   </button>
                 )
               })}

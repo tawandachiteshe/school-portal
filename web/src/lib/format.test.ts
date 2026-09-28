@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { fileSize, isUrgent, maskPhone, postedAt, relativeDue, shortDateTime } from './format'
+import {
+  acceptedText,
+  dateWithYear,
+  dayDateTimeWithYear,
+  fileSize,
+  isUrgent,
+  longDateWithYear,
+  maskPhone,
+  onDay,
+  postedAt,
+  relativeDue,
+  shortDateTime,
+  weekRange,
+} from './format'
 
 // 2027-03-11 is a Thursday. Harare is UTC+2 with no DST.
 const now = new Date('2027-03-11T07:40:00Z') // 09:40 in Harare
@@ -32,6 +45,25 @@ describe('format', () => {
     expect(fileSize(1_200_000)).toBe('1.2 MB')
     expect(fileSize(640_000)).toBe('640 KB')
     expect(maskPhone('+263773184521')).toBe('+263 77 ••• 4521')
+  })
+})
+
+describe('acceptedText', () => {
+  it('says which files to upload, like the design', () => {
+    expect(acceptedText(['.c', '.pdf'])).toBe('a .c file or PDF')
+    expect(acceptedText(['.pdf'])).toBe('a PDF')
+    expect(acceptedText(null)).toBeNull()
+  })
+})
+
+describe('dates with a year', () => {
+  it('drops the comma Intl puts after the weekday', () => {
+    const d = new Date('2027-03-11T08:00:00Z')
+    expect(dateWithYear(d)).toBe('11 March 2027')
+    expect(dayDateTimeWithYear(d)).toBe('Thu 11 March 2027, 10:00')
+    expect(longDateWithYear(d)).toBe('Thursday 11 March 2027')
+    expect(weekRange(onDay('2027-03-08'), onDay('2027-03-12'))).toBe('8–12 March')
+    expect(weekRange(onDay('2026-09-29'), onDay('2026-10-03'))).toBe('29 September – 3 October')
   })
 })
 

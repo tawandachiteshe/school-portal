@@ -16,7 +16,7 @@ export function ReservationStatus({ r }: { r: ReservationOut }) {
 }
 
 // Reserve / Cancel / status for one book; used by the phone row and the desktop table.
-export function BookActions({ b, compact = false }: { b: Book; compact?: boolean }) {
+function BookActions({ b, compact = false }: { b: Book; compact?: boolean }) {
   const qc = useQueryClient()
   const onError = (e: unknown) => toast(errorMessage(e, 'Something went wrong. Try again.'))
   const reserve = useReserveBook({

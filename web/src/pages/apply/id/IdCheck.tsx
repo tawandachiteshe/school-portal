@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { ConfirmIdIn, NationalIdState } from '@/api/generated/model'
 import { errorMessage } from '@/lib/api'
+import { time } from '@/lib/format'
 import { decodeId, formatId } from '@/lib/national-id'
 import { cn } from '@/lib/utils'
 
 const pad = (n: number) => String(n).padStart(2, '0')
-const hm = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Africa/Harare' })
 
 function Field({ id, label, children, hint }: { id: string; label: string; children: React.ReactNode; hint?: string }) {
   return (
@@ -113,7 +113,7 @@ export function IdCheck({
             {read.origin}
           </figure>
           {state?.received_at && (
-            <p className="text-xs text-muted-foreground">From your photo, taken {hm.format(new Date(state.received_at))}</p>
+            <p className="text-xs text-muted-foreground">From your photo, taken {time(new Date(state.received_at))}</p>
           )}
         </div>
         <p>
@@ -230,7 +230,7 @@ export function IdCheck({
             <div className="font-medium">Photo of the front</div>
             {state.received_at && (
               <div className="text-sm text-muted-foreground">
-                Taken {hm.format(new Date(state.received_at))} {where}
+                Taken {time(new Date(state.received_at))} {where}
               </div>
             )}
           </div>

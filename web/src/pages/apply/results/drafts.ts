@@ -1,7 +1,7 @@
 // The applicant's ZIMSEC results as they edit them (design/Zimsec, ZimsecDesktop): from what the
 // API read, to what it saves. Shared by the phone and desktop results pages.
-import { time } from '@/lib/format'
 import type { ResultsState, SittingIn, SittingOut, SubjectOut } from '@/api/generated/model'
+import { shortDayMonth, time } from '@/lib/format'
 
 export type Row = { code: string | null; name: string; grade: string; check: boolean; read_as: string | null; crop: SubjectOut['crop'] }
 export type Draft = {
@@ -18,8 +18,6 @@ export type Draft = {
   read_at: string | null
   editing: boolean // the header fields are open for editing
 }
-
-const dayMonth = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Harare' })
 
 export function toDraft(s: SittingOut): Draft {
   const header = !!(s.level && s.session && s.year && s.centre_number && s.candidate_number)
@@ -74,5 +72,5 @@ export function toBody(drafts: Draft[]): { sittings: SittingIn[] } {
 
 export const scannedText = (d: Draft) =>
   d.pages[0]
-    ? `Scanned on your ${d.pages[0].capture_device?.startsWith('phone') ? 'phone' : 'computer'}, ${dayMonth.format(new Date(d.pages[0].received_at)).replace('Sept', 'Sep')} ${time(new Date(d.pages[0].received_at))} · ${d.pages.length} ${d.pages.length === 1 ? 'page' : 'pages'}`
+    ? `Scanned on your ${d.pages[0].capture_device?.startsWith('phone') ? 'phone' : 'computer'}, ${shortDayMonth(new Date(d.pages[0].received_at))} ${time(new Date(d.pages[0].received_at))} · ${d.pages.length} ${d.pages.length === 1 ? 'page' : 'pages'}`
     : null

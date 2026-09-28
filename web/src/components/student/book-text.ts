@@ -1,7 +1,6 @@
 // Words for a book's state, shared by the phone rows and the desktop table (design/Library, DeskLibrary).
 import type { Book, ReservationOut } from '@/api/generated/model'
-import { shortDate } from '@/lib/format'
-import { onDay } from '@/lib/records'
+import { onDay, shortDate } from '@/lib/format'
 
 export function reservationText(r: ReservationOut) {
   return r.status === 'ready' && r.collect_by

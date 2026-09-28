@@ -3,27 +3,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ClassContext, DeskBar } from '@/components/shell/student-desktop'
 import type { Slot, Week } from '@/api/generated/model'
-import { calendarDaysBetween, isUrgent, time, weekday } from '@/lib/format'
-import { onDay } from '@/lib/records'
+import { calendarDaysBetween, dayOfMonth, isUrgent, onDay, time, weekday, weekRange } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 const HOUR = 64 // px per hour (design/DeskTimetable)
 const KIND: Record<string, string> = { lecture: 'Lecture', tutorial: 'Tutorial', lab: 'Lab', consultation: 'Consultation' }
-const TZ = 'Africa/Harare'
 const minutesOfDay = (d: Date) => {
-  const [h, m] = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: TZ })
-    .format(d)
-    .split(':')
-    .map(Number)
+  const [h, m] = time(d).split(':').map(Number)
   return h * 60 + m
-}
-const dayNum = (d: Date) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', timeZone: TZ }).format(d)
-const monthDay = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: TZ })
-
-function range(a: Date, b: Date) {
-  const [da, ma] = monthDay.format(a).split(' ')
-  const [db, mb] = monthDay.format(b).split(' ')
-  return ma === mb ? `${da}–${db} ${ma}` : `${da} ${ma} – ${db} ${mb}`
 }
 
 // "Lab 3 closed on Friday 2 October for network maintenance. None of…" → "Lab 3 closed"
@@ -67,7 +54,7 @@ export default function TimetableDesk({
         <div className="flex items-center justify-between">
           <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">
             {w.week ? `Week ${w.week} · ` : ''}
-            {range(onDay(w.starts_on), onDay(w.ends_on))}
+            {weekRange(onDay(w.starts_on), onDay(w.ends_on))}
           </h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" aria-label="Previous week" disabled={!w.has_previous} onClick={() => onWeek(-1)}>
@@ -98,7 +85,7 @@ export default function TimetableDesk({
                   {weekday(date).slice(0, 3)}
                   {today && ' · today'}
                 </div>
-                <div className={cn('font-mono', today ? 'font-semibold text-primary' : 'font-medium')}>{dayNum(date)}</div>
+                <div className={cn('font-mono', today ? 'font-semibold text-primary' : 'font-medium')}>{dayOfMonth(date)}</div>
                 {notice && (
                   <div className="truncate text-xs text-muted-foreground" title={notice.text}>
                     {shortNotice(notice.text)}

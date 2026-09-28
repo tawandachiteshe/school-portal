@@ -13,22 +13,14 @@ import { Empty } from '@/components/student/section'
 import type { Results as ResultsData, TermResults } from '@/api/generated/model'
 import { getResultsQueryKey, useRequestRemark, useResults } from '@/api/generated/records/records'
 import { errorMessage } from '@/lib/api'
-import { formatLongDate } from '@/lib/format'
-import { onDay } from '@/lib/records'
+import { formatLongDate, longDateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 import { ClassContext, DeskBar } from '@/components/shell/student-desktop'
 
-const longYear = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'Africa/Harare',
-})
 const n = (x: number | null) => (x === null ? '–' : `${x}`)
 
-export function RemarkSheet({
+function RemarkSheet({
   term,
   open,
   onOpenChange,
@@ -128,7 +120,7 @@ function Term({ t }: { t: TermResults }) {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">{t.term_name}</h1>
         {t.published_at && (
-          <p className="text-muted-foreground">Published {longYear.format(new Date(t.published_at)).replace(',', '')}</p>
+          <p className="text-muted-foreground">Published {longDateWithYear(new Date(t.published_at))}</p>
         )}
       </div>
 
@@ -250,7 +242,7 @@ function ResultsDesk({ data }: { data: ResultsData }) {
               <div className="flex flex-col gap-1">
                 <h1 className="text-[28px] leading-9 font-semibold tracking-[-0.015em]">Results · {t.term_name}</h1>
                 {t.published_at && (
-                  <p className="text-muted-foreground">Published {longYear.format(new Date(t.published_at)).replace(',', '')}</p>
+                  <p className="text-muted-foreground">Published {longDateWithYear(new Date(t.published_at))}</p>
                 )}
               </div>
               <Button variant="outline" asChild>
