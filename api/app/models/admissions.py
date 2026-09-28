@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy import (
     BigInteger,
@@ -134,12 +135,16 @@ class Document(Base):
     size_bytes: Mapped[int] = mapped_column(Integer)
     sha256: Mapped[bytes] = mapped_column(LargeBinary)
     page_count: Mapped[int] = mapped_column(SmallInteger, server_default="1")
-    quality_score: Mapped[float | None] = mapped_column(Numeric(4, 3))
+    quality_score: Mapped[float | None] = mapped_column(
+        Numeric(4, 3, asdecimal=False)
+    )  # a 0–1 score, read as float
     ocr_engine: Mapped[str | None] = mapped_column(
         pg_enum("ocr_engine", "paddle", "tesseract", "llm", "manual")
     )
     ocr_text: Mapped[str | None] = mapped_column(Text)
-    ocr_confidence: Mapped[float | None] = mapped_column(Numeric(4, 3))
+    ocr_confidence: Mapped[float | None] = mapped_column(
+        Numeric(4, 3, asdecimal=False)
+    )  # a 0–1 score, read as float
     error: Mapped[str | None] = mapped_column(Text)
     extracted: Mapped[dict | None] = mapped_column(JSONB)
     capture_device: Mapped[str | None] = mapped_column(Text)  # 'phone (Android · Chrome)'
@@ -160,7 +165,9 @@ class DocumentField(Base):
     ocr_value: Mapped[str | None] = mapped_column(Text)
     llm_value: Mapped[str | None] = mapped_column(Text)
     confirmed_value: Mapped[str | None] = mapped_column(Text)
-    confidence: Mapped[float | None] = mapped_column(Numeric(4, 3))
+    confidence: Mapped[float | None] = mapped_column(
+        Numeric(4, 3, asdecimal=False)
+    )  # a 0–1 score, read as float
     bbox: Mapped[dict | None] = mapped_column(JSONB)
     edited_by_applicant: Mapped[bool] = mapped_column(
         Boolean, Computed("confirmed_value IS DISTINCT FROM COALESCE(llm_value, ocr_value)", persisted=True)
@@ -252,7 +259,7 @@ class ApplicationPayment(Base):
     application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id", ondelete="CASCADE"))
     method: Mapped[str] = mapped_column(Text)  # ecocash | onemoney | bank | cash
     status: Mapped[str] = mapped_column(Text)
-    amount: Mapped[float] = mapped_column(Numeric(10, 2))
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     currency: Mapped[str] = mapped_column(String(3), server_default="USD")
     phone: Mapped[str | None] = mapped_column(Text)
     provider: Mapped[str | None] = mapped_column(Text)

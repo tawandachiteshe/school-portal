@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 import anthropic
+from anthropic.types import MessageParam, TextBlockParam, ToolParam, ToolResultBlockParam
 
 from app.assistant.tools import Context, Source, Tool, run
 from app.config import get_settings
@@ -75,7 +76,7 @@ def _cited(text: str, sources: list[Source]) -> tuple[str, list[Source]]:
 async def answer(
     ctx: Context,
     tools: list[Tool],
-    history: list[dict],
+    history: list[MessageParam],
     question: str,
     on_status: Callable[[str], Awaitable[None]],
     cancelled: Callable[[], Awaitable[bool]],
@@ -86,11 +87,11 @@ async def answer(
     who = "student" if ctx.student else "applicant"
     d = now or clock.now()
     today = f"{d:%A} {d.day} {d:%B %Y}"
-    system = [
+    system: list[TextBlockParam] = [
         {"type": "text", "text": SYSTEM.format(who=who, today=today), "cache_control": {"type": "ephemeral"}}
     ]
-    schemas = [t.schema() for t in tools]
-    messages = [*history, {"role": "user", "content": question}]
+    schemas: list[ToolParam] = [t.schema() for t in tools]
+    messages: list[MessageParam] = [*history, {"role": "user", "content": question}]
     out = Answer(text="", sources=[], handoff=False, model=s.assistant_model)
     c = client()
     for round_ in range(s.assistant_max_tool_rounds + 1):
@@ -118,10 +119,8 @@ async def answer(
             if not out.text:
                 out.text = TOO_LONG
             return out
-        messages.append(
-            {"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in resp.content]}
-        )
-        results = []
+        messages.append({"role": "assistant", "content": resp.content})
+        results: list[ToolResultBlockParam] = []
         for b in calls:
             tool = next((t for t in tools if t.name == b.name), None)
             if tool and tool.status:

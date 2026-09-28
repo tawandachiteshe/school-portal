@@ -1,5 +1,7 @@
 import uuid
 from datetime import date, datetime, time
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -19,6 +21,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.academic import ModuleOffering, Venue
 from app.models.base import Base, pg_enum, uuid_pk
+
+if TYPE_CHECKING:  # relationship targets, imported for type checkers only (no import cycle)
+    from app.models.people import Student
 
 ASSESSMENT_KIND = pg_enum("assessment_kind", "test", "assignment", "practical", "project", "exam")
 SUBMISSION_MODE = pg_enum("submission_mode", "online", "physical", "none")
@@ -84,8 +89,8 @@ class Assessment(Base):
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     duration_minutes: Mapped[int | None] = mapped_column(Integer)
     venue_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("venues.id"))
-    weight: Mapped[float] = mapped_column(Numeric(5, 2), server_default="0")
-    max_mark: Mapped[float] = mapped_column(Numeric(6, 2), server_default="100")
+    weight: Mapped[Decimal] = mapped_column(Numeric(5, 2), server_default="0")
+    max_mark: Mapped[Decimal] = mapped_column(Numeric(6, 2), server_default="100")
     submission_mode: Mapped[str] = mapped_column(SUBMISSION_MODE, server_default="online")
     allow_late_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     allow_resubmission: Mapped[bool] = mapped_column(Boolean, server_default="true")
@@ -108,7 +113,7 @@ class Submission(Base):
     student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"))
     status: Mapped[str] = mapped_column(SUBMISSION_STATUS, server_default="draft")
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    mark: Mapped[float | None] = mapped_column(Numeric(6, 2))
+    mark: Mapped[Decimal | None] = mapped_column(Numeric(6, 2))
     feedback_md: Mapped[str | None] = mapped_column(Text)
     student_note: Mapped[str | None] = mapped_column(Text)
     is_absent: Mapped[bool] = mapped_column(Boolean, server_default="false")
@@ -118,7 +123,7 @@ class Submission(Base):
 
     files: Mapped[list["SubmissionFile"]] = relationship(lazy="selectin")
     assessment: Mapped[Assessment] = relationship()
-    student: Mapped["Student"] = relationship()  # noqa: F821
+    student: Mapped["Student"] = relationship()
 
 
 class SubmissionFile(Base):
@@ -143,16 +148,16 @@ class ModuleResult(Base):
     offering_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("module_offerings.id", ondelete="CASCADE"), primary_key=True
     )
-    coursework_mark: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    exam_mark: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    final_mark: Mapped[float | None] = mapped_column(Numeric(5, 2))
+    coursework_mark: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+    exam_mark: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+    final_mark: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
     grade: Mapped[str | None] = mapped_column(Text)
     is_pass: Mapped[bool | None] = mapped_column(Boolean)
     remarks: Mapped[str | None] = mapped_column(Text)
     entered_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     approved_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
 
-    student: Mapped["Student"] = relationship()  # noqa: F821
+    student: Mapped["Student"] = relationship()
     offering: Mapped[ModuleOffering] = relationship()
 
 

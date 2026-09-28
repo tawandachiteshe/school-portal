@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Any
 
+from anthropic.types import ToolParam
 from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,6 +51,13 @@ class Context:
     student: Student | None
     sources: list[Source] = field(default_factory=list)
     handoff: bool = False  # the model suggested sending the question to Student Affairs
+
+    @property
+    def own_student(self) -> Student:
+        """The asker's student record. Student tools are only offered when there is one."""
+        if self.student is None:
+            raise HTTPException(403, "Only students have this.")
+        return self.student
 
     def source(self, label: str, href: str | None, personal: bool) -> int:
         for s in self.sources:
@@ -98,7 +106,7 @@ class Tool:
     status: str  # shown while it runs: "Looking at your deadlines…"
     run: Callable[[Context, Any], Awaitable[BaseModel]]
 
-    def schema(self) -> dict:
+    def schema(self) -> ToolParam:
         s = self.input.model_json_schema()
         s.pop("title", None)
         for p in s.get("properties", {}).values():
@@ -191,7 +199,7 @@ class ProgrammesOut(BaseModel):
 class AnnouncementDoc(BaseModel):
     source: int
     title: str
-    from_label: str = Field(serialization_alias="from")
+    from_label: str | None = Field(serialization_alias="from")
     published: date
     text: str
 
@@ -210,7 +218,7 @@ class HandoffOut(BaseModel):
 
 
 async def _deadlines(ctx: Context, a: DaysInput) -> DeadlinesOut:
-    d = await deadlines_route(student=ctx.student, db=ctx.db)
+    d = await deadlines_route(student=ctx.own_student, db=ctx.db)
     now = clock.now()
     return DeadlinesOut(
         source=ctx.source("Your deadlines", "/deadlines", True),
@@ -220,12 +228,12 @@ async def _deadlines(ctx: Context, a: DaysInput) -> DeadlinesOut:
 
 
 async def _timetable(ctx: Context, a: WeekInput) -> TimetableOut:
-    w = await week_timetable(start=a.week_of, cu=ctx.cu, student=ctx.student, db=ctx.db)
+    w = await week_timetable(start=a.week_of, cu=ctx.cu, student=ctx.own_student, db=ctx.db)
     return TimetableOut(source=ctx.source("Your timetable", "/timetable", True), timetable=w)
 
 
 async def _modules(ctx: Context, _: NoInput) -> ModulesOut:
-    m = await list_modules(cu=ctx.cu, student=ctx.student, db=ctx.db)
+    m = await list_modules(cu=ctx.cu, student=ctx.own_student, db=ctx.db)
     return ModulesOut(source=ctx.source("Your modules", "/modules", True), modules=m)
 
 
@@ -236,7 +244,7 @@ async def _library(ctx: Context, _: NoInput) -> LibraryOut:
     s = get_settings()
     return LibraryOut(
         source=ctx.source("Library", "/library", True),
-        my_library=await library_home(student=ctx.student, db=ctx.db),
+        my_library=await library_home(student=ctx.own_student, db=ctx.db),
         rules=LibraryRules(
             location=s.library_location,
             loan_days=s.library_loan_days,
@@ -254,19 +262,19 @@ async def _library(ctx: Context, _: NoInput) -> LibraryOut:
 
 
 async def _catalogue(ctx: Context, a: QueryInput) -> CatalogueOut:
-    r = await search_catalogue(q=a.query, student=ctx.student, db=ctx.db)
+    r = await search_catalogue(q=a.query, student=ctx.own_student, db=ctx.db)
     return CatalogueOut(
         source=ctx.source("Library catalogue", f"/library/search?q={a.query}", False), books=r.books[:10]
     )
 
 
 async def _results(ctx: Context, _: NoInput) -> ResultsOut:
-    r = await results_route(student=ctx.student, db=ctx.db)
+    r = await results_route(student=ctx.own_student, db=ctx.db)
     return ResultsOut(source=ctx.source("Your results", "/results", True), results=r)
 
 
 async def _fees(ctx: Context, _: NoInput) -> FeesOut:
-    f = await fees_route(student=ctx.student, db=ctx.db)
+    f = await fees_route(student=ctx.own_student, db=ctx.db)
     return FeesOut(source=ctx.source("Fees statement", "/fees", True), fees=f)
 
 

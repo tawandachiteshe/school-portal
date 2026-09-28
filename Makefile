@@ -74,7 +74,7 @@ test-web: ## Web tests
 	$(WEB) bun run test
 
 lint: ## Lint and type-check
-	$(API) uv run ruff check . && uv run ruff format --check .
+	$(API) uv run ruff check . && uv run ruff format --check . && uv run ty check app
 	$(WEB) bun run lint && bunx tsc -b --noEmit
 
 format: ## Format the API code

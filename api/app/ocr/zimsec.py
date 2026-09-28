@@ -10,7 +10,7 @@ import io
 import re
 import shutil
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from rapidfuzz import fuzz, process
 
@@ -144,7 +144,7 @@ def parse(words: list[Word], subjects: dict[str, str], width: int = 0, height: i
         if len(ln) < 2:
             continue
         # Certificates repeat the grade in lower case, "C (c)" or "C(c)", and stray marks follow it.
-        ln = [Word(**{**w.__dict__, "text": re.sub(r"^([A-Z0-9])\([a-z]\)$", r"\1", w.text)}) for w in ln]
+        ln = [replace(w, text=re.sub(r"^([A-Z0-9])\([a-z]\)$", r"\1", w.text)) for w in ln]
         gradeish = grades | {"8", "0", "6", "G"}
         for k in range(len(ln) - 1, max(len(ln) - 4, 0), -1):
             if ln[k].text.strip(".,:;").upper() in gradeish and len(ln[k].text.strip(".,:;")) == 1:

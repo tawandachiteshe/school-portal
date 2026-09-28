@@ -308,8 +308,8 @@ async def module_detail(
                 submission_mode=a.submission_mode,
                 status=subs[a.id].status if a.id in subs and subs[a.id].status != "draft" else None,
                 submitted_at=subs[a.id].submitted_at if a.id in subs else None,
-                mark=float(subs[a.id].mark)
-                if a.id in subs and subs[a.id].mark is not None and released(a)
+                mark=float(got.mark)
+                if (got := subs.get(a.id)) and got.mark is not None and released(a)
                 else None,
                 max_mark=float(a.max_mark),
             )

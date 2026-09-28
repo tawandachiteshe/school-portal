@@ -344,12 +344,18 @@ def _slip_svg(name: str, sitting: ExamSitting, grades: list[tuple[str, str]]) ->
     )
 
 
+def user_of(p: Person) -> User:
+    """Every seeded person has a sign-in record."""
+    assert p.user is not None, p.surname
+    return p.user
+
+
 class AdmissionsSeed:
     def __init__(self, db: AsyncSession, intake: Intake, programmes: dict[str, Programme], officer: Person):
         self.db = db
         self.intake = intake
         self.programmes = programmes
-        self.officer = officer.user
+        self.officer = user_of(officer)
         now = clock.now()
         # "Today" in the design is late morning; keep every seeded time in the past.
         self.day0 = (
@@ -442,6 +448,7 @@ class AdmissionsSeed:
         self.db.add(app)
         await self.db.flush()
         name = f"{a.first} {a.surname}"
+        assert person.national_id_enc is not None  # set above from the persona's ID
         number = crypto.decrypt(person.national_id_enc)
         id_doc = self.document(
             app,
@@ -636,6 +643,7 @@ class AdmissionsSeed:
     async def run(self, tariro: Person) -> None:
         self.reference_data()
         self.dev_applicant()
+        assert tariro.date_of_birth  # set by the main seed
         # design/StaffReview: Tariro's application, in review with C. Marufu.
         tariro_app = Applicant(
             "APP-27-08813",

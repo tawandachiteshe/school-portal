@@ -507,7 +507,7 @@ async def _identity(db: AsyncSession, a: Application, people: dict[uuid.UUID, Pe
         checked_at=doc.reviewed_at if checked else None,
         birth_certificate_id=birth.id if birth else None,
         birth_name=bf.get("full_name"),
-        birth_date_of_birth=date.fromisoformat(bf["date_of_birth"]) if bf.get("date_of_birth") else None,
+        birth_date_of_birth=date.fromisoformat(printed) if (printed := bf.get("date_of_birth")) else None,
     )
 
 

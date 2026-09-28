@@ -113,6 +113,10 @@ def _scan_of(d: Document) -> str | None:
     return (d.extracted or {}).get("scan")
 
 
+def _page_no(d: Document) -> int:
+    return (d.extracted or {}).get("page", 0)
+
+
 async def _reference(db: AsyncSession) -> dict[str, str]:
     rows = await db.execute(
         select(ZimsecSubject).where(ZimsecSubject.level == "O").order_by(ZimsecSubject.name)
@@ -121,7 +125,7 @@ async def _reference(db: AsyncSession) -> dict[str, str]:
 
 
 def _pages(docs: list[Document]) -> list[Page]:
-    docs = sorted(docs, key=lambda d: (d.extracted or {}).get("page", 0))
+    docs = sorted(docs, key=_page_no)
     return [
         Page(
             document_id=d.id,
@@ -197,7 +201,7 @@ async def results_state(db: AsyncSession, a: Application) -> ResultsState:
     for scan, pages in by_scan.items():
         if scan in saved_scans:
             continue
-        head = min(pages, key=lambda d: (d.extracted or {}).get("page", 0))
+        head = min(pages, key=_page_no)
         ex = head.extracted or {}
         if ex.get("status") in ("discarded", "saved"):
             continue
@@ -239,10 +243,8 @@ async def results_state(db: AsyncSession, a: Application) -> ResultsState:
 async def _read_scan(application_id: uuid.UUID, scan: str) -> None:
     """Background: read every page of a scan and merge them into one sitting."""
     async with get_sessionmaker()() as db:
-        a = await db.get(Application, application_id)
-        pages = sorted(
-            [d for d in a.documents if _scan_of(d) == scan], key=lambda d: d.extracted.get("page", 0)
-        )
+        a = await db.get_one(Application, application_id)
+        pages = sorted([d for d in a.documents if _scan_of(d) == scan], key=_page_no)
         if not pages:
             return
         subjects = await _reference(db)
@@ -278,7 +280,7 @@ async def _read_scan(application_id: uuid.UUID, scan: str) -> None:
         merged["subjects"] = list(seen.values())
         head = pages[0]
         head.extracted = {
-            **head.extracted,
+            **(head.extracted or {}),
             "status": "read" if merged["subjects"] else "failed",
             "read": merged,
         }
@@ -379,8 +381,8 @@ def _start_read(a: Application, scan: str) -> None:
     pages = [d for d in a.documents if _scan_of(d) == scan]
     if not pages:
         raise HTTPException(404, "Photograph the slip first.")
-    head = min(pages, key=lambda d: d.extracted.get("page", 0))
-    head.extracted = {**head.extracted, "status": "reading"}
+    head = min(pages, key=_page_no)
+    head.extracted = {**(head.extracted or {}), "status": "reading"}
 
 
 class SubjectIn(BaseModel):
@@ -429,7 +431,7 @@ async def _save(db: AsyncSession, a: Application, body: SaveResultsIn, actor: uu
             if x.grade.upper() not in grades:
                 raise HTTPException(422, f"Choose a grade for {x.name}.")
         scan = saved_scan.get(s.key or "", s.key)
-        pages = sorted([d for d in docs if _scan_of(d) == scan], key=lambda d: d.extracted.get("page", 0))
+        pages = sorted([d for d in docs if _scan_of(d) == scan], key=_page_no)
         head = pages[0] if pages else None
         read = (
             {x["name"]: x for x in ((head.extracted or {}).get("read") or {}).get("subjects", [])}
@@ -477,7 +479,7 @@ async def _save(db: AsyncSession, a: Application, body: SaveResultsIn, actor: uu
                 unclear_total += 1
         for d in pages:
             d.status = "confirmed"
-            d.extracted = {**d.extracted, "status": "saved"}
+            d.extracted = {**(d.extracted or {}), "status": "saved"}
         # Signals for Admissions: the name on the slip, and the same candidate on another application.
         if p.national_id_enc and not name_words(sitting.candidate_name) >= name_words(
             f"{p.first_names} {p.surname}"

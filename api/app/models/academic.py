@@ -1,11 +1,16 @@
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, SmallInteger, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import STUDY_MODE, Base, created_at, pg_enum, uuid_pk
+
+if TYPE_CHECKING:  # relationship targets, imported for type checkers only (no import cycle)
+    from app.models.people import Staff
 
 PROGRAMME_LEVEL = pg_enum(
     "programme_level", "certificate", "diploma", "higher_national_diploma", "degree", "short_course"
@@ -69,7 +74,7 @@ class Module(Base):
     description: Mapped[str | None] = mapped_column(Text)
     credits: Mapped[int] = mapped_column(SmallInteger)
     department_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("departments.id"))
-    coursework_weight: Mapped[float] = mapped_column(Numeric(5, 2), server_default="40")
+    coursework_weight: Mapped[Decimal] = mapped_column(Numeric(5, 2), server_default="40")
 
     department: Mapped[Department | None] = relationship()
 
@@ -124,7 +129,7 @@ class OfferingLecturer(Base):
         pg_enum("lecturer_role", "lead", "assistant", "tutor"), server_default="lead"
     )
 
-    staff: Mapped["Staff"] = relationship(lazy="joined")  # noqa: F821
+    staff: Mapped["Staff"] = relationship(lazy="joined")
 
 
 class IntakePlace(Base):

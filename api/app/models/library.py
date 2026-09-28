@@ -1,11 +1,17 @@
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Numeric, SmallInteger, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, created_at, uuid_pk
+
+if TYPE_CHECKING:  # relationship targets, imported for type checkers only (no import cycle)
+    from app.models.academic import ModuleOffering
+    from app.models.identity import Person
 
 
 class LibraryItem(Base):
@@ -46,7 +52,7 @@ class LibraryLoan(Base):
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     returned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     renewals: Mapped[int] = mapped_column(SmallInteger, server_default="0")
-    fine_amount: Mapped[float] = mapped_column(Numeric(10, 2), server_default="0")
+    fine_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), server_default="0")
     fine_currency: Mapped[str] = mapped_column(String(3), server_default="USD")
     fine_paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_reminder_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -55,7 +61,7 @@ class LibraryLoan(Base):
     returned_to: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
 
     copy: Mapped[LibraryCopy] = relationship(lazy="joined")
-    person: Mapped["Person"] = relationship()  # noqa: F821
+    person: Mapped["Person"] = relationship()
 
 
 class LibraryReservation(Base):
@@ -71,7 +77,7 @@ class LibraryReservation(Base):
     collect_by: Mapped[date | None] = mapped_column(Date)
 
     item: Mapped[LibraryItem] = relationship(lazy="joined")
-    person: Mapped["Person"] = relationship()  # noqa: F821
+    person: Mapped["Person"] = relationship()
     copy: Mapped[LibraryCopy | None] = relationship()
 
 
@@ -89,4 +95,4 @@ class ReadingListItem(Base):
     sort_order: Mapped[int] = mapped_column(SmallInteger, server_default="0")
 
     item: Mapped[LibraryItem] = relationship(lazy="joined")
-    offering: Mapped["ModuleOffering"] = relationship()  # noqa: F821
+    offering: Mapped["ModuleOffering"] = relationship()

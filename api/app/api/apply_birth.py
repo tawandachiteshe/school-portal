@@ -73,7 +73,9 @@ async def birth_state(db: AsyncSession, a: Application) -> BirthCertificateState
     f = {x.field: x.confirmed_value for x in rows.scalars()}
     confirmed = d.status in ("confirmed", "approved")
     name = f.get("full_name") if confirmed else id_name
-    dob = date.fromisoformat(f["date_of_birth"]) if confirmed and f.get("date_of_birth") else p.date_of_birth
+    dob = (
+        date.fromisoformat(printed) if confirmed and (printed := f.get("date_of_birth")) else p.date_of_birth
+    )
     return BirthCertificateState(
         status=BirthStatus.confirmed if confirmed else BirthStatus.uploaded,
         document_id=d.id,

@@ -8,6 +8,7 @@ from collections.abc import AsyncIterator
 from datetime import datetime, timedelta
 from typing import Annotated, Literal
 
+from anthropic.types import MessageParam
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -190,7 +191,10 @@ async def ask(body: AskIn, request: Request, cu: AskerDep, db: DbDep) -> Streami
         .scalars()
         .all()
     )
-    history = [{"role": m.role, "content": m.content.get("text", "")} for m in reversed(history_rows)]
+    history: list[MessageParam] = [
+        {"role": "assistant" if m.role == "assistant" else "user", "content": m.content.get("text", "")}
+        for m in reversed(history_rows)
+    ]
     db.add(
         ChatMessage(
             session_id=session.id,

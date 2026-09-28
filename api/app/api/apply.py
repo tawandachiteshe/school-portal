@@ -349,7 +349,9 @@ async def choose_programme(body: ProgrammeIn, cu: ApplicantDep, db: DbDep) -> My
         a.programme_id = prog.id
         a.updated_at = clock.now()
     await db.commit()
+    # Read it again: that loads the relationships _out needs (documents, ...) for a new application.
     a = await _current(db, person)
+    assert a is not None
     await db.refresh(a, ["programme"])
     return await _out(db, a)
 

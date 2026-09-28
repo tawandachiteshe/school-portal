@@ -17,9 +17,10 @@ from functools import lru_cache
 from urllib.parse import urlencode, urlsplit, urlunsplit
 
 import httpx
+from asyncer import asyncify
 from itsdangerous import BadSignature, URLSafeTimedSerializer
 from joserfc import jwt
-from joserfc.jwk import KeySet
+from joserfc.jwk import KeySet, KeySetSerialization
 
 from app.config import get_settings
 from app.crypto import random_token
@@ -130,7 +131,7 @@ def read_state(cookie: str | None) -> dict | None:
 
 
 @lru_cache(maxsize=4)
-def _jwks_cached(uri: str, _hour: int) -> dict:
+def _jwks_cached(uri: str, _hour: int) -> KeySetSerialization:
     r = httpx.get(_internal(uri), headers=_host_header(), timeout=10)
     r.raise_for_status()
     return r.json()
@@ -162,7 +163,8 @@ async def exchange(code: str, state: dict) -> Tokens:
         )
         r.raise_for_status()
         t = r.json()
-    keys = KeySet.import_key_set(_jwks_cached(d.jwks_uri, int(time.time() // 3600)))
+    # A blocking fetch (cached for the hour): in a worker thread, so sign-in never stalls other requests.
+    keys = KeySet.import_key_set(await asyncify(_jwks_cached)(d.jwks_uri, int(time.time() // 3600)))
     claims = jwt.decode(t["id_token"], keys).claims
     jwt.JWTClaimsRegistry(
         leeway=60,

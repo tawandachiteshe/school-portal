@@ -505,7 +505,7 @@ async def _payment(db: AsyncSession, payment_id: uuid.UUID) -> tuple[Application
     p = await db.get(ApplicationPayment, payment_id)
     if p is None or p.status != "awaiting_confirmation":
         raise HTTPException(409, "This payment isn't waiting for confirmation.")
-    return p, await db.get(Application, p.application_id)
+    return p, await db.get_one(Application, p.application_id)
 
 
 @staff_router.post("/payments/{payment_id}/confirm")

@@ -203,7 +203,7 @@ async def _borrower(db: AsyncSession, person: Person, number: str, programme, cl
             HeldBook(
                 reservation_id=r.id,
                 title=r.item.title,
-                barcode=copies[r.copy_id].barcode if r.copy_id in copies else None,
+                barcode=copies[r.copy_id].barcode if r.copy_id and r.copy_id in copies else None,
                 collect_by=r.collect_by,
             )
             for r in held
@@ -425,7 +425,7 @@ async def return_book(body: ReturnIn, cu: LibrarianDep, db: DbDep) -> Returned:
         nxt.copy_id = c.id
         nxt.ready_at = now
         nxt.collect_by = clock.today() + timedelta(days=get_settings().library_hold_days)
-        p = await db.get(Person, nxt.person_id)
+        p = await db.get_one(Person, nxt.person_id)
         await db.refresh(p, ["user"])
         hold_for = f"{p.first_names.split()[0]} {p.surname}"
         _notify(
@@ -607,7 +607,7 @@ async def remind(body: RemindIn, _: LibrarianDep, db: DbDep) -> Reminded:
     now = clock.now()
     sms = no_phone = 0
     for loan in loans:
-        p = await db.get(Person, loan.person_id)
+        p = await db.get_one(Person, loan.person_id)
         await db.refresh(p, ["user"])
         due = loan.due_at.astimezone(clock.tz())
         # design: "Your library book [title] was due [date]. Please return it to the Block A desk."

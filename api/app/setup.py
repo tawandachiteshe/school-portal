@@ -61,7 +61,7 @@ async def reference(db: AsyncSession, districts_csv: str | None, subjects_csv: s
         )
         db.add(row)
 
-    districts = {c: (d, p) for c, (d, p) in DISTRICTS.items()}
+    districts: dict[str, tuple[str, str | None]] = dict(DISTRICTS)
     districts |= {
         r["code"].strip().zfill(2): (r["district"].strip(), r["province"].strip() or None)
         for r in _rows(districts_csv, ["code", "district", "province"])

@@ -76,7 +76,7 @@ for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns
   `bun run test` (Vitest), `bun run lint` (oxlint), `bun run gen:api` (exports the FastAPI spec to `web/openapi.json`,
   then Orval generates typed TanStack Query hooks into `src/api/generated/`; never hand-write API types or hooks,
   and rerun it after any API change: an API test fails when the committed spec is stale).
-- API (in `api/`): `uv sync`, `uv run uvicorn app.main:app --reload`, `uv run pytest`, `uv run ruff check . && uv run ruff format .`
+- API (in `api/`): `uv sync`, `uv run uvicorn app.main:app --reload`, `uv run pytest`, `uv run ruff check . && uv run ruff format .`, `uv run ty check app`
 - API code follows the official FastAPI skill (`.claude/skills/fastapi/`, copied from fastapi/fastapi), except: keep
   SQLAlchemy (not SQLModel), and the web app is served by Traefik (not `app.frontend()`).
 - Full stack: `cp .env.example .env && docker compose up -d --build`.

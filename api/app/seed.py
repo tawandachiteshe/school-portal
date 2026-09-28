@@ -11,6 +11,7 @@ import asyncio
 import re
 import sys
 from datetime import UTC, date, datetime, time, timedelta
+from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,7 +54,7 @@ from app.models import (
 )
 from app.pdf import make_pdf
 from app.reference_data import DEPARTMENTS, PROGRAMMES
-from app.seed_admissions import AdmissionsSeed
+from app.seed_admissions import AdmissionsSeed, user_of
 from app.services import clock
 
 GROUPS = {
@@ -284,7 +285,7 @@ class Seeder:
             status="active",
         )
         self.db.add(student)
-        self.tariro_user = tariro.user
+        self.tariro_user = user_of(tariro)
         await self.db.flush()
         for o in offerings.values():
             self.db.add(Enrolment(student_id=student.id, offering_id=o.id))
@@ -303,7 +304,7 @@ class Seeder:
         programmes = {p.code: p for p in (dit, dse, dte, ccn)}
         await AdmissionsSeed(self.db, intake, programmes, marufu.person).run(tariro)
         for a in self._reads:
-            self.db.add(AnnouncementRead(announcement_id=a.id, user_id=tariro.user.id))
+            self.db.add(AnnouncementRead(announcement_id=a.id, user_id=self.tariro_user.id))
         await self.db.commit()
 
     # --- classmates: full classes for the lecturer screens --------------------------------------
@@ -488,7 +489,7 @@ class Seeder:
             ("TCFL/2026/0214", "Chikwanha", "Blessing", dit, "DIT-2B", "+263712660214"),
         ):
             p = self.person_user(number, surname, first)
-            p.user.phone = phone
+            user_of(p).phone = phone
             st = Student(
                 person=p,
                 student_number=number,
@@ -528,8 +529,8 @@ class Seeder:
             )
 
         # design/LecturerHome "Downloaded by": 24/79, 35/38, 71/79 (Tariro hasn't opened the first or last).
-        dit_users = [st.person.user for st in dit_students]
-        dte_users = [st.person.user for st in dte_students]
+        dit_users = [user_of(st.person) for st in dit_students]
+        dte_users = [user_of(st.person) for st in dte_students]
         await self.db.flush()
         for title, count in (
             ("Amplitude and frequency modulation", 24),
@@ -538,6 +539,7 @@ class Seeder:
             everyone = [(u, "DIT-1A") for u in dit_users] + [(u, "DTE-1A") for u in dte_users]
             for u, cg in everyone[:count]:
                 m = self.materials_by[(title, cg)]
+                assert m.published_at  # every seeded note is published
                 self.db.add(
                     MaterialDownload(
                         material_id=m.id,
@@ -590,7 +592,7 @@ class Seeder:
             d = now.date() + timedelta(days=i)
             for c, dow, a, _b, venue, _k in self.SLOTS:
                 t = clock.at(d, time.fromisoformat(a))
-                if c == code and dow == d.isoweekday() and t >= now:
+                if c == code and venue and dow == d.isoweekday() and t >= now:
                     return t, venue
         raise AssertionError(code)
 
@@ -794,7 +796,7 @@ class Seeder:
         fees_due = start + timedelta(weeks=11, days=2)  # Wednesday of week 12
         friday = today + timedelta(days=(4 - today.weekday()) % 7 or 7)
         briefing = today + timedelta(days=(1 - today.weekday()) % 7 or 7)  # next Tuesday
-        rows = [
+        rows: list[dict[str, Any]] = [
             dict(
                 title=f"Second fees instalment due {long(fees_due)}",
                 from_label="Accounts Office",
@@ -1081,9 +1083,9 @@ class Seeder:
             for barcode, holder in copies.items():
                 copy = LibraryCopy(item=item, barcode=barcode, location=f"Block A · shelf {call}")
                 self.db.add(copy)
-                if holder in ("tariro", "other") or (holder or "").startswith("late:"):
+                if holder in ("tariro", "other") or (holder and holder.startswith("late:")):
                     copy.status = "on_loan"
-                if (holder or "").startswith("late:"):
+                if holder and holder.startswith("late:"):
                     _, number, days = holder.split(":")
                     self.pending_loans.append((copy, number, int(days)))
                 if holder == "tariro" and key == "stroud":  # overdue (design: "Overdue since Mon 8 Mar")

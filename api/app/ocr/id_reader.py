@@ -14,11 +14,15 @@ import shutil
 import subprocess
 from dataclasses import dataclass, field
 from datetime import date
+from typing import Literal, cast, get_args
+
+from anthropic.types import ToolParam
 
 from app.config import get_settings
 from app.ocr.national_id import decode
 
-READABLE = {"image/jpeg", "image/png", "image/webp"}
+ImageType = Literal["image/jpeg", "image/png", "image/webp"]
+READABLE: set[str] = set(get_args(ImageType))
 
 
 @dataclass
@@ -136,7 +140,7 @@ def _claude(image: bytes, mime: str) -> IdReading | None:
     import anthropic
 
     client = anthropic.Anthropic(api_key=s.anthropic_api_key)
-    tool = {
+    tool: ToolParam = {
         "name": "national_id",
         "description": "Fields printed on the front of a Zimbabwe National ID card. "
         "Use null for anything unreadable.",
@@ -164,7 +168,7 @@ def _claude(image: bytes, mime: str) -> IdReading | None:
                         "type": "image",
                         "source": {
                             "type": "base64",
-                            "media_type": mime,
+                            "media_type": cast(ImageType, mime),  # only READABLE types get here
                             "data": base64.b64encode(image).decode(),
                         },
                     },
@@ -180,14 +184,20 @@ def _claude(image: bytes, mime: str) -> IdReading | None:
     if not isinstance(data, dict):
         return None
     r = IdReading(engine="llm")
-    d = decode(data.get("id_number") or "")
+
+    # The model's answer is untrusted input: anything that isn't a string counts as unreadable.
+    def text(key: str) -> str:
+        v = data.get(key)
+        return v.strip() if isinstance(v, str) else ""
+
+    d = decode(text("id_number"))
     r.id_number = d.normalized if d else None
     for k in ("surname", "first_names"):
-        v = (data.get(k) or "").strip().upper()
+        v = text(k).upper()
         if NAME.match(v):
             setattr(r, k, v)
     try:
-        r.date_of_birth = date.fromisoformat(data.get("date_of_birth") or "")
+        r.date_of_birth = date.fromisoformat(text("date_of_birth"))
     except ValueError:
         r.date_of_birth = None
     r.confidence = dict.fromkeys(("id_number", "surname", "first_names", "date_of_birth"), 0.85)
@@ -208,8 +218,8 @@ def read_national_id(image: bytes, mime: str, *, allow_llm: bool) -> IdReading:
                 reading = r
             if (
                 reading.complete
-                and decode(reading.id_number or "")
-                and decode(reading.id_number).check_letter_valid
+                and (decoded := decode(reading.id_number or ""))
+                and decoded.check_letter_valid
             ):
                 break
     low = any(v < s.ocr_min_confidence for v in reading.confidence.values())

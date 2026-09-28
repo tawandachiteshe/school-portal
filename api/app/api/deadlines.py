@@ -190,8 +190,11 @@ def _window(a: Assessment, sub: Submission | None, now: datetime) -> tuple[bool,
 
 
 def _submission_out(sub: Submission | None) -> SubmissionOut | None:
-    if sub is None or sub.status == "draft":
-        return None
+    """What the student has handed in; a draft isn't handed in yet."""
+    return _submitted_out(sub) if sub is not None and sub.status != "draft" else None
+
+
+def _submitted_out(sub: Submission) -> SubmissionOut:
     return SubmissionOut(
         status=sub.status,
         submitted_at=sub.submitted_at,
@@ -421,7 +424,7 @@ async def complete_upload(
     up.completed_at = now
     await db.commit()
     await db.refresh(sub, ["files"])
-    return _submission_out(sub)  # type: ignore[return-value]
+    return _submitted_out(sub)
 
 
 @router.delete("/uploads/{upload_id}", status_code=204)

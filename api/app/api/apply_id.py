@@ -191,7 +191,7 @@ async def _read_document(document_id: uuid.UUID) -> None:
         doc = await db.get(Document, document_id)
         if doc is None:
             return
-        a = await db.get(Application, doc.application_id)
+        a = await db.get_one(Application, doc.application_id)
         doc.status = "processing"
         await db.commit()
         try:

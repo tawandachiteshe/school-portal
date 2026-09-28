@@ -93,7 +93,7 @@ async def reply_to_question(
     return InboxQuestion(
         id=q.id,
         reference=q.reference,
-        name=asker_user.display_name if asker_user else "",
+        name=(asker_user.display_name if asker_user else None) or "",
         student_number=s.student_number if s else None,
         class_group=s.class_group if s else None,
         question=q.question,

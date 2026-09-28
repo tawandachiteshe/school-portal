@@ -240,6 +240,7 @@ async def _shared_notes(db: AsyncSession, offerings: list[ModuleOffering], count
     out = []
     for ms in list(groups.values())[:limit]:
         first = ms[0]
+        assert first.published_at  # the query only reads published notes
         out.append(
             SharedNote(
                 title=first.title,
@@ -381,7 +382,7 @@ async def _sheet(db: AsyncSession, a: Assessment) -> MarksSheet:
                 student_id=st.id,
                 student_number=st.student_number,
                 name=sort_name(st),
-                mark=float(subs[st.id].mark) if st.id in subs and subs[st.id].mark is not None else None,
+                mark=float(got.mark) if (got := subs.get(st.id)) and got.mark is not None else None,
                 is_absent=bool(st.id in subs and subs[st.id].is_absent),
                 absence_note=subs[st.id].absence_note if st.id in subs else None,
                 comment=subs[st.id].feedback_md if st.id in subs else None,
