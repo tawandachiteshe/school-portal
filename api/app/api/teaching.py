@@ -627,10 +627,10 @@ class Shared(BaseModel):
 async def upload_notes(
     lec: LecturerDep,
     db: DbDep,
-    file: UploadFile = File(...),
-    title: str = Form(min_length=1, max_length=200),
-    week: int | None = Form(default=None, ge=1, le=52),
-    offering_ids: list[uuid.UUID] = Form(...),
+    file: Annotated[UploadFile, File()],
+    title: Annotated[str, Form(min_length=1, max_length=200)],
+    offering_ids: Annotated[list[uuid.UUID], Form()],
+    week: Annotated[int | None, Form(ge=1, le=52)] = None,
 ) -> Shared:
     mine = {o.id: o for o in await my_offerings(db, lec)}
     if not offering_ids or any(i not in mine for i in offering_ids):

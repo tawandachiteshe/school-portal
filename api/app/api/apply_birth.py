@@ -6,6 +6,7 @@ import hashlib
 import uuid
 from datetime import date, datetime
 from enum import StrEnum
+from typing import Annotated
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from pydantic import BaseModel, Field
@@ -194,7 +195,7 @@ async def upload_birth_certificate(
     request: Request,
     cu: ApplicantDep,
     db: DbDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> BirthCertificateState:
     a = await _draft(db, cu)
     await _upload(db, a, file, request.headers.get("user-agent"), None)
@@ -223,7 +224,7 @@ async def phone_upload_birth_certificate(
     request: Request,
     h: PhoneDep,
     db: DbDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> BirthCertificateState:
     await _upload(db, h.application, file, request.headers.get("user-agent"), h)
     return await _fresh(db, h.application)

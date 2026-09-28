@@ -371,7 +371,7 @@ async def cancel_payment(cu: ApplicantDep, db: DbDep) -> SubmitState:
 
 
 @router.post("/apply/payments/current/proof")
-async def upload_proof(cu: ApplicantDep, db: DbDep, file: UploadFile = File(...)) -> SubmitState:
+async def upload_proof(cu: ApplicantDep, db: DbDep, file: Annotated[UploadFile, File()]) -> SubmitState:
     a = await _draft(db, cu)
     p = await _latest_payment(db, a)
     if p is None or p.status != "awaiting_confirmation" or p.method != "bank":

@@ -6744,6 +6744,14 @@
             "minLength": 1,
             "title": "Title"
           },
+          "offering_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Offering Ids"
+          },
           "week": {
             "anyOf": [
               {
@@ -6756,14 +6764,6 @@
               }
             ],
             "title": "Week"
-          },
-          "offering_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Offering Ids"
           }
         },
         "type": "object",

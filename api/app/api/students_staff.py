@@ -35,7 +35,7 @@ def _name(p: Person) -> str:
 async def find_students(
     _: StaffDep,
     db: DbDep,
-    q: str = Query(min_length=2, max_length=60),
+    q: Annotated[str, Query(min_length=2, max_length=60)],
 ) -> list[StudentRow]:
     """Student number (all or part), or any part of the name."""
     words = [w for w in q.strip().split() if w]

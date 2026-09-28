@@ -3,6 +3,7 @@ catalogue in the portal"). Students see the same books through app/api/library.p
 
 import re
 import uuid
+from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -93,7 +94,7 @@ async def _items(db: AsyncSession, items: list[LibraryItem]) -> list[CatalogueIt
 async def catalogue(
     _: LibrarianDep,
     db: DbDep,
-    q: str | None = Query(default=None, max_length=100),
+    q: Annotated[str | None, Query(max_length=100)] = None,
 ) -> list[CatalogueItem]:
     """Title, author, subject, ISBN, call number or a copy's barcode; everything (A–Z) without a query."""
     stmt = select(LibraryItem).order_by(LibraryItem.title).limit(100)

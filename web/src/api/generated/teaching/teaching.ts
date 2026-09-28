@@ -636,10 +636,10 @@ export const uploadNotes = async (bodyUploadNotes: BodyUploadNotes, options?: Pa
     const formData = new FormData();
 formData.append(`file`, bodyUploadNotes.file);
 formData.append(`title`, bodyUploadNotes.title);
+bodyUploadNotes.offering_ids.forEach(value => formData.append(`offering_ids`, value));
 if(bodyUploadNotes.week !== undefined && bodyUploadNotes.week !== null) {
  formData.append(`week`, bodyUploadNotes.week.toString())
  }
-bodyUploadNotes.offering_ids.forEach(value => formData.append(`offering_ids`, value));
 
   return apiFetch<Shared>(getUploadNotesUrl(),
   {

@@ -357,7 +357,7 @@ async def upload_national_id(
     background: BackgroundTasks,
     cu: ApplicantDep,
     db: DbDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> NationalIdState:
     a = await _draft(db, cu)
     doc = await _upload(db, a, file, request.headers.get("user-agent"), None)
@@ -688,7 +688,7 @@ async def phone_upload_national_id(
     background: BackgroundTasks,
     h: PhoneDep,
     db: DbDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> NationalIdState:
     a = h.application
     doc = await _upload(db, a, file, request.headers.get("user-agent"), h)

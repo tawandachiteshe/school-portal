@@ -3,6 +3,7 @@
 import uuid
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
@@ -88,7 +89,7 @@ async def week_timetable(
     cu: CurrentUserDep,
     student: StudentDep,
     db: DbDep,
-    start: date | None = Query(default=None, description="Any date in the week; defaults to this week"),
+    start: Annotated[date | None, Query(description="Any date in the week; defaults to this week")] = None,
 ) -> Week:
     today = clock.today()
     # At the weekend, "this week" is over: open next week unless a week was asked for.

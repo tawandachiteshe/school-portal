@@ -3,6 +3,7 @@
 import hmac
 import logging
 import re
+from typing import Annotated
 
 from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
@@ -20,7 +21,7 @@ class Queued(BaseModel):
 
 
 @router.post("/sms")
-async def authentik_sms(request: Request, db: DbDep, authorization: str = Header(default="")) -> Queued:
+async def authentik_sms(request: Request, db: DbDep, authorization: Annotated[str, Header()] = "") -> Queued:
     """Authentik's generic SMS provider (sign-up phone check, password reset) posts
     {"From", "To", "Body"} here. The text joins the SMS queue that the SMS worker sends once a
     provider is configured (SMS_PROVIDER)."""

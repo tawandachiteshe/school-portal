@@ -9,6 +9,7 @@ import hashlib
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import Annotated
 
 from asyncer import asyncify
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
@@ -561,9 +562,9 @@ async def add_results_page(
     request: Request,
     cu: ApplicantDep,
     db: DbDep,
-    file: UploadFile = File(...),
-    scan: str | None = Form(default=None),
-    quality: str | None = Form(default=None),
+    file: Annotated[UploadFile, File()],
+    scan: Annotated[str | None, Form()] = None,
+    quality: Annotated[str | None, Form()] = None,
 ) -> ResultsState:
     a = await _draft(db, cu)
     await _add_page(db, a, file, scan, quality, request.headers.get("user-agent"), None)
@@ -616,9 +617,9 @@ async def phone_add_results_page(
     request: Request,
     h: PhoneDep,
     db: DbDep,
-    file: UploadFile = File(...),
-    scan: str | None = Form(default=None),
-    quality: str | None = Form(default=None),
+    file: Annotated[UploadFile, File()],
+    scan: Annotated[str | None, Form()] = None,
+    quality: Annotated[str | None, Form()] = None,
 ) -> ResultsState:
     await _add_page(db, h.application, file, scan, quality, request.headers.get("user-agent"), h)
     return await _fresh(db, h.application)

@@ -9,6 +9,7 @@ import hashlib
 import re
 import uuid
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
@@ -340,7 +341,7 @@ async def upload_chunk(
     request: Request,
     student: StudentDep,
     db: DbDep,
-    offset: int = Query(ge=0),
+    offset: Annotated[int, Query(ge=0)],
 ) -> UploadOut:
     up = await _upload(db, student, upload_id)
     if up.completed_at:

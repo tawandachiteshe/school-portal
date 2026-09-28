@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime, timedelta
+from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
@@ -385,7 +386,7 @@ async def search_student(
     cu: CurrentUserDep,
     student: StudentDep,
     db: DbDep,
-    q: str = Query(min_length=2, max_length=100),
+    q: Annotated[str, Query(min_length=2, max_length=100)],
 ) -> StudentSearchResults:
     term = q.strip().lower()
     now = clock.now()

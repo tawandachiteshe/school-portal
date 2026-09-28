@@ -12,6 +12,6 @@ export interface BodyUploadNotes {
      * @maxLength 200
      */
   title: string;
-  week?: number | null;
   offering_ids: string[];
+  week?: number | null;
 }
