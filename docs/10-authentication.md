@@ -150,7 +150,7 @@ The **portal writes back** to Authentik in only three cases, using a service-acc
 | **Existing student, first login** | The import pre-created the Authentik user (with `idp_user_pk` stored) and the portal `users`/`people`/`students` rows. The first login matches on `idp_subject`. |
 | **Email or name changed in Authentik** | Cached copies in `users` are refreshed on the next login or token refresh |
 | **Account disabled in Authentik** (staff leaves, suspension) | The next token refresh is rejected, so the portal session is revoked. For instant effect, an Authentik **notification rule** (event `model_updated` on users) calls the portal webhook `POST /api/internal/idp-events`, which revokes all of that user's sessions. |
-| **Logout** | The portal deletes the session and redirects to Authentik's `end-session` endpoint (RP-initiated logout), so the single sign-on session also ends |
+| **Logout** | The portal deletes its session, then the page `GET`s the `default-invalidation-flow` executor (as "Not you?" does), which ends the Authentik session too, and goes to `/`. The browser never visits Authentik's own pages |
 | **Data-subject deletion request** | The portal anonymises its rows. The DPO checklist includes deleting the Authentik user. |
 
 ## 10.6 API implementation sketch
@@ -200,13 +200,10 @@ async def callback(request: Request):
     return resp
 
 @router.post("/logout")
-async def logout(request: Request):
-    id_token = await sessions.revoke(request.cookies.get("portal_session"))
-    resp = RedirectResponse(
-        f"{settings.oidc_issuer}end-session/?id_token_hint={id_token}"
-        f"&post_logout_redirect_uri={settings.app_url}/", status_code=303)
-    resp.delete_cookie("portal_session", path="/")
-    return resp
+async def logout(request: Request, response: Response, db: DbDep) -> LogoutOut:
+    await sessions.revoke(db, request.cookies.get("portal_session"))
+    response.delete_cookie("portal_session", path="/")
+    return LogoutOut(redirect="/")  # the page ends Authentik's session through its flow API, then goes here
 ```
 
 ```python

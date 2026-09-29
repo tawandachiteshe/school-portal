@@ -36,7 +36,7 @@
           "auth"
         ],
         "summary": "Logout",
-        "description": "Ends the portal session, and Authentik's too (RP-initiated logout) when it signed the user in.",
+        "description": "Ends the portal session. The page then ends Authentik's through its flow API (the same\n`default-invalidation-flow` call as \"Not you?\") and goes home, so nobody sees Authentik's pages.",
         "operationId": "logout",
         "responses": {
           "200": {

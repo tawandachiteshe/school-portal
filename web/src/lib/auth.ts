@@ -3,6 +3,7 @@ import { logout } from '@/api/generated/auth/auth'
 import { getMeQueryKey, me as fetchMe } from '@/api/generated/me/me'
 import type { MeOut, Role } from '@/api/generated/model'
 import { ApiError } from '@/lib/api'
+import { signOutAuthentik } from '@/lib/authentik-flow'
 import { claimOfflineData, forgetOfflineData } from '@/lib/offline'
 import { markSignedIn, sessionEnded } from '@/lib/session'
 
@@ -53,6 +54,8 @@ export function useSignOut() {
   const qc = useQueryClient()
   return async () => {
     const { redirect } = await logout()
+    // Authentik's session too, through its flow API, so sign-out stays in the portal and lands home.
+    await signOutAuthentik().catch(() => undefined)
     qc.clear()
     forgetOfflineData()
     window.location.assign(redirect)

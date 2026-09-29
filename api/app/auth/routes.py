@@ -9,7 +9,6 @@ from sqlalchemy import select
 
 from app.auth import oidc, sessions, sync
 from app.config import get_settings
-from app.crypto import decrypt
 from app.db import DbDep
 from app.models import User
 
@@ -40,15 +39,11 @@ class LogoutOut(BaseModel):
 
 @router.post("/logout")
 async def logout(request: Request, response: Response, db: DbDep) -> LogoutOut:
-    """Ends the portal session, and Authentik's too (RP-initiated logout) when it signed the user in."""
-    ws = await sessions.revoke(db, request.cookies.get(sessions.COOKIE))
+    """Ends the portal session. The page then ends Authentik's through its flow API (the same
+    `default-invalidation-flow` call as "Not you?") and goes home, so nobody sees Authentik's pages."""
+    await sessions.revoke(db, request.cookies.get(sessions.COOKIE))
     response.delete_cookie(sessions.COOKIE, path="/")
-    after = f"{get_settings().app_url.rstrip('/')}/login"
-    if ws and ws.id_token_enc:
-        url = await oidc.end_session_url(decrypt(ws.id_token_enc), after)
-        if url:
-            return LogoutOut(redirect=url)
-    return LogoutOut(redirect="/login")
+    return LogoutOut(redirect="/")
 
 
 # --- OIDC with Authentik (docs/10 §10.2) --------------------------------------------------------

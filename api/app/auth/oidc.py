@@ -11,7 +11,6 @@ store is needed before sign-in.
 
 import base64
 import hashlib
-import json
 import time
 from dataclasses import dataclass
 from functools import lru_cache
@@ -61,7 +60,6 @@ class Discovery:
     authorization_endpoint: str
     token_endpoint: str
     jwks_uri: str
-    end_session_endpoint: str | None
     issuer: str
 
 
@@ -83,7 +81,6 @@ async def discovery() -> Discovery:
         authorization_endpoint=d["authorization_endpoint"],
         token_endpoint=d["token_endpoint"],
         jwks_uri=d["jwks_uri"],
-        end_session_endpoint=d.get("end_session_endpoint"),
         issuer=d["issuer"],
     )
     _discovery = (time.monotonic(), disc)
@@ -93,8 +90,8 @@ async def discovery() -> Discovery:
 def _public_headers() -> dict[str, str]:
     """Authentik builds URLs and the token issuer from the request's host and scheme. The API reaches
     it over plain http inside Docker, so say which public address the call stands for: without the
-    scheme, tokens behind an https proxy say "http://…", and Authentik's logout page then rejects
-    them as malformed (it checks the token's issuer against the https request)."""
+    scheme, tokens behind an https proxy say "http://…" while the browser sees https://…, and
+    Authentik rejects them where it compares the two (its end-session page did)."""
     public = urlsplit(get_settings().oidc_issuer)
     return {"Host": public.netloc, "X-Forwarded-Proto": public.scheme}
 
@@ -186,28 +183,3 @@ async def exchange(code: str, state: dict) -> Tokens:
         refresh_token=t.get("refresh_token"),
         expires_in=int(t.get("expires_in", 300)),
     )
-
-
-async def end_session_url(id_token: str | None, after: str) -> str | None:
-    try:
-        d = await discovery()
-    except httpx.HTTPError:
-        return None
-    if not d.end_session_endpoint:
-        return None
-    # Authentik only redirects back with a valid id_token_hint from this issuer; a token from before
-    # an address change would get its "malformed request" page. Without one, it still ends its
-    # session, then shows its own "signed out" page.
-    if not id_token or _issuer_of(id_token) != d.issuer:
-        return d.end_session_endpoint
-    q = {"post_logout_redirect_uri": after, "id_token_hint": id_token}
-    return f"{d.end_session_endpoint}?{urlencode(q)}"
-
-
-def _issuer_of(id_token: str) -> str | None:
-    """The token's `iss`, unverified: only used to decide what to send Authentik, which verifies it."""
-    try:
-        payload = id_token.split(".")[1]
-        return json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4))).get("iss")
-    except (IndexError, ValueError, AttributeError):
-        return None

@@ -23,7 +23,6 @@ DISCOVERY = Discovery(
     authorization_endpoint="http://localhost:5173/auth/application/o/authorize/",
     token_endpoint="http://localhost:5173/auth/application/o/token/",
     jwks_uri="http://localhost:5173/auth/application/o/tcfl-portal/jwks/",
-    end_session_endpoint="http://localhost:5173/auth/application/o/tcfl-portal/end-session/",
     issuer=ISSUER,
 )
 

@@ -69,7 +69,8 @@ export const getLogoutUrl = () => {
 }
 
 /**
- * Ends the portal session, and Authentik's too (RP-initiated logout) when it signed the user in.
+ * Ends the portal session. The page then ends Authentik's through its flow API (the same
+ * `default-invalidation-flow` call as "Not you?") and goes home, so nobody sees Authentik's pages.
  * @summary Logout
  */
 export const logout = async ( options?: Parameters<typeof apiFetch>[1]): Promise<LogoutOut> => {
