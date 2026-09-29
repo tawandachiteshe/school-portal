@@ -11,6 +11,7 @@ store is needed before sign-in.
 
 import base64
 import hashlib
+import json
 import time
 from dataclasses import dataclass
 from functools import lru_cache
@@ -73,7 +74,9 @@ async def discovery() -> Discovery:
         return _discovery[1]
     s = get_settings()
     async with httpx.AsyncClient(timeout=10) as c:
-        r = await c.get(_internal(f"{s.oidc_issuer}.well-known/openid-configuration"), headers=_host_header())
+        r = await c.get(
+            _internal(f"{s.oidc_issuer}.well-known/openid-configuration"), headers=_public_headers()
+        )
         r.raise_for_status()
         d = r.json()
     disc = Discovery(
@@ -87,9 +90,13 @@ async def discovery() -> Discovery:
     return disc
 
 
-def _host_header() -> dict[str, str]:
-    """Authentik builds URLs (and the issuer) from the Host header: keep the public one."""
-    return {"Host": urlsplit(get_settings().oidc_issuer).netloc}
+def _public_headers() -> dict[str, str]:
+    """Authentik builds URLs and the token issuer from the request's host and scheme. The API reaches
+    it over plain http inside Docker, so say which public address the call stands for: without the
+    scheme, tokens behind an https proxy say "http://…", and Authentik's logout page then rejects
+    them as malformed (it checks the token's issuer against the https request)."""
+    public = urlsplit(get_settings().oidc_issuer)
+    return {"Host": public.netloc, "X-Forwarded-Proto": public.scheme}
 
 
 def begin(next_path: str, shared: bool = False) -> tuple[str, str]:
@@ -132,7 +139,7 @@ def read_state(cookie: str | None) -> dict | None:
 
 @lru_cache(maxsize=4)
 def _jwks_cached(uri: str, _hour: int) -> KeySetSerialization:
-    r = httpx.get(_internal(uri), headers=_host_header(), timeout=10)
+    r = httpx.get(_internal(uri), headers=_public_headers(), timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -151,7 +158,7 @@ async def exchange(code: str, state: dict) -> Tokens:
     async with httpx.AsyncClient(timeout=15) as c:
         r = await c.post(
             _internal(d.token_endpoint),
-            headers=_host_header(),
+            headers=_public_headers(),
             data={
                 "grant_type": "authorization_code",
                 "code": code,
@@ -188,7 +195,19 @@ async def end_session_url(id_token: str | None, after: str) -> str | None:
         return None
     if not d.end_session_endpoint:
         return None
-    q = {"post_logout_redirect_uri": after}
-    if id_token:
-        q["id_token_hint"] = id_token
+    # Authentik only redirects back with a valid id_token_hint from this issuer; a token from before
+    # an address change would get its "malformed request" page. Without one, it still ends its
+    # session, then shows its own "signed out" page.
+    if not id_token or _issuer_of(id_token) != d.issuer:
+        return d.end_session_endpoint
+    q = {"post_logout_redirect_uri": after, "id_token_hint": id_token}
     return f"{d.end_session_endpoint}?{urlencode(q)}"
+
+
+def _issuer_of(id_token: str) -> str | None:
+    """The token's `iss`, unverified: only used to decide what to send Authentik, which verifies it."""
+    try:
+        payload = id_token.split(".")[1]
+        return json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4))).get("iss")
+    except (IndexError, ValueError, AttributeError):
+        return None
