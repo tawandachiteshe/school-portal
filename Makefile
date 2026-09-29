@@ -58,7 +58,7 @@ migrate: ## Apply database migrations
 seed: ## Replace everything with the sample data from the designs (development only)
 	$(API) uv run python -m app.seed
 
-accounts: ## Authentik sign-ins for the sample accounts (password tcfl-dev-2027)
+accounts: ## Authentik sign-ins for the sample accounts (password campus-dev-2027)
 	$(API) uv run python -m app.authentik_dev
 
 reset: seed accounts ## Back to the starting point: sample data and sign-ins
@@ -91,8 +91,8 @@ check: lint test ## Everything to pass before a commit
 build: ## Build the production images
 	docker compose -f docker-compose.prod.yml build
 
-prod-env: ## Make .env.production with fresh secrets: make prod-env DOMAIN=https://portal.tcfl.ac.zw
-	@test -n "$(DOMAIN)" || { echo "Give the domain: make prod-env DOMAIN=https://portal.tcfl.ac.zw"; exit 1; }
+prod-env: ## Make .env.production with fresh secrets: make prod-env DOMAIN=https://portal.example.ac.zw
+	@test -n "$(DOMAIN)" || { echo "Give the domain: make prod-env DOMAIN=https://portal.example.ac.zw"; exit 1; }
 	@test ! -f .env.production || { echo ".env.production exists: move it away first (its secrets restore backups)."; exit 1; }
 	python3 infra/new-env.py $(DOMAIN) > .env.production && chmod 600 .env.production
 	@echo "Wrote .env.production (not in git). Paste it into Dokploy's Environment tab and keep a safe copy."

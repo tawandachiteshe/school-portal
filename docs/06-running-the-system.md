@@ -43,7 +43,7 @@ Authentik lives under `/auth/` on the portal origin, not on its own subdomain, b
 ## 6.3 Local development with Docker Compose
 
 ```bash
-git clone <repo-url> telone-better-portal && cd telone-better-portal
+git clone <repo-url> school-portal && cd school-portal
 cp .env.example .env                       # edit values
 
 docker compose up -d --build
@@ -58,7 +58,7 @@ Then create the tables and buckets, load the sample data, and give every sample 
 docker compose exec api alembic upgrade head          # create tables
 docker compose exec api python -m app.storage         # create the S3 buckets
 docker compose exec api python -m app.seed            # sample data from the designs (development only; wipes the database)
-docker compose exec api python -m app.authentik_dev   # an Authentik user for each sample account, password tcfl-dev-2027
+docker compose exec api python -m app.authentik_dev   # an Authentik user for each sample account, password campus-dev-2027
 ```
 
 Open:
@@ -128,9 +128,9 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 
 [Dokploy](https://dokploy.com) runs the stack as a **Compose** application and provides TLS and routing through its built-in Traefik. There's no reverse proxy in this repo. The first release is **applications only** (landing page, sign-up, the applicant flow, Admissions and Accounts); students and staff tools follow once their data can be imported ([12](12-status-and-gaps.md)).
 
-1. **Server:** Ubuntu 24.04 with Dokploy installed, at least 4 GB RAM and 2 CPUs (Authentik, Postgres ×2, the API with Tesseract). The firewall allows 80/443, plus Dokploy's admin port from the staff network only. SSH is restricted to admin IPs or VPN. Keep it on TelOne/TCFL infrastructure or in a Zimbabwe data centre ([07](07-security-and-compliance.md)).
-2. **DNS:** point the portal's domain (for example `portal.tcfl.ac.zw`) at the server.
-3. **Environment:** on your own machine, run `python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production`. It fills [.env.production.example](../.env.production.example) with a fresh random value for every secret. Keep the file out of git and somewhere safe (a password manager): it's needed to restore backups.
+1. **Server:** Ubuntu 24.04 with Dokploy installed, at least 4 GB RAM and 2 CPUs (Authentik, Postgres ×2, the API with Tesseract). The firewall allows 80/443, plus Dokploy's admin port from the staff network only. SSH is restricted to admin IPs or VPN. Keep it on the college's infrastructure or in a Zimbabwe data centre ([07](07-security-and-compliance.md)).
+2. **DNS:** point the portal's domain (for example `portal.example.ac.zw`) at the server.
+3. **Environment:** on your own machine, run `python3 infra/new-env.py https://portal.example.ac.zw > .env.production`. It fills [.env.production.example](../.env.production.example) with a fresh random value for every secret. Keep the file out of git and somewhere safe (a password manager): it's needed to restore backups.
 4. **Create the application:** in Dokploy, **Create → Compose**, choose the git repository and branch `main`, set **Compose path** to `docker-compose.prod.yml`, and paste `.env.production` into the **Environment** tab.
 5. **Routing** is in the Traefik labels in `docker-compose.prod.yml`, from `APP_HOST` and `ID_HOST`: nothing to add in Dokploy's **Domains** tab (remove any domains added there, or Traefik gets two routes for one host). The web, api and authentik-server containers join Dokploy's `dokploy-network`.
 
@@ -158,9 +158,9 @@ Imports are idempotent (upsert on natural keys) and log a summary of created/upd
 11. **Updates:** push to `main` and click **Deploy** (or turn on auto-deploy). Settings that only Authentik reads (for example `SIGNUP_VERIFY_PHONE`, `GOOGLE_CLIENT_ID`, `AUTHENTIK_EMAIL__HOST`) need the Authentik services restarted too, so the blueprints pick them up.
 
 **A pitch or training site** (sample data, not real applicants):
-- Environment: `python3 infra/new-env.py --demo https://tcfl.example.com > .env.production`. It sets `DEMO=true` (allows the sample data on a production server), `STUDENT_PORTAL_OPEN=true`, and an Authentik admin token made on first start (`AUTHENTIK_BOOTSTRAP_TOKEN`, also used as `AUTHENTIK_API_TOKEN`).
-- Hosts: `new-env.py --demo https://tcfl.example.com id.example.com` sets `APP_HOST` and `ID_HOST`; the labels route both (step 5). The admin console is at `https://id.example.com/` (it goes to `/auth/if/admin/`). The app keeps using `/auth` on its own host, which the portal's sign-in screens need.
-- After deploying, in the `api` terminal: `python -m app.seed`, then `python -m app.authentik_dev` (every persona's password is `tcfl-dev-2027`; [11-test-personas.md](11-test-personas.md)). Run both again to reset the site after a demo.
+- Environment: `python3 infra/new-env.py --demo https://campus.example.com > .env.production`. It sets `DEMO=true` (allows the sample data on a production server), `STUDENT_PORTAL_OPEN=true`, and an Authentik admin token made on first start (`AUTHENTIK_BOOTSTRAP_TOKEN`, also used as `AUTHENTIK_API_TOKEN`).
+- Hosts: `new-env.py --demo https://campus.example.com id.example.com` sets `APP_HOST` and `ID_HOST`; the labels route both (step 5). The admin console is at `https://id.example.com/` (it goes to `/auth/if/admin/`). The app keeps using `/auth` on its own host, which the portal's sign-in screens need.
+- After deploying, in the `api` terminal: `python -m app.seed`, then `python -m app.authentik_dev` (every persona's password is `campus-dev-2027`; [11-test-personas.md](11-test-personas.md)). Run both again to reset the site after a demo.
 - The one-click sign-in page (`/login/dev`) stays off: it's never on in production.
 
 **Opening the student portal later:** import students, staff and modules (not built yet, [12](12-status-and-gaps.md)), set `STUDENT_PORTAL_OPEN=true`, and add staff to `portal-lecturers`, `portal-librarians` and `portal-student-affairs`.

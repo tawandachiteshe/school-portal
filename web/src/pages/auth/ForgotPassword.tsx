@@ -40,7 +40,7 @@ export default function ForgotPassword() {
     <>
       <h2 className={desktop ? 'text-lg leading-6 font-semibold' : 'font-semibold'}>Changed your number, or lost your phone?</h2>
       <p className="text-sm">Bring your National ID to ICT Services in Block C and they'll reset it for you.</p>
-      <p className="border-t pt-3 text-sm text-muted-foreground">Staff: use the reset link in your TCFL email, or ask ICT Services.</p>
+      <p className="border-t pt-3 text-sm text-muted-foreground">Staff: use the reset link in your college email, or ask ICT Services.</p>
     </>
   )
 
@@ -63,7 +63,7 @@ export default function ForgotPassword() {
                 for you.
               </p>
             </Alert>
-            <p className="text-sm text-muted-foreground">Staff: use the reset link in your TCFL email, or ask ICT Services.</p>
+            <p className="text-sm text-muted-foreground">Staff: use the reset link in your college email, or ask ICT Services.</p>
           </>
         )
       }

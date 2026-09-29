@@ -4,7 +4,7 @@ account. Then you choose a new password."
 Authentik's recovery flow resets by email link; students and applicants mostly use their phones, so
 the portal sends a 6-digit code by SMS, and by email too when the account has one and SMTP is set up
 (app/mail.py), then sets the new password through the Authentik admin API. Answers never say
-whether an account exists. Staff reset through ICT or their TCFL email (the design says so).
+whether an account exists. Staff reset through ICT or their college email (the design says so).
 """
 
 import logging
@@ -44,7 +44,7 @@ def _authentik() -> httpx.AsyncClient:
 
 
 def _candidates(identifier: str) -> list[str]:
-    """Usernames the identifier could be: TCFL/2027/0142 as typed, or a mobile number as 263…"""
+    """Usernames the identifier could be: CC/2027/0142 as typed, or a mobile number as 263…"""
     raw = identifier.strip()
     out = [raw.upper(), raw]
     digits = re.sub(r"\D", "", raw)
@@ -133,7 +133,8 @@ async def reset_start(body: ResetStartIn, db: DbDep) -> ResetStarted:
     if (recent or 0) >= MAX_PER_HOUR:
         raise HTTPException(429, "Too many codes. Wait an hour, or ask ICT Services, Block C.")
     code = f"{secrets.randbelow(1_000_000):06d}"
-    text = f"TCFL: your password reset code is {code}. It expires in {CODE_MINUTES} minutes."
+    college = get_settings().college_name
+    text = f"{college}: your password reset code is {code}. It expires in {CODE_MINUTES} minutes."
     # SMS and email both, where the account has them. Texts queue until an SMS provider is set up;
     # email goes only when SMTP is set up. Development logs both.
     if found.phone:

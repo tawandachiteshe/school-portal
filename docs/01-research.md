@@ -2,7 +2,7 @@
 
 ## 1.1 The problem
 
-Onboarding at TCFL today is mostly manual. It looks like this:
+Onboarding at the college today is mostly manual. It looks like this:
 
 1. Applicants bring physical copies of their ZIMSEC certificates, result slips and national ID.
 2. Admissions staff read each document and type the details into the student system. They check the entry requirements by hand.
@@ -15,7 +15,7 @@ This causes several problems:
 - **Weak fraud detection.** Forged or altered result slips are hard to spot by eye.
 - **No single place for students.** Nothing tells a student "what's due, where, and who teaches it".
 
-TCFL already runs blended and online learning ([TCFL](http://www.tcfl.ac.zw/), [Paynow blog on the TelOne e-learning portal](https://paynow.co.zw/blog/telone-e-learning-portal/)). The new portal should **integrate** with the existing LMS where one exists, not replace it on day one.
+The college already runs blended and online learning. The new portal should **integrate** with the existing LMS where one exists, not replace it on day one.
 
 ## 1.2 ZIMSEC documents
 
@@ -146,7 +146,7 @@ Step 4 is configurable (`OCR_LLM_MODE=off|fallback|always`), so the college can 
   The licence application asks what sensitive data you process, what safeguards you use, and whether data is stored outside Zimbabwe.
 - National ID numbers, academic records and photos count as personal data, so the portal must support consent, access requests, retention limits and breach notification.
 
-TCFL's parent, TelOne, probably already holds a licence. The portal's processing should be **added to TelOne/TCFL's existing registration**, and the DPO should review this design. See [07-security-and-compliance.md](07-security-and-compliance.md).
+The college (or its parent organisation) probably already holds a licence. The portal's processing should be **added to the existing registration**, and the DPO should review this design. See [07-security-and-compliance.md](07-security-and-compliance.md).
 
 ## 1.6 Stakeholders interviewed / to interview
 
@@ -175,4 +175,3 @@ TCFL's parent, TelOne, probably already holds a licence. The portal's processing
 - [Reducto: Best OCR models 2026](https://reducto.ai/guides/best-ocr-models-accuracy-speed-cost)
 - [MISA Zimbabwe: Data Protection Act requirements](https://zimbabwe.misa.org/2025/03/14/navigating-the-data-protection-act-requirements-ensuring-compliance-for-zimbabwean-data-controllers/)
 - [DLA Piper Africa: Quick-start guide to Zimbabwe's data protection regulations](https://www.dlapiperafrica.com/en/zimbabwe/insights/2024/A-Quick-Start-Guide-to-Zimbabwes-Data-Protection-Regulations)
-- [TCFL website](http://www.tcfl.ac.zw/)

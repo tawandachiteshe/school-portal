@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from app.auth.deps import CurrentUser, require_role
+from app.config import get_settings
 from app.db import DbDep
 from app.models import AskQuestion, SmsOutbox, User
 from app.services import clock
@@ -84,7 +85,8 @@ async def reply_to_question(
         db.add(
             SmsOutbox(
                 to_phone=asker_user.phone,
-                body=f"TCFL Student Affairs replied to {q.reference}. Read it in Ask Campus on the portal.",
+                body=f"{get_settings().college_name} Student Affairs replied to {q.reference}. "
+                "Read it in Ask Campus on the portal.",
                 purpose="ask_reply",
             )
         )

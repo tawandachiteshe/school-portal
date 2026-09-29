@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router'
 import { Wordmark } from '@/components/shell/wordmark'
+import { COLLEGE } from '@/lib/college'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
 
@@ -67,7 +68,7 @@ export function AuthLayout({
       <footer className="border-t">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-8 py-8 text-sm text-muted-foreground lg:px-20">
           <span>
-            <span className="font-semibold text-foreground">TelOne Centre for Learning</span> · Harare, Zimbabwe
+            <span className="font-semibold text-foreground">{COLLEGE}</span> · Harare, Zimbabwe
           </span>
           <span>Can't sign in? ICT Services, Block C.</span>
         </div>

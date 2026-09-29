@@ -13,9 +13,8 @@ from app.assistant.tools import Context, Source, Tool, run
 from app.config import get_settings
 from app.services import clock
 
-SYSTEM = """You are Ask Campus, the assistant in Campus Portal, the TelOne Centre for Learning (TCFL)
-portal in Harare.
-You answer questions from one signed-in {who} about their own studies or application and about TCFL.
+SYSTEM = """You are Ask Campus, the assistant in Campus Portal, the student portal of {college} in Harare.
+You answer questions from one signed-in {who} about their own studies or application and about {college}.
 
 How to answer:
 - Use the tools for the asker's own records (deadlines, timetable, modules, library, results, fees,
@@ -89,7 +88,11 @@ async def answer(
     d = now or clock.now()
     today = f"{d:%A} {d.day} {d:%B %Y}"
     system: list[TextBlockParam] = [
-        {"type": "text", "text": SYSTEM.format(who=who, today=today), "cache_control": {"type": "ephemeral"}}
+        {
+            "type": "text",
+            "text": SYSTEM.format(who=who, today=today, college=s.college_name),
+            "cache_control": {"type": "ephemeral"},
+        }
     ]
     schemas: list[ToolParam] = [t.schema() for t in tools]
     messages: list[MessageParam] = [*history, {"role": "user", "content": question}]

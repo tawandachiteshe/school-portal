@@ -30,7 +30,7 @@ entries:
     id: enrollment-flow
     identifiers: { slug: tcfl-enrollment }
     attrs:
-      name: TCFL applicant sign-up
+      name: Campus Portal applicant sign-up
       title: Start an application
       designation: enrollment
       authentication: require_unauthenticated
@@ -63,7 +63,7 @@ entries:
     id: authentication-flow
     identifiers: { slug: tcfl-authentication }
     attrs:
-      name: TCFL sign-in
+      name: Campus Portal sign-in
       title: Sign in
       designation: authentication
       authentication: none
@@ -192,7 +192,7 @@ entries:
     identifiers: { name: tcfl-verify-phone }
     attrs:
       provider: generic
-      from_number: TCFL
+      from_number: Campus
       account_sid: !Env [PORTAL_SMS_WEBHOOK_URL, "http://host.docker.internal:8000/internal/sms"]
       auth: !Env [SMS_WEBHOOK_SECRET, dev-sms-webhook-secret]
       auth_type: bearer
@@ -264,7 +264,7 @@ entries:
     identifiers: { slug: tcfl-source-authentication }
     conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
     attrs:
-      name: TCFL sign-in with Google
+      name: Campus Portal sign-in with Google
       title: Sign in
       designation: authentication
       authentication: require_unauthenticated
@@ -277,7 +277,7 @@ entries:
     identifiers: { slug: tcfl-source-enrollment }
     conditions: [!Env [GOOGLE_CLIENT_ID, ""]]
     attrs:
-      name: TCFL sign-up with Google
+      name: Campus Portal sign-up with Google
       title: Start an application
       designation: enrollment
       authentication: require_unauthenticated

@@ -165,7 +165,7 @@ async def _state(db: AsyncSession, a: Application) -> SubmitState:
     mobile = gw is not None
     bank = (
         BankDetails(
-            account_name=s.bank_account_name,
+            account_name=s.bank_account_name or s.college_name,
             bank=s.bank_name,
             account_number=s.bank_account_number,
             branch=s.bank_branch or None,
@@ -256,8 +256,8 @@ async def submit_application(db: AsyncSession, a: Application, payment: Applicat
             user_id=user.id,
             category="application",
             title=f"Application {a.reference} received",
-            body=f"TCFL: we've received your application {a.reference} for the {a.programme.name}. "
-            "We'll text you when there's a decision.",
+            body=f"{get_settings().college_name}: we've received your application {a.reference} "
+            f"for the {a.programme.name}. We'll text you when there's a decision.",
             link="/apply/status",
             dedupe_key=f"application:{a.id}:submitted",
         )
@@ -418,7 +418,7 @@ async def application_copy(cu: ApplicantDep, db: DbDep) -> Response:
         sitting = f"{s.level}-Level {SESSION.get(s.session, s.session)} {s.year}"
         lines.append(f"{sitting}, centre {s.centre_number}, candidate {s.candidate_number}")
         lines += [f"    {r.subject_code or '    '}  {r.subject_name}  {r.grade}" for r in s.results]
-    pdf = make_pdf("TelOne Centre for Learning: application", lines)
+    pdf = make_pdf(f"{get_settings().college_name}: application", lines)
     return Response(
         pdf,
         media_type="application/pdf",

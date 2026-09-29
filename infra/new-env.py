@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fill .env.production.example for a domain, with a fresh random value for every secret.
 
-    python3 infra/new-env.py https://portal.tcfl.ac.zw > .env.production
-    python3 infra/new-env.py --demo https://tcfl.example.com id.example.com > .env.production   # pitch site
+    python3 infra/new-env.py https://portal.example.ac.zw > .env.production
+    python3 infra/new-env.py --demo https://campus.example.com id.example.com > .env.production   # pitch site
 
 The second, optional argument is the host for Authentik's admin console (default id.<app host>).
 
@@ -26,8 +26,8 @@ origin = args[0].rstrip("/")
 app_host = origin.removeprefix("https://")
 id_host = args[1] if len(args) == 2 else f"id.{app_host}"
 text = (Path(__file__).resolve().parent.parent / ".env.production.example").read_text()
-text = text.replace("ID_HOST=id.portal.tcfl.ac.zw", f"ID_HOST={id_host}")
-text = text.replace("https://portal.tcfl.ac.zw", origin).replace("APP_HOST=portal.tcfl.ac.zw", f"APP_HOST={app_host}")
+text = text.replace("ID_HOST=id.portal.example.ac.zw", f"ID_HOST={id_host}")
+text = text.replace("https://portal.example.ac.zw", origin).replace("APP_HOST=portal.example.ac.zw", f"APP_HOST={app_host}")
 
 
 def token(n: int = 36) -> str:

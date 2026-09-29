@@ -430,7 +430,7 @@ async def offer_letter(cu: ApplicantDep, db: DbDep) -> Response:
     if o:
         lines.append(f"Please accept this offer in the portal by {o.accept_by.day} {o.accept_by:%B %Y}.")
     lines.append("Bring your original National ID and ZIMSEC certificate to registration.")
-    pdf = make_pdf("TelOne Centre for Learning: offer of a place", lines)
+    pdf = make_pdf(f"{get_settings().college_name}: offer of a place", lines)
     filename = f"Offer letter {a.reference}.pdf"
     return Response(
         pdf,

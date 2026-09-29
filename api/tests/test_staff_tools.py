@@ -49,7 +49,7 @@ async def test_only_admissions_manages_places():
 async def test_catalogue_search_counts_copies_and_loans():
     async with signed_in("schinembiri") as c:
         books = (await c.get("/staff/library/catalogue", params={"q": "forouzan"})).json()
-        by_barcode = (await c.get("/staff/library/catalogue", params={"q": "TCFL-B-003390"})).json()
+        by_barcode = (await c.get("/staff/library/catalogue", params={"q": "CC-B-003390"})).json()
     forouzan = books[0]
     assert forouzan["title"] == "Data Communications and Networking"
     assert forouzan["copies"] == 2 and forouzan["on_loan"] == 2 and forouzan["available"] == 0
@@ -57,7 +57,7 @@ async def test_catalogue_search_counts_copies_and_loans():
 
 
 async def test_librarian_adds_a_book_and_a_copy():
-    code = f"TCFL-B-9{uuid.uuid4().int % 100000:05d}"
+    code = f"CC-B-9{uuid.uuid4().int % 100000:05d}"
     async with signed_in("schinembiri") as c:
         r = await c.post(
             "/staff/library/catalogue",
@@ -102,7 +102,7 @@ async def test_reading_lists_add_and_remove_a_book():
 
 
 async def test_catalogue_is_for_librarians():
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         assert (await c.get("/staff/library/catalogue")).status_code == 403
 
 
@@ -113,9 +113,9 @@ async def test_find_a_student_by_name_or_number_and_the_view_is_audited():
     async with signed_in("tmushonga") as c:
         by_name = (await c.get("/staff/students", params={"q": "tariro moyo"})).json()
         by_number = (await c.get("/staff/students", params={"q": "0147"})).json()
-        profile = (await c.get("/staff/students/TCFL/2027/0142")).json()
-        missing = await c.get("/staff/students/TCFL/2027/9999")
-    assert [s["student_number"] for s in by_name] == ["TCFL/2027/0142"]
+        profile = (await c.get("/staff/students/CC/2027/0142")).json()
+        missing = await c.get("/staff/students/CC/2027/9999")
+    assert [s["student_number"] for s in by_name] == ["CC/2027/0142"]
     assert by_number[0]["name"] == "Thandeka Mpofu"
     assert profile["class_group"] == "DIT-1A" and profile["phone"] == "+263773184521"
     assert "Engineering Mathematics" in [ln["title"] for ln in profile["loans"]]
@@ -124,14 +124,13 @@ async def test_find_a_student_by_name_or_number_and_the_view_is_audited():
     async with get_sessionmaker()() as db:
         n = await db.scalar(
             text(
-                "SELECT count(*) FROM audit_log WHERE action = 'student.view' "
-                "AND entity_id = 'TCFL/2027/0142'"
+                "SELECT count(*) FROM audit_log WHERE action = 'student.view' AND entity_id = 'CC/2027/0142'"
             )
         )
     assert n >= 1
 
 
 async def test_lecturers_and_students_cannot_look_students_up():
-    for who in ("fchikore", "TCFL/2027/0147"):
+    for who in ("fchikore", "CC/2027/0147"):
         async with signed_in(who) as c:
             assert (await c.get("/staff/students", params={"q": "moyo"})).status_code == 403

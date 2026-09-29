@@ -92,7 +92,7 @@ function AddBook({ open, onClose }: { open: boolean; onClose: () => void }) {
               value={f.barcodes}
               onChange={set('barcodes')}
               className="rounded-sm border border-input bg-card px-3 py-2 font-mono text-sm"
-              placeholder="TCFL-B-004520"
+              placeholder="CC-B-004520"
             />
           </Field>
           <Field id={`${id}-l`} label="Where they're shelved">

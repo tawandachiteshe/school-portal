@@ -30,7 +30,7 @@ async def test_overview_matches_the_design():
 
 
 async def test_students_cannot_use_the_lecturer_api():
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         assert (await c.get("/staff/teaching/overview")).status_code == 403
 
 
@@ -90,7 +90,7 @@ async def test_upload_notes_to_two_classes():
         assert r.json()["students"] == 79 and len(r.json()["material_ids"]) == 2
         page = (await c.get(f"/staff/teaching/classes/{classes[0]['offering_id']}")).json()
         assert page["notes"][0]["title"] == "Multiplexing, part 1"
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         notes = (await c.get("/student/modules/DCN201")).json()["notes"]
         assert notes[0]["title"] == "Multiplexing, part 1"
 

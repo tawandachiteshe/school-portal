@@ -105,7 +105,7 @@ Amber rule on the dashboard/deadlines: `due - now <= 48h` and not submitted → 
 
 ## Open questions (placeholders in the designs)
 
-- Official TelOne colours (primary is a stand-in).
+- The college's official colours (primary is a stand-in).
 - Application fee amount (US$ 20.00 used), payment provider (e.g. Paynow), bank name and account number, which methods to offer.
 - Semester fees and payment options for students.
 - ZIMSEC subject codes (1122, 4004, 5009, 4021, 2248, 3159 used), programme durations and entry requirements.

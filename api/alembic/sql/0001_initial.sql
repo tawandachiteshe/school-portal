@@ -1,5 +1,5 @@
 -- =============================================================================
--- TelOne Better Portal — reference database schema
+-- Campus Portal — reference database schema
 -- PostgreSQL 16 + pgvector. The source of truth in the codebase will be the
 -- Alembic migrations in api/alembic/, generated to match this file.
 -- Design notes: docs/09-database-design.md

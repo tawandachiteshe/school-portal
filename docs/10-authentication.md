@@ -67,14 +67,14 @@ Everything below is created by the blueprint in `infra/authentik/blueprints/tcfl
 | Setting | Value |
 |---------|-------|
 | Client type | Confidential |
-| Redirect URIs | `https://portal.tcfl.ac.zw/api/auth/callback` (prod), `http://localhost:5173/api/auth/callback` (dev) |
+| Redirect URIs | `https://portal.example.ac.zw/api/auth/callback` (prod), `http://localhost:5173/api/auth/callback` (dev) |
 | Scopes | `openid`, `email`, `profile` (includes `groups`), `offline_access` |
 | Subject mode | Based on the user's **UUID**. It's stable and doesn't change if the email changes. |
 | Access token validity | 5 minutes |
 | Refresh token validity | 8 hours (staff), up to 14 days (students, via "remember me") |
 | Signing key | The default self-signed certificate (RS256) |
 
-- **Issuer:** `https://portal.tcfl.ac.zw/auth/application/o/tcfl-portal/` (dev: `http://localhost:5173/auth/application/o/tcfl-portal/`)
+- **Issuer:** `https://portal.example.ac.zw/auth/application/o/tcfl-portal/` (dev: `http://localhost:5173/auth/application/o/tcfl-portal/`)
 - **Discovery:** issuer + `.well-known/openid-configuration`
 
 **Groups → portal roles:**
@@ -123,9 +123,9 @@ Both flows are in `infra/authentik/blueprints/tcfl-flows.yaml`.
 **Password reset by SMS code (design/ForgotPassword).** Students and applicants have phones, not reliable email, so the portal does this itself:
 - `POST /api/auth/reset/start {identifier}` takes a student number, mobile number or email. It sends a 6-digit code by SMS and/or email (valid 10 minutes, at most 3 codes an hour) and always answers `{minutes: 10}`, so the page can't be used to find accounts.
 - `POST /api/auth/reset/finish {identifier, code, password}` checks the code (keyed hash, 5 tries, used once), then sets the password with the Authentik admin API (`AUTHENTIK_API_URL`, `AUTHENTIK_API_TOKEN`). Authentik's password policy errors are shown as they come.
-- Staff reset through ICT Services or their TCFL email, as the design says.
+- Staff reset through ICT Services or their college email, as the design says.
 
-**Development accounts.** `uv run python -m app.authentik_dev` (in `api/`) creates or updates an Authentik user for every seeded portal user. It sets their groups and phone and the password `tcfl-dev-2027`, and links them. Rerun it after `app.seed`, or to put back passwords changed while testing. `/login/dev` still signs in as a sample account without Authentik while `DEV_LOGIN` is on.
+**Development accounts.** `uv run python -m app.authentik_dev` (in `api/`) creates or updates an Authentik user for every seeded portal user. It sets their groups and phone and the password `campus-dev-2027`, and links them. Rerun it after `app.seed`, or to put back passwords changed while testing. `/login/dev` still signs in as a sample account without Authentik while `DEV_LOGIN` is on.
 
 ## 10.4 Two layers of authorisation
 
@@ -226,7 +226,7 @@ def require_role(*roles: Role):
 Notes:
 - **CSRF:** the session cookie is `SameSite=Lax`, and state-changing endpoints additionally require an `X-CSRF-Token` header. It's a double-submit token issued by `GET /api/auth/csrf`, and the React `lib/api.ts` wrapper sends it automatically.
 - **Internal vs. public URL in development:**
-  - The browser reaches Authentik at `http://localhost:5173/auth/` (dev) or `https://portal.tcfl.ac.zw/auth/` (prod), but the API container reaches it at `http://authentik-server:9000/auth/`.
+  - The browser reaches Authentik at `http://localhost:5173/auth/` (dev) or `https://portal.example.ac.zw/auth/` (prod), but the API container reaches it at `http://authentik-server:9000/auth/`.
   - Keep `OIDC_ISSUER` as the public URL, because it must match the token's `iss` claim.
   - Set `OIDC_INTERNAL_BASE_URL` so the API's back-channel calls (discovery, token, JWKS) are sent to the internal host.
 - **React side:**
@@ -238,7 +238,7 @@ Notes:
 `.env` additions (API):
 
 ```dotenv
-OIDC_ISSUER=http://localhost:5173/auth/application/o/tcfl-portal/   # prod: https://portal.tcfl.ac.zw/auth/application/o/tcfl-portal/
+OIDC_ISSUER=http://localhost:5173/auth/application/o/tcfl-portal/   # prod: https://portal.example.ac.zw/auth/application/o/tcfl-portal/
 OIDC_INTERNAL_BASE_URL=http://authentik-server:9000              # dev and prod: back-channel calls stay internal
 OIDC_CLIENT_ID=tcfl-portal
 OIDC_CLIENT_SECRET=change-me                                     # must match the blueprint
@@ -262,7 +262,7 @@ AUTHENTIK_EMAIL__PORT=587
 AUTHENTIK_EMAIL__USERNAME=
 AUTHENTIK_EMAIL__PASSWORD=
 AUTHENTIK_EMAIL__USE_TLS=true
-AUTHENTIK_EMAIL__FROM=Campus Portal <no-reply@tcfl.ac.zw>
+AUTHENTIK_EMAIL__FROM=Campus Portal <no-reply@example.ac.zw>
 AUTHENTIK_BOOTSTRAP_PASSWORD=change-me          # first akadmin password (dev/CI only)
 AUTHENTIK_BOOTSTRAP_TOKEN=change-me             # first API token (dev/CI only)
 ```
@@ -302,7 +302,7 @@ entries:
       invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
       redirect_uris:
         - { matching_mode: strict, url: "http://localhost:5173/api/auth/callback" }
-        - { matching_mode: strict, url: "https://portal.tcfl.ac.zw/api/auth/callback" }
+        - { matching_mode: strict, url: "https://portal.example.ac.zw/api/auth/callback" }
       sub_mode: user_uuid
       access_token_validity: minutes=5
       refresh_token_validity: days=14
@@ -317,7 +317,7 @@ entries:
     attrs:
       name: Campus Portal
       provider: !KeyOf provider
-      meta_launch_url: https://portal.tcfl.ac.zw/
+      meta_launch_url: https://portal.example.ac.zw/
 ```
 
 The flows (`tcfl-authentication`, `tcfl-enrollment`, `tcfl-recovery`, `tcfl-invitation`) live in separate blueprint files next to this one. Build them once in the Authentik admin UI, then export them (**Flows → Export**) into the repo, so they're versioned and reproducible.

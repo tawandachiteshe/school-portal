@@ -6,7 +6,7 @@ from tests.helpers import signed_in
 from tests.test_modules import storage_up
 
 pytestmark = pytest.mark.anyio
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 async def _item(c, title):

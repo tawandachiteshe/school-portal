@@ -1,10 +1,12 @@
 # Campus Portal
 
-The product is called Campus Portal (its assistant: Ask Campus). The college is still TelOne Centre for Learning
-(TCFL), and internal names keep `tcfl` (containers, Authentik slugs, cookies, student numbers like TCFL/2027/0142).
-The design files predate the rename and still say "TCFL Portal" / "Ask TCFL": use the new names.
+The product is Campus Portal (its assistant: Ask Campus). The college's name is a setting, `COLLEGE_NAME` (default
+"Campus College"; the API reads it, the web build gets it as `VITE_COLLEGE_NAME` → `src/lib/college.ts`): never
+hard-code an institution's name. Sample IDs use the prefix `CC` (student CC/2027/0142, staff CC-S-0090, books CC-B-…).
+Internal names keep `tcfl` (containers, Authentik slugs, cookies). The design files predate this and still show an
+older product name, college name and sample IDs: use the ones above.
 
-Mobile-first web app for TelOne Centre for Learning (Harare, Zimbabwe). It replaces paper-based
+Mobile-first web app for a college in Harare, Zimbabwe. It replaces paper-based
 student onboarding and gives students one place for modules, lecturers, deadlines, notes, results,
 library and announcements. Staff (admissions, lecturers, librarians, Student Affairs) use it on laptops.
 
@@ -60,7 +62,7 @@ library and announcements. Staff (admissions, lecturers, librarians, Student Aff
 
 ## Sample data
 
-Use the sample data in the design files (Tariro Moyo, TCFL/2027/0142, DIT-1A, 63-2047823 Q 29, etc.)
+Use the sample data in the design files (Tariro Moyo, CC/2027/0142, DIT-1A, 63-2047823 Q 29, etc.)
 for seeds and Storybook. Values marked `[LIKE THIS]` in the designs are unknowns — do not invent them.
 
 ## Repo layout

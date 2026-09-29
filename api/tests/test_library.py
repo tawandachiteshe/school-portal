@@ -3,7 +3,7 @@ import pytest
 from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 async def test_library_home_matches_the_design():

@@ -9,7 +9,7 @@ from app.services import clock
 from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 async def _publish(when):
@@ -111,7 +111,7 @@ async def test_fees_statement():
 async def test_card():
     async with signed_in(TARIRO) as c:
         card = (await c.get("/student/card")).json()
-    assert card["barcode"] == "TCFL20270142"
+    assert card["barcode"] == "CC20270142"
     assert card["valid_until"] == "2027-12-31"
 
 

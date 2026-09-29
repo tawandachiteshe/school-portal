@@ -35,7 +35,7 @@
 |-------|--------|-----|
 | Frontend | **React 19 + TypeScript**, built with **Vite** as a single-page app (SPA) | FastAPI is the only backend. The portal is behind a login, so SEO and server rendering add nothing. The build is plain static files served by a small nginx container behind Dokploy's Traefik, with no JS runtime in production. |
 | Frontend tooling | **Bun** (package manager + script runner), lockfile `bun.lock` | Installs are much faster than npm; one tool for install, scripts and `bunx`. Vite, shadcn CLI and Vitest all run under it. |
-| UI components | **shadcn/ui** (Radix primitives + Tailwind CSS v4), `lucide-react` icons | Accessible components (dialogs, forms, tables, tabs, toasts) whose source is copied into the repo, so we own and theme them in TCFL colours. Dark mode works out of the box. |
+| UI components | **shadcn/ui** (Radix primitives + Tailwind CSS v4), `lucide-react` icons | Accessible components (dialogs, forms, tables, tabs, toasts) whose source is copied into the repo, so we own and theme them in the college's colours. Dark mode works out of the box. |
 | Frontend libraries | React Router (routing), TanStack Query (API data and caching), React Hook Form + Zod (forms and validation, the shadcn `Form` pattern), `openapi-typescript` (types generated from FastAPI's OpenAPI schema), `vite-plugin-pwa` (installable app and offline cache) | Mobile-first, because most applicants use phones. Timetables and notes stay viewable offline once cached. |
 | API | **FastAPI** (Python 3.12), Pydantic v2, SQLAlchemy 2, Alembic | Python is where the OCR ecosystem lives; auto-generated OpenAPI docs |
 | Background jobs | **Celery** + Redis | OCR is slow (1–10 s/page); keep it off the request thread |
@@ -51,7 +51,7 @@
 ## 2.3 Repository layout (target)
 
 ```
-telone-better-portal/
+school-portal/
 ├── README.md
 ├── docs/                       # these documents
 ├── docker-compose.yml

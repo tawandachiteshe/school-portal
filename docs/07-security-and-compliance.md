@@ -1,6 +1,6 @@
 # 7. Security & Compliance
 
-> This is technical guidance, not legal advice. Have TelOne/TCFL's Data Protection Officer and legal team review it before go-live.
+> This is technical guidance, not legal advice. Have the college's Data Protection Officer and legal team review it before go-live.
 
 ## 7.1 Legal framework (Zimbabwe)
 
@@ -11,7 +11,7 @@ Sources: [MISA Zimbabwe](https://zimbabwe.misa.org/2025/03/14/navigating-the-dat
 
 ### Compliance checklist
 
-- [ ] Confirm TCFL is covered by TelOne's (or its own) data controller licence; update the declaration to include the portal's processing (ID numbers, academic records, images, chat logs).
+- [ ] Confirm the college is covered by its own (or its parent organisation's) data controller licence; update the declaration to include the portal's processing (ID numbers, academic records, images, chat logs).
 - [ ] DPO reviews this design; Data Protection Impact Assessment (DPIA) completed for OCR + AI features.
 - [ ] Privacy notice shown at sign-up, in plain English (and Shona/Ndebele), explaining: what's collected, why, who sees it, retention, third-party processors (Anthropic, SMS/email providers), rights and contact.
 - [ ] Explicit consent checkbox for document processing; separate opt-in for AI features where images/data are sent to an external processor.

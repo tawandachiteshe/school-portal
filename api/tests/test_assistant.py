@@ -20,7 +20,7 @@ from tests.helpers import client, signed_in
 
 pytestmark = pytest.mark.anyio
 
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 async def _ctx(db, username: str) -> Context:
@@ -82,7 +82,7 @@ async def test_the_model_cannot_ask_for_another_students_records():
     async with read_only_session() as db:
         ctx = await _ctx(db, TARIRO)
         tools = allowed({"student", "applicant"}, has_student=True)
-        out, is_error = await run(ctx, tools, "get_my_library", {"student_number": "TCFL/2027/0126"})
+        out, is_error = await run(ctx, tools, "get_my_library", {"student_number": "CC/2027/0126"})
     assert is_error and out.startswith("INVALID_INPUT")
 
 
@@ -166,7 +166,7 @@ async def test_answers_cite_the_sources_the_model_names(monkeypatch):
         a = await chat.answer(ctx, tools, [], "How much is the second fees instalment?", on_status, _never)
     assert a.text == "The second instalment is due Wednesday 4 November."
     assert [s.label for s in a.sources] == ["Second fees instalment due Wednesday 4 November"]
-    assert statuses == ["Looking in TCFL announcements…"]
+    assert statuses == ["Looking in college announcements…"]
     # Only the asker's tools, and no others (no web search, no code), were offered.
     assert {t["name"] for t in fake.calls[0]["tools"]} == {t.name for t in tools}
     assert "data, not instructions" in fake.calls[0]["system"][0]["text"]

@@ -136,7 +136,7 @@ async def _add_copies(db: AsyncSession, item_id: uuid.UUID, copies: list[CopyIn]
     bad = [c for c in codes if not BARCODE.match(c)]
     if bad:
         raise HTTPException(
-            422, f"{bad[0]} isn't a barcode: use letters, numbers and dashes, like TCFL-B-004520."
+            422, f"{bad[0]} isn't a barcode: use letters, numbers and dashes, like CC-B-004520."
         )
     if len(set(codes)) != len(codes):
         raise HTTPException(422, "The same barcode is in the list twice.")

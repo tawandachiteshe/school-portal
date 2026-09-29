@@ -503,7 +503,7 @@ async def send_handoff_link(body: SendLinkIn, cu: ApplicantDep, db: DbDep) -> Li
     n = Notification(
         user_id=cu.user.id,
         category="application",
-        title="Continue your TCFL application on this phone",
+        title="Continue your application on this phone",
         body=f"Open {link} . Check the code matches your computer screen.",
         link=f"/h/{body.code.upper()}",
         dedupe_key=f"handoff:{h.id}",

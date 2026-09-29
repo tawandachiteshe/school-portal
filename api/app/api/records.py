@@ -224,10 +224,11 @@ async def timetable_ics(student: StudentDep, db: DbDep) -> Response:
             "END:VEVENT",
         ]
     lines.append("END:VCALENDAR")
+    name = f"{get_settings().college_name} timetable {term.name}.ics"
     return Response(
         "\r\n".join(lines) + "\r\n",
         media_type="text/calendar",
-        headers={"Content-Disposition": f'attachment; filename="TCFL timetable {term.name}.ics"'},
+        headers={"Content-Disposition": f'attachment; filename="{name}"'},
     )
 
 
@@ -344,7 +345,8 @@ async def results_slip(term_code: str, student: StudentDep, db: DbDep) -> Respon
         lines.append(f"{m.module_code}  {m.module_name}   Coursework {cw} · Exam {ex}   {fin}  {verdict}")
     lines += ["", t.notice]
     pdf = make_pdf(f"Results · {t.term_name}", lines)
-    name = f"TCFL results {t.term_name} {student.student_number.replace('/', '-')}.pdf"
+    number = student.student_number.replace("/", "-")
+    name = f"{get_settings().college_name} results {t.term_name} {number}.pdf"
     return Response(
         pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'}
     )
@@ -469,7 +471,7 @@ async def fee_statement(student: StudentDep, db: DbDep) -> Response:
         lines.append(f"{x.occurred_on:%d %b %Y}  {x.description}{ref}   {x.amount:,.2f}")
     lines += ["", f"Balance: US$ {f.balance:,.2f}", "All amounts in US dollars."]
     pdf = make_pdf(f"Fees statement · {f.term_name or ''}", lines)
-    name = f"TCFL fees statement {student.student_number.replace('/', '-')}.pdf"
+    name = f"{get_settings().college_name} fees statement {student.student_number.replace('/', '-')}.pdf"
     return Response(
         pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'}
     )
@@ -481,7 +483,7 @@ async def fee_statement(student: StudentDep, db: DbDep) -> Response:
 class Card(BaseModel):
     name: str
     student_number: str
-    barcode: str  # Code 128 payload, e.g. TCFL20270142
+    barcode: str  # Code 128 payload, e.g. CC20270142
     programme_name: str
     class_group: str | None
     valid_until: date

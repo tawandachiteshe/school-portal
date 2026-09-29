@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
 
   web:
-    build: { context: ./web, target: prod }
+    build: { context: ./web, target: prod, args: { VITE_COLLEGE_NAME: "${COLLEGE_NAME:-Campus College}" } }
     restart: unless-stopped
     networks: [default, dokploy-network]
     labels:

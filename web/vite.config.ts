@@ -16,7 +16,7 @@ export default defineConfig({
       manifest: {
         name: 'Campus Portal',
         short_name: 'Campus',
-        description: 'TelOne Centre for Learning student portal',
+        description: `${process.env.VITE_COLLEGE_NAME || 'Campus College'} student portal`,
         theme_color: '#FAF9F7',
         background_color: '#FAF9F7',
         display: 'standalone',

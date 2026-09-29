@@ -12,6 +12,7 @@ import { ApplyShell } from '@/components/shell/apply-shell'
 import type { MyApplication } from '@/api/generated/model'
 import { getMyApplicationQueryKey, useMyApplication, useWithdraw } from '@/api/generated/apply/apply'
 import { errorMessage } from '@/lib/api'
+import { COLLEGE } from '@/lib/college'
 import { dayDateTimeWithYear, dayDateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
@@ -226,7 +227,7 @@ export default function Status() {
         <DialogContent className="max-w-[440px]">
           <DialogTitle>Withdraw your application?</DialogTitle>
           <DialogDescription>
-            Admissions stops reviewing it. To study at TCFL later, you'd need to apply again.
+            Admissions stops reviewing it. To study at {COLLEGE} later, you'd need to apply again.
           </DialogDescription>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirm(false)}>

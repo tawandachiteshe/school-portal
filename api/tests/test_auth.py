@@ -13,18 +13,18 @@ async def test_me_requires_a_session():
 async def test_state_changing_requests_need_the_csrf_header():
     async with client() as c:
         await c.get("/healthz")
-        r = await c.post("/auth/dev-login", json={"username": "TCFL/2027/0142"})
+        r = await c.post("/auth/dev-login", json={"username": "CC/2027/0142"})
         assert r.status_code == 403
 
 
 async def test_student_me():
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         me = (await c.get("/me")).json()
     assert me["display_name"] == "Tariro Moyo"
     assert me["initials"] == "TM"
     assert me["roles"] == ["applicant", "student"]  # her application is still on record
     assert me["student"] == {
-        "student_number": "TCFL/2027/0142",
+        "student_number": "CC/2027/0142",
         "programme_code": "DIT",
         "programme_name": "Diploma in Information Technology",
         "class_group": "DIT-1A",
@@ -54,11 +54,11 @@ async def test_dev_accounts_lists_seeded_users():
     async with client() as c:
         accounts = (await c.get("/auth/dev-accounts")).json()
     names = {a["username"] for a in accounts}
-    assert {"TCFL/2027/0142", "fchikore", "cmarufu", "schinembiri", "tmushonga"} <= names
+    assert {"CC/2027/0142", "fchikore", "cmarufu", "schinembiri", "tmushonga"} <= names
 
 
 async def test_me_includes_the_current_term_week():
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         term = (await c.get("/me")).json()["term"]
     assert term["name"] == "Semester 1 2027"
     assert term["week"] == 6
@@ -66,7 +66,7 @@ async def test_me_includes_the_current_term_week():
 
 
 async def test_sms_reminders_setting_round_trips():
-    async with signed_in("TCFL/2027/0142") as c:
+    async with signed_in("CC/2027/0142") as c:
         assert (await c.get("/me/settings")).json() == {"sms_reminders": True}
         assert (await c.patch("/me/settings", json={"sms_reminders": False})).json() == {
             "sms_reminders": False

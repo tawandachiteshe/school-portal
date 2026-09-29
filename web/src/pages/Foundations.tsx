@@ -107,7 +107,7 @@ export default function Foundations() {
         <h2 className="text-lg font-semibold">Identifiers</h2>
         <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 [&_dd]:font-mono [&_dt]:text-muted-foreground">
           <dt>Student no.</dt>
-          <dd>TCFL/2027/0142</dd>
+          <dd>CC/2027/0142</dd>
           <dt>Class group</dt>
           <dd>DIT-1A</dd>
           <dt>Module</dt>

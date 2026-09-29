@@ -5,7 +5,7 @@ from app.config import get_settings
 from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 def storage_up() -> bool:

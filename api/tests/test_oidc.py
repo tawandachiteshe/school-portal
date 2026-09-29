@@ -201,7 +201,7 @@ async def test_sms_webhook_queues_the_text():
     async with client() as c:
         r = await c.post(
             "/internal/sms",
-            json={"From": "TCFL", "To": "263771234567", "Body": "Your code is 123456"},
+            json={"From": "Campus", "To": "263771234567", "Body": "Your code is 123456"},
             headers={"Authorization": f"Bearer {secret}"},
         )
     assert r.status_code == 200 and r.json() == {"queued": True}

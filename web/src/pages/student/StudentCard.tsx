@@ -7,6 +7,7 @@ import { TextLink } from '@/components/student/section'
 import type { Card } from '@/api/generated/model'
 import { getStudentCardQueryKey, studentCard } from '@/api/generated/records/records'
 import { code128 } from '@/lib/code128'
+import { COLLEGE } from '@/lib/college'
 import { dateWithYear, onDay } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { DeskPage, deskH1 } from '@/components/shell/student-desktop'
@@ -56,8 +57,7 @@ export default function StudentCard() {
           >
             <div className="flex items-center justify-between bg-[#0B4A8B] px-4 py-3 text-white">
               <span className="flex items-baseline gap-1.5">
-                <span className="font-bold tracking-[0.02em]">TCFL</span>
-                <span className="opacity-85">TelOne Centre for Learning</span>
+                <span className="font-bold tracking-[0.02em]">{COLLEGE}</span>
               </span>
               <span className="text-xs font-semibold tracking-[0.06em]">STUDENT</span>
             </div>

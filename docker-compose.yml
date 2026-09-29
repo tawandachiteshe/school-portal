@@ -54,6 +54,7 @@ services:
     build: { context: ./web, target: dev }
     environment:
       API_PROXY_TARGET: http://api:8000
+      VITE_COLLEGE_NAME: ${COLLEGE_NAME:-Campus College}
       AUTH_PROXY_TARGET: http://authentik-server:9000
     command: bun run dev --host 0.0.0.0
     volumes: ["./web:/app", "/app/node_modules"]

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Wordmark } from '@/components/shell/wordmark'
 import { usePublicHome } from '@/api/generated/public/public'
 import type { PublicHome } from '@/api/generated/model'
+import { COLLEGE } from '@/lib/college'
 import { longDateWithYear, onDay, time } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
@@ -225,7 +226,7 @@ export default function Landing() {
           <section className={cn(section, 'grid items-start gap-20 md:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:pt-20 md:pb-[72px]')}>
             <div className="flex flex-col gap-4 md:gap-6 md:pt-6">
               <p className="text-xs leading-4 font-semibold tracking-[0.06em] text-muted-foreground uppercase">
-                TelOne Centre for Learning · Harare
+                {COLLEGE} · Harare
               </p>
               <h1 className="max-w-[640px] text-[30px] leading-[38px] font-semibold tracking-[-0.015em] text-balance md:text-5xl md:leading-[56px] md:tracking-[-0.02em]">
                 Apply, study and keep up with college in one place.
@@ -378,7 +379,7 @@ export default function Landing() {
       <footer className="border-t">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 pt-6 pb-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8 md:py-8 lg:px-20">
           <span>
-            <span className="font-semibold text-foreground">TelOne Centre for Learning</span> · Harare, Zimbabwe
+            <span className="font-semibold text-foreground">{COLLEGE}</span> · Harare, Zimbabwe
           </span>
           <Link to="/login" className="underline-offset-2 hover:underline">
             Staff sign in

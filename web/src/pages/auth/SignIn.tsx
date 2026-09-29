@@ -17,6 +17,7 @@ import {
   generalError,
   startFlow,
 } from '@/lib/authentik-flow'
+import { COLLEGE } from '@/lib/college'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { AUTH_DESKTOP, AuthHeading, AuthLayout, Checklist } from './AuthLayout'
 import { GoogleSignIn } from './GoogleSignIn'
@@ -176,7 +177,7 @@ export default function SignIn() {
   const apply = (
     <section aria-labelledby="h-new" className="flex flex-col items-start gap-2 border-t pt-6">
       <h2 id="h-new" className="font-semibold">
-        Applying to TCFL?
+        Applying to {COLLEGE}?
       </h2>
       <p className="text-sm text-muted-foreground">Create an account with your mobile number. Have your National ID and ZIMSEC results with you.</p>
       <Button variant="outline" className="mt-2" asChild>
@@ -208,7 +209,7 @@ export default function SignIn() {
         </>
       }
     >
-      <AuthHeading eyebrow="TelOne Centre for Learning" title="Sign in" lead="Students, applicants and staff all sign in here." />
+      <AuthHeading eyebrow={COLLEGE} title="Sign in" lead="Students, applicants and staff all sign in here." />
       {signedIn || ((challenge || down) && form)}
       {!already && (challenge || down) && <GoogleSignIn next={next} />}
       {devLink}

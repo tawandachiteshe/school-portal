@@ -1,6 +1,6 @@
 # Campus Portal
 
-A modern student onboarding and student-life portal for TelOne Centre for Learning (TCFL).
+A modern student onboarding and student-life portal for a college. Its name is a setting (`COLLEGE_NAME`).
 
 It replaces the manual, paper-heavy onboarding process with:
 

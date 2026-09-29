@@ -21,6 +21,7 @@ import {
 } from '@/api/generated/apply-submit/apply-submit'
 import { errorMessage } from '@/lib/api'
 import { useSignOut } from '@/lib/auth'
+import { COLLEGE } from '@/lib/college'
 import { dayDateTimeWithYear } from '@/lib/format'
 import { useIsDesktop } from '@/lib/use-desktop'
 import { cn } from '@/lib/utils'
@@ -139,7 +140,7 @@ export function Submit() {
             {checked && <Check className="size-4" strokeWidth={2.5} />}
           </span>
           <span>
-            I confirm that the information and documents in this application are true and are mine. I understand TCFL may
+            I confirm that the information and documents in this application are true and are mine. I understand {COLLEGE} may
             check my results with ZIMSEC and cancel an offer if anything is false.
           </span>
         </label>
@@ -178,7 +179,7 @@ function Waiting({ s, onResend, onOther }: { s: SubmitState; onResend: () => voi
         <h1 className="text-2xl leading-8 font-semibold">Approve the payment on your phone</h1>
         <p>
           {LABEL[p.method]} has sent a prompt to <span className="font-mono font-semibold whitespace-nowrap">{p.phone_masked}</span>.
-          Enter your PIN there to pay <span className="font-semibold">US$ {p.amount}</span> to TelOne Centre for Learning.
+          Enter your PIN there to pay <span className="font-semibold">US$ {p.amount}</span> to {COLLEGE}.
         </p>
       </div>
       <dl className="border-y text-sm [&>div+div]:border-t">
@@ -512,7 +513,7 @@ export function Pay() {
           {mobile ? `Pay US$ ${s.fee} with ${LABEL[pick]}` : 'Continue'}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
-          {s.provider ? `Mobile payments are processed by ${s.provider}. ` : ''}TCFL never asks for your PIN.
+          {s.provider ? `Mobile payments are processed by ${s.provider}. ` : ''}{COLLEGE} never asks for your PIN.
         </p>
       </div>
     </Frame>

@@ -771,7 +771,7 @@ async def send_message(reference: str, body: MessageIn, cu: OfficerDep, db: DbDe
     if not (a.person.user and a.person.user.phone):
         raise HTTPException(409, "This applicant has no phone number.")
     queued = _notify(
-        db, a, "Message from TCFL Admissions", body.text.strip(), True, f"admissions-sms:{uuid.uuid4()}"
+        db, a, "Message from Admissions", body.text.strip(), True, f"admissions-sms:{uuid.uuid4()}"
     )
     _event(db, a, cu, "message", f"SMS sent: “{body.text.strip()}”", visible_to_applicant=True)
     await db.commit()
@@ -816,7 +816,7 @@ async def decide(
     title = {
         Decision.offer: f"You've been offered a place on the {a.programme.name}",
         Decision.decline: f"Your application for the {a.programme.name} was not successful",
-        Decision.ask: "TCFL Admissions needs more information for your application",
+        Decision.ask: "Admissions needs more information for your application",
     }[body.decision]
     _notify(db, a, title, message, True, f"application:{a.id}:{to}:{now:%Y%m%d%H%M%S}")
     await audit.record(db, cu, request, "application.decide", "application", a.reference, {"status": to})

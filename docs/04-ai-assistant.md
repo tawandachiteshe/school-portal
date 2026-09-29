@@ -44,7 +44,7 @@ from app.assistant.tools import TOOLS, run_tool, ToolInputError
 
 client = anthropic.AsyncAnthropic()
 
-SYSTEM = """You are "Ask Campus", the student assistant for TelOne Centre for Learning.
+SYSTEM = """You are "Ask Campus", the student assistant for {college}.
 You help the signed-in user with their modules, lecturers, timetable, tests, assignments,
 results, notes, library and college announcements.
 - Use the tools for anything about the user's own records; use the <context> documents for

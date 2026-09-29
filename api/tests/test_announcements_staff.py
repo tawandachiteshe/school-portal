@@ -10,7 +10,7 @@ from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
 AFFAIRS = "tmushonga"
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 @pytest.fixture(scope="module")
@@ -76,14 +76,16 @@ async def test_options_and_reach():
 async def test_draft_is_hidden_until_published_then_notifies_the_audience():
     async with signed_in(AFFAIRS) as c:
         d = (
-            await c.post("/staff/announcements", json=draft(sms_text="TCFL: Year 1 briefing Tue 14:00, B2."))
+            await c.post(
+                "/staff/announcements", json=draft(sms_text="Campus: Year 1 briefing Tue 14:00, B2.")
+            )
         ).json()
         assert d["status"] == "draft" and d["audience"]["groups"] == [{"programme_id": None, "year": 1}]
     assert draft()["title"] not in await _student_titles(TARIRO)
 
     async with signed_in(AFFAIRS) as c:
         p = await c.put(
-            f"/staff/announcements/{d['id']}", json=draft(action="publish", sms_text="TCFL: Year 1.")
+            f"/staff/announcements/{d['id']}", json=draft(action="publish", sms_text="Campus: Year 1.")
         )
         assert p.status_code == 200 and p.json()["status"] == "published"
         listed = next(a for a in (await c.get("/staff/announcements")).json() if a["id"] == d["id"])

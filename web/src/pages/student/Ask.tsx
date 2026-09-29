@@ -80,7 +80,7 @@ export default function Ask() {
           What do you need to know?
         </h1>
         <p className="text-muted-foreground">
-          Ask about fees, timetables, tests, the library or college rules. Answers come from TCFL documents and your own timetable, and show
+          Ask about fees, timetables, tests, the library or college rules. Answers come from college documents and your own timetable, and show
           where they came from.
         </p>
       </div>

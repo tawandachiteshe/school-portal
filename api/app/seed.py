@@ -122,9 +122,11 @@ class Seeder:
         self, username: str, number: str, title: str | None, first: str, surname: str, roles, **kw
     ) -> Staff:
         person = self.user(
-            username, surname=surname, first_names=first, roles=roles, email=f"{username}@tcfl.ac.zw"
+            username, surname=surname, first_names=first, roles=roles, email=f"{username}@example.ac.zw"
         )
-        s = Staff(person=person, staff_number=number, title=title, work_email=f"{username}@tcfl.ac.zw", **kw)
+        s = Staff(
+            person=person, staff_number=number, title=title, work_email=f"{username}@example.ac.zw", **kw
+        )
         self.db.add(s)
         return s
 
@@ -184,7 +186,7 @@ class Seeder:
 
         chikore = self.staff(
             "fchikore",
-            "TCFL-S-0231",
+            "CC-S-0231",
             "Eng.",
             "Fungai",
             "Chikore",
@@ -195,7 +197,7 @@ class Seeder:
         )
         ncube = self.staff(
             "sncube",
-            "TCFL-S-0112",
+            "CC-S-0112",
             "Dr",
             "Sipho",
             "Ncube",
@@ -205,7 +207,7 @@ class Seeder:
         )
         ndlovu = self.staff(
             "rndlovu",
-            "TCFL-S-0178",
+            "CC-S-0178",
             "Mrs",
             "Rumbidzai",
             "Ndlovu",
@@ -215,7 +217,7 @@ class Seeder:
         )
         mutasa = self.staff(
             "tmutasa",
-            "TCFL-S-0204",
+            "CC-S-0204",
             "Mr",
             "Tendai",
             "Mutasa",
@@ -224,11 +226,11 @@ class Seeder:
             position="Lecturer · Programming",
         )
         marufu = self.staff(
-            "cmarufu", "TCFL-S-0090", None, "Chipo", "Marufu", ["admissions"], position="Admissions officer"
+            "cmarufu", "CC-S-0090", None, "Chipo", "Marufu", ["admissions"], position="Admissions officer"
         )
         self.staff(
             "schinembiri",
-            "TCFL-S-0145",
+            "CC-S-0145",
             None,
             "Shamiso",
             "Chinembiri",
@@ -238,11 +240,11 @@ class Seeder:
         )
         # Accounts: confirms bank and cash application fees. Not in the designs; a placeholder name.
         self.staff(
-            "nmapfumo", "TCFL-S-0104", None, "Nyasha", "Mapfumo", ["accounts"], position="Accounts officer"
+            "nmapfumo", "CC-S-0104", None, "Nyasha", "Mapfumo", ["accounts"], position="Accounts officer"
         )
         mushonga = self.staff(
             "tmushonga",
-            "TCFL-S-0066",
+            "CC-S-0066",
             None,
             "Takudzwa",
             "Mushonga",
@@ -265,19 +267,19 @@ class Seeder:
         self.dte_dcn = dte_dcn
 
         tariro = self.user(
-            "TCFL/2027/0142",
+            "CC/2027/0142",
             surname="Moyo",
             first_names="Tariro",
             # Still an applicant too: her application is in review (design/Status, StaffReview).
             roles=["student", "applicant"],
             phone="+263773184521",
-            email="tariro.moyo@students.tcfl.ac.zw",
+            email="tariro.moyo@students.example.ac.zw",
             gender="female",
             date_of_birth=date(2006, 5, 14),
         )
         student = Student(
             person=tariro,
-            student_number="TCFL/2027/0142",
+            student_number="CC/2027/0142",
             programme=dit,
             intake=intake,
             current_term_number=1,
@@ -407,7 +409,7 @@ class Seeder:
 
     # Classmates who are also test personas (docs: Campus Portal test personas) can sign in: Thandeka is
     # Tariro's classmate, to check one student never sees another's records.
-    PERSONA_CLASSMATES = {"TCFL/2027/0147": "+263772100147"}
+    PERSONA_CLASSMATES = {"CC/2027/0147": "+263772100147"}
 
     def person_user(self, number: str, surname: str, first: str) -> Person:
         # Other classmates have portal records but no sign-in (no username).
@@ -429,8 +431,8 @@ class Seeder:
         dit_students, dte_students = [], []
         for n, surname, first in self.DIT_NAMES:
             st = Student(
-                person=self.person_user(f"TCFL/2027/{n}", surname, first),
-                student_number=f"TCFL/2027/{n}",
+                person=self.person_user(f"CC/2027/{n}", surname, first),
+                student_number=f"CC/2027/{n}",
                 programme=dit,
                 intake=intake,
                 class_group="DIT-1A",
@@ -438,7 +440,7 @@ class Seeder:
             self.db.add(st)
             dit_students.append(st)
         for i, surname in enumerate(self.DTE_SURNAMES):
-            n = f"TCFL/2027/{201 + i * 3:04d}"
+            n = f"CC/2027/{201 + i * 3:04d}"
             st = Student(
                 person=self.person_user(n, surname, self.DTE_FIRST[i % len(self.DTE_FIRST)]),
                 student_number=n,
@@ -485,8 +487,8 @@ class Seeder:
         # design/LibraryOverdue: two second-years with long-overdue books (reminded by SMS a week ago).
         year2 = []
         for number, surname, first, programme, group, phone in (
-            ("TCFL/2026/0388", "Gumbo", "Tapiwa", dte, "DTE-2A", "+263772210388"),
-            ("TCFL/2026/0214", "Chikwanha", "Blessing", dit, "DIT-2B", "+263712660214"),
+            ("CC/2026/0388", "Gumbo", "Tapiwa", dte, "DTE-2A", "+263772210388"),
+            ("CC/2026/0214", "Chikwanha", "Blessing", dit, "DIT-2B", "+263712660214"),
         ):
             p = self.person_user(number, surname, first)
             user_of(p).phone = phone
@@ -503,7 +505,7 @@ class Seeder:
         await self.db.flush()
         by_number = {st.student_number: st.person for st in [*dit_students, *dte_students, *year2]}
         for copy, number, days in self.pending_loans:
-            reminded = number.startswith("TCFL/2026")
+            reminded = number.startswith("CC/2026")
             self.db.add(
                 LibraryLoan(
                     copy=copy,
@@ -930,7 +932,7 @@ class Seeder:
             "7th edition",
             2013,
             "510 STR",
-            {"TCFL-B-001873": "tariro", "TCFL-B-001874": "late:TCFL/2027/0130:2"},
+            {"CC-B-001873": "tariro", "CC-B-001874": "late:CC/2027/0130:2"},
         ),
         (
             "forouzan",
@@ -939,7 +941,7 @@ class Seeder:
             "5th edition",
             2012,
             "004.6 FOR",
-            {"TCFL-B-003390": "tariro", "TCFL-B-003391": "late:TCFL/2027/0147:1"},
+            {"CC-B-003390": "tariro", "CC-B-003391": "late:CC/2027/0147:1"},
         ),
         (
             "tanenbaum",
@@ -948,7 +950,7 @@ class Seeder:
             "5th edition",
             2011,
             "004.6 TAN",
-            {"TCFL-B-004512": "held", "TCFL-B-002215": "late:TCFL/2027/0126:6"},
+            {"CC-B-004512": "held", "CC-B-002215": "late:CC/2027/0126:6"},
         ),
         (
             "stallings",
@@ -957,7 +959,7 @@ class Seeder:
             "10th edition",
             2013,
             "004.6 STA",
-            {"TCFL-B-003512": None, "TCFL-B-003513": "other"},
+            {"CC-B-003512": None, "CC-B-003513": "other"},
         ),
         (
             "tomasi",
@@ -966,7 +968,7 @@ class Seeder:
             "5th edition",
             2003,
             "621.382 TOM",
-            {"TCFL-B-002877": None},
+            {"CC-B-002877": None},
         ),
         (
             "frenzel",
@@ -975,7 +977,7 @@ class Seeder:
             "4th edition",
             2015,
             "621.382 FRE",
-            {"TCFL-B-003104": "other"},
+            {"CC-B-003104": "other"},
         ),
         (
             "kurose",
@@ -984,7 +986,7 @@ class Seeder:
             "7th edition",
             2016,
             "004.6 KUR",
-            {"TCFL-B-003655": "other", "TCFL-B-003656": "other"},
+            {"CC-B-003655": "other", "CC-B-003656": "other"},
         ),
         (
             "odom",
@@ -993,7 +995,7 @@ class Seeder:
             None,
             2019,
             "004.6 ODO",
-            {"TCFL-B-003801": "other"},
+            {"CC-B-003801": "other"},
         ),
         (
             "kr",
@@ -1002,7 +1004,7 @@ class Seeder:
             "2nd edition",
             1988,
             "005.133 KER",
-            {"TCFL-B-001220": None, "TCFL-B-001221": None},
+            {"CC-B-001220": None, "CC-B-001221": None},
         ),
         (
             "king",
@@ -1011,7 +1013,7 @@ class Seeder:
             "2nd edition",
             2008,
             "005.133 KIN",
-            {"TCFL-B-001340": None},
+            {"CC-B-001340": None},
         ),
         (
             "bird",
@@ -1020,7 +1022,7 @@ class Seeder:
             "8th edition",
             2017,
             "510 BIR",
-            {"TCFL-B-001902": None, "TCFL-B-001903": "other"},
+            {"CC-B-001902": None, "CC-B-001903": "other"},
         ),
         # design/LibraryOverdue: books out with other students
         (
@@ -1030,7 +1032,7 @@ class Seeder:
             "4th edition",
             2014,
             "005.133 KOC",
-            {"TCFL-B-001410": "late:TCFL/2027/0111:8"},
+            {"CC-B-001410": "late:CC/2027/0111:8"},
         ),
         (
             "floyd",
@@ -1039,7 +1041,7 @@ class Seeder:
             "11th edition",
             2015,
             "621.381 FLO",
-            {"TCFL-B-002630": "late:TCFL/2026/0388:17"},
+            {"CC-B-002630": "late:CC/2026/0388:17"},
         ),
         (
             "connolly",
@@ -1048,7 +1050,7 @@ class Seeder:
             "6th edition",
             2014,
             "005.74 CON",
-            {"TCFL-B-003020": "late:TCFL/2026/0214:14"},
+            {"CC-B-003020": "late:CC/2026/0214:14"},
         ),
         (
             "stroud-adv",
@@ -1057,7 +1059,7 @@ class Seeder:
             "5th edition",
             2011,
             "510 STR",
-            {"TCFL-B-001880": "other"},
+            {"CC-B-001880": "other"},
         ),
     ]
     READING_LISTS = {

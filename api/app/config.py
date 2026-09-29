@@ -32,13 +32,16 @@ class Settings(BaseSettings):
     # and resets passwords after an SMS code. Development: the bootstrap token works.
     authentik_api_url: str = "http://localhost:9000/auth/api/v3/"
     authentik_api_token: str = ""
-    authentik_dev_password: str = "tcfl-dev-2027"  # app/authentik_dev.py
+    authentik_dev_password: str = "campus-dev-2027"  # app/authentik_dev.py
     # Portal email (password reset codes). Empty host: nothing is sent; development logs the text.
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    smtp_from: str = "Campus Portal <portal@tcfl.ac.zw>"
+    smtp_from: str = "Campus Portal <portal@example.ac.zw>"
+    # The institution, where copy names it: SMS, PDFs, file names, the assistant. The web build reads
+    # the same variable (VITE_COLLEGE_NAME in docker-compose).
+    college_name: str = "Campus College"
     smtp_use_tls: bool = True
     # Set for Authentik's Google source too (infra/authentik/blueprints/tcfl-flows.yaml): shows
     # "Continue with Google" on sign-in and sign-up.
@@ -82,7 +85,7 @@ class Settings(BaseSettings):
     payment_provider: str = ""
     payment_prompt_seconds: int = 60  # design/PayWaiting "Prompt expires in 0:48"
     # design/PayOffice: unknowns until Accounts confirm them; bank transfer is offered once set.
-    bank_account_name: str = "TelOne Centre for Learning"
+    bank_account_name: str = ""  # empty: the college name
     bank_name: str = ""
     bank_account_number: str = ""
     bank_branch: str = ""

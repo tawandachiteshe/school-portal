@@ -3,7 +3,7 @@ tried with them. Run after `python -m app.seed`:
 
     uv run python -m app.authentik_dev
 
-Every account gets the password in AUTHENTIK_DEV_PASSWORD (default tcfl-dev-2027). The portal user
+Every account gets the password in AUTHENTIK_DEV_PASSWORD (default campus-dev-2027). The portal user
 is linked to the Authentik user (idp_subject, idp_user_pk), so signing in lands on the same data.
 """
 

@@ -29,7 +29,7 @@ Permissions are checked in the API (not only hidden in the UI). Lecturers only s
 
 Applicants often start on a laptop or a lab computer, but a phone camera is far better for scanning documents. At any point in the wizard, especially on the ID and ZIMSEC steps, the applicant can choose **Continue on your phone**:
 
-1. The desktop shows a **QR code**, a short link (`portal.tcfl.ac.zw/h/K7Q2-9MXD`), and a **"Send link to my phone"** option by SMS to their verified number, or by email.
+1. The desktop shows a **QR code**, a short link (`portal.example.ac.zw/h/K7Q2-9MXD`), and a **"Send link to my phone"** option by SMS to their verified number, or by email.
 2. The phone opens the link and goes **straight to the same step**, with no second login (see [10 §10.10](10-authentication.md#1010-desktop-to-phone-handoff)). Both screens show the same **4-character match code**, so the applicant can confirm they're pairing their own phone.
 3. The desktop switches to a **waiting view** ("Phone connected: Android · Chrome") and updates live as each document is uploaded: "National ID received ✓, reading…". Extracted fields appear on **both** screens.
 4. The applicant can finish on either device. The desktop can **disconnect the phone** at any time, and the link expires on its own.
@@ -63,7 +63,7 @@ Single mobile-first page, cards in this order:
 
 - Per term: module, coursework mark, exam mark, final mark, grade, credits; term GPA/average and cumulative.
 - Results visible only after registry **publishes** them (`published_at`); optional fee-clearance gate.
-- Downloadable **provisional statement of results** PDF with QR code linking to a verification URL (`/verify/<token>`) that shows the same data for employers — a TCFL equivalent of the ZIMSEC confirmation idea.
+- Downloadable **provisional statement of results** PDF with QR code linking to a verification URL (`/verify/<token>`) that shows the same data for employers — the college's equivalent of the ZIMSEC confirmation idea.
 - Onboarding (ZIMSEC) results are shown under **Entry qualifications** with their verification status.
 
 ## 5.6 Upcoming tests

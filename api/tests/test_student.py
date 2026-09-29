@@ -9,7 +9,7 @@ from app.services import clock, timetable
 from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 async def test_dashboard_lists_the_next_seven_days():

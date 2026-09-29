@@ -234,7 +234,7 @@ Programme entry requirements are stored as JSON on `programmes.entry_rules_json`
 }
 ```
 
-> The numbers above are **examples** — confirm TCFL's actual entry requirements per programme with admissions before go-live.
+> The numbers above are **examples** — confirm the college's actual entry requirements per programme with admissions before go-live.
 
 `eligibility.evaluate(applicant)` returns `eligible | not_eligible | needs_review` plus a human-readable explanation shown to both applicant and staff.
 

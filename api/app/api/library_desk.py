@@ -137,10 +137,10 @@ class Borrower(BaseModel):
 
 
 def normalise_number(raw: str) -> str:
-    """Card barcodes drop the slashes: TCFL20270142 → TCFL/2027/0142."""
+    """Card barcodes drop the slashes: CC20270142 → CC/2027/0142 (whatever the letter prefix)."""
     s = raw.strip().upper().replace(" ", "")
-    m = re.fullmatch(r"TCFL(\d{4})(\d{4})", s)
-    return f"TCFL/{m[1]}/{m[2]}" if m else s
+    m = re.fullmatch(r"([A-Z]+)(\d{4})(\d{4})", s)
+    return f"{m[1]}/{m[2]}/{m[3]}" if m else s
 
 
 async def _borrower(db: AsyncSession, person: Person, number: str, programme, class_group) -> Borrower:

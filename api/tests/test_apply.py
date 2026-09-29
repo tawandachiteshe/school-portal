@@ -7,7 +7,7 @@ from tests.helpers import signed_in
 
 pytestmark = pytest.mark.anyio
 NEW = "263772345678"  # Chiedza Nyoni, nothing started
-TARIRO = "TCFL/2027/0142"
+TARIRO = "CC/2027/0142"
 
 
 def test_entry_text():

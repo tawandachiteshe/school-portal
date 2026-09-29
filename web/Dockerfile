@@ -8,6 +8,9 @@ COPY . .
 EXPOSE 5173
 
 FROM deps AS build
+# The college's name, baked into the build (src/lib/college.ts); docker-compose passes COLLEGE_NAME.
+ARG VITE_COLLEGE_NAME="Campus College"
+ENV VITE_COLLEGE_NAME=$VITE_COLLEGE_NAME
 COPY . .
 RUN bun run build
 

@@ -49,7 +49,7 @@ entries:
       authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
       # Signing out of the portal ends the Authentik session too, then comes back to /login.
       invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
-      # The portal's own address (APP_URL: https://portal.tcfl.ac.zw in production, the Vite dev
+      # The portal's own address (APP_URL: https://portal.example.ac.zw in production, the Vite dev
       # server in development).
       redirect_uris:
         - { matching_mode: strict, url: !Format ["%s/api/auth/callback", !Env [APP_URL, "http://localhost:5173"]] }
