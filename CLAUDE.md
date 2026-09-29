@@ -1,4 +1,8 @@
-# TCFL Portal
+# Campus Portal
+
+The product is called Campus Portal (its assistant: Ask Campus). The college is still TelOne Centre for Learning
+(TCFL), and internal names keep `tcfl` (containers, Authentik slugs, cookies, student numbers like TCFL/2027/0142).
+The design files predate the rename and still say "TCFL Portal" / "Ask TCFL": use the new names.
 
 Mobile-first web app for TelOne Centre for Learning (Harare, Zimbabwe). It replaces paper-based
 student onboarding and gives students one place for modules, lecturers, deadlines, notes, results,
@@ -48,7 +52,7 @@ library and announcements. Staff (admissions, lecturers, librarians, Student Aff
 
 ## Layouts
 
-- Students: 360–390px first. Top bar (wordmark, "Ask TCFL" text button, avatar) + bottom nav
+- Students: 360–390px first. Top bar (wordmark, "Ask Campus" text button, avatar) + bottom nav
   Home · Modules · Deadlines · Library · More. Sub-pages use a back-arrow header, no bottom nav.
 - Applicants: top bar + step indicator with names (Programme · National ID · ZIMSEC results · Review · Submit).
   Desktop 1280 uses the same steps as underlined tabs.

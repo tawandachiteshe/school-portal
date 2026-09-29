@@ -1,4 +1,4 @@
-# TCFL Portal sign-in and sign-up flows (docs/10 §10.3). The portal renders its own screens for
+# Campus Portal sign-in and sign-up flows (docs/10 §10.3). The portal renders its own screens for
 # every stage by driving the flow executor API (web/src/lib/authentik-flow.ts); Authentik's own UI is
 # only the fallback for a stage the portal doesn't know.
 #
@@ -14,7 +14,7 @@
 # Password reset by SMS code (design/ForgotPassword) is done by the portal, not a flow.
 version: 1
 metadata:
-  name: TCFL Portal flows
+  name: Campus Portal flows
   labels:
     blueprints.goauthentik.io/depends-on: tcfl-portal
 entries:
@@ -227,7 +227,7 @@ entries:
     attrs:
       friendly_name: Email
       use_global_settings: true
-      subject: "TCFL Portal: your code"
+      subject: "Campus Portal: your code"
       token_expiry: minutes=15
   - model: authentik_flows.flowstagebinding
     id: verify-email-binding

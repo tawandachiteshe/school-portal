@@ -67,13 +67,13 @@ function Sidebar() {
   )
   return (
     <aside aria-label="Student" className="sticky top-0 flex h-dvh w-60 shrink-0 flex-col border-r bg-card px-3 py-4">
-      <Link to="/" className="px-2.5 pt-1 pb-4" aria-label="TCFL Portal home">
+      <Link to="/" className="px-2.5 pt-1 pb-4" aria-label="Campus Portal home">
         <Wordmark />
       </Link>
       <nav className="flex flex-col gap-0.5">
         {items.map(link)}
         <div className="mt-3 mb-2 border-t" />
-        {link({ to: '/ask', label: 'Ask TCFL', icon: MessageSquare })}
+        {link({ to: '/ask', label: 'Ask Campus', icon: MessageSquare })}
       </nav>
       {me && (
         <Link to="/more" className="mt-auto flex items-center gap-2.5 border-t px-2.5 pt-3" title="Account and settings">

@@ -405,7 +405,7 @@ class Seeder:
         "Ngoni",
     ]
 
-    # Classmates who are also test personas (docs: TCFL Portal test personas) can sign in: Thandeka is
+    # Classmates who are also test personas (docs: Campus Portal test personas) can sign in: Thandeka is
     # Tariro's classmate, to check one student never sees another's records.
     PERSONA_CLASSMATES = {"TCFL/2027/0147": "+263772100147"}
 

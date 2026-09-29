@@ -36,7 +36,7 @@ def create_app() -> FastAPI:
     # Routes are mounted at the root; the browser reaches them under /api via the
     # Vite dev proxy or Traefik (docs/06 §6.3).
     app = FastAPI(
-        title="TCFL Portal API",
+        title="Campus Portal API",
         version="0.1.0",
         docs_url=None if settings.is_prod else "/docs",
         # operationId = the route function's name, so generated web hooks read well (useDashboard).

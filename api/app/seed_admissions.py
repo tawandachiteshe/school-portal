@@ -399,7 +399,7 @@ class AdmissionsSeed:
         return d
 
     def person_for(self, a: Applicant, number: str, reg: str, origin: str, valid: bool) -> Person:
-        # Personas (docs: TCFL Portal test personas) have a phone, which is their sign-in username.
+        # Personas (docs: Campus Portal test personas) have a phone, which is their sign-in username.
         u = User(
             idp_subject=f"seed:applicant:{a.ref}",
             username=a.phone[1:] if a.phone else None,

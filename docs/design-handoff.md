@@ -1,4 +1,4 @@
-# TCFL Portal — design handoff
+# Campus Portal — design handoff
 
 Every screen below is a file in `design/`. Suggested routes are a starting point.
 
@@ -121,4 +121,4 @@ Amber rule on the dashboard/deadlines: `due - now <= 48h` and not submitted → 
 4. Applicant flow A → H including the phone handoff (the riskiest piece).
 5. Student dashboard and tabs, with offline cache (service worker) and upload queue.
 6. Staff admissions, lecturer, library screens.
-7. Ask TCFL (retrieval over official documents, always cite sources, hand off when unsure).
+7. Ask Campus (retrieval over official documents, always cite sources, hand off when unsure).

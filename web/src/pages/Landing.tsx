@@ -45,7 +45,7 @@ function Header({ studentsOpen }: { studentsOpen: boolean }) {
     <header className="sticky top-0 z-10 border-b bg-card">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between gap-6 pr-2 pl-4 md:h-16 md:px-8 lg:px-20">
         <div className="flex items-center gap-10">
-          <Link to="/" aria-label="TCFL Portal, home">
+          <Link to="/" aria-label="Campus Portal, home">
             <Wordmark />
           </Link>
           <nav aria-label="Main" className="hidden gap-7 text-sm md:flex">
@@ -202,7 +202,7 @@ function Help({ home }: { home?: PublicHome }) {
           </div>
         ))}
       </dl>
-      <p className="text-sm text-muted-foreground">Students can also ask questions in the portal with Ask TCFL. Its answers link to the official source.</p>
+      <p className="text-sm text-muted-foreground">Students can also ask questions in the portal with Ask Campus. Its answers link to the official source.</p>
     </section>
   )
 }

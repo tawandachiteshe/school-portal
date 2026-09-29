@@ -24,7 +24,7 @@ export function Handoff({ question, sessionId }: { question: string; sessionId: 
           <p className="font-semibold">Sent to Student Affairs</p>
           <p className="text-sm">
             Reference <span className="font-mono">{sent.reference}</span>.{' '}
-            {sent.sms_to ? "We'll text you when they reply." : 'Their reply will appear in Ask TCFL.'}
+            {sent.sms_to ? "We'll text you when they reply." : 'Their reply will appear in Ask Campus.'}
           </p>
         </div>
       </Alert>
@@ -57,10 +57,10 @@ export function Handoff({ question, sessionId }: { question: string; sessionId: 
             {p.class_group && ' and your class'}.{' '}
             {p.sms_to ? (
               <>
-                Replies come by SMS to <span className="font-mono">{p.sms_to}</span> and appear in Ask TCFL.
+                Replies come by SMS to <span className="font-mono">{p.sms_to}</span> and appear in Ask Campus.
               </>
             ) : (
-              'Replies appear in Ask TCFL.'
+              'Replies appear in Ask Campus.'
             )}
           </p>
         )}

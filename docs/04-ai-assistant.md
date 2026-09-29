@@ -1,6 +1,6 @@
 # 4. AI Assistant
 
-A chat helper inside the portal ("Ask TCFL") that answers questions using **the student's own data and college knowledge** — not the open internet.
+A chat helper inside the portal ("Ask Campus") that answers questions using **the student's own data and college knowledge** — not the open internet.
 
 ## 4.1 What it should handle
 
@@ -44,7 +44,7 @@ from app.assistant.tools import TOOLS, run_tool, ToolInputError
 
 client = anthropic.AsyncAnthropic()
 
-SYSTEM = """You are "Ask TCFL", the student assistant for TelOne Centre for Learning.
+SYSTEM = """You are "Ask Campus", the student assistant for TelOne Centre for Learning.
 You help the signed-in user with their modules, lecturers, timetable, tests, assignments,
 results, notes, library and college announcements.
 - Use the tools for anything about the user's own records; use the <context> documents for
@@ -138,7 +138,7 @@ TOOLS = [
 
 What exists today, and how it differs from the design above.
 
-**Where it is.** Students open Ask TCFL at `/ask` (design/AskStart, AskChat, AskHandoff, DeskAsk). The API is `api/app/api/assistant.py` (`GET /assistant`, `POST /assistant/ask` as Server-Sent Events, feedback, hand-off), the loop is `api/app/assistant/chat.py`, the tools are `api/app/assistant/tools.py`. Student Affairs answers handed-off questions at `/staff/ask-questions` (`api/app/api/ask_questions_staff.py`).
+**Where it is.** Students open Ask Campus at `/ask` (design/AskStart, AskChat, AskHandoff, DeskAsk). The API is `api/app/api/assistant.py` (`GET /assistant`, `POST /assistant/ask` as Server-Sent Events, feedback, hand-off), the loop is `api/app/assistant/chat.py`, the tools are `api/app/assistant/tools.py`. Student Affairs answers handed-off questions at `/staff/ask-questions` (`api/app/api/ask_questions_staff.py`).
 
 **Sandbox (enforced in code, with tests in `api/tests/test_assistant.py`).**
 1. Tools only read: they run on a database connection Postgres keeps read-only (`default_transaction_read_only`, `app/assistant/sandbox.py`), so a write fails even if a tool tried one.
@@ -153,7 +153,7 @@ What exists today, and how it differs from the design above.
 - **No retrieval index yet.** `kb_documents` and `kb_chunks` exist but are empty. College knowledge comes from `search_announcements` (keyword match over the announcements the asker can see) and the library rules in settings. Questions about policy (sick days, exam rules, deferments) are handed to Student Affairs until documents like the Student Handbook are indexed.
 - **Sources** are the tools' own: each result carries a number, the model cites `[[n]]`, and the page links to the portal page (Your deadlines, Library, an announcement).
 - **History** keeps only the questions and answers (not tool calls), last 8 messages.
-- **Replies from Student Affairs** show in Ask TCFL ("Your questions to Student Affairs") and are texted; the design has them under Announcements, which would need per-person announcements.
+- **Replies from Student Affairs** show in Ask Campus ("Your questions to Student Affairs") and are texted; the design has them under Announcements, which would need per-person announcements.
 - No photo or file attachments.
 
 **Settings** (`.env.example`): `ANTHROPIC_API_KEY`, `ASSISTANT_ENABLED`, `ASSISTANT_MODEL`, `ASSISTANT_MAX_TOKENS`, `ASSISTANT_MAX_TOOL_ROUNDS`, `ASSISTANT_PER_HOUR`, `ASSISTANT_PER_DAY`. Tests never call Claude: `tests/conftest.py` blanks the key and the chat tests use a fake client.

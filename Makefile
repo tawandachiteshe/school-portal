@@ -1,4 +1,4 @@
-# TCFL Portal: everyday commands. `make` or `make help` lists them.
+# Campus Portal: everyday commands. `make` or `make help` lists them.
 # Development runs the backing services in Docker and the API and web app on this machine
 # (docs/06 §6.4). Production runs on Dokploy (docs/06 §6.7): only `prod-env` is for that.
 

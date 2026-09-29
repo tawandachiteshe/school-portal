@@ -14,8 +14,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'TCFL Portal',
-        short_name: 'TCFL',
+        name: 'Campus Portal',
+        short_name: 'Campus',
         description: 'TelOne Centre for Learning student portal',
         theme_color: '#FAF9F7',
         background_color: '#FAF9F7',

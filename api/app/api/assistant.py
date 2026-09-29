@@ -1,4 +1,4 @@
-"""Ask TCFL (design/AskStart, AskChat, AskHandoff, DeskAsk). The assistant is sandboxed: see
+"""Ask Campus (design/AskStart, AskChat, AskHandoff, DeskAsk). The assistant is sandboxed: see
 app/assistant/__init__.py. Student Affairs answers handed-off questions in ask_questions_staff.py."""
 
 import asyncio
@@ -32,7 +32,7 @@ asker = require_role("student", "applicant")
 AskerDep = Annotated[CurrentUser, Depends(asker)]
 
 NOT_SET_UP = (
-    "Ask TCFL isn't set up yet, so it can't answer questions. You can send your question to Student "
+    "Ask Campus isn't set up yet, so it can't answer questions. You can send your question to Student "
     "Affairs instead."
 )
 
@@ -54,7 +54,7 @@ SUGGESTIONS = {
 
 def _enabled() -> None:
     if not get_settings().assistant_enabled:
-        raise HTTPException(404, "Ask TCFL is switched off")
+        raise HTTPException(404, "Ask Campus is switched off")
 
 
 # --- start page -----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ async def _rate_limit(db: AsyncSession, user_id: uuid.UUID) -> None:
     if await count(now - timedelta(hours=1)) >= s.assistant_per_hour:
         raise HTTPException(429, "You've asked a lot of questions this hour. Try again later.")
     if await count(now - timedelta(days=1)) >= s.assistant_per_day:
-        raise HTTPException(429, "You've reached today's limit for Ask TCFL. Try again tomorrow.")
+        raise HTTPException(429, "You've reached today's limit for Ask Campus. Try again tomorrow.")
 
 
 def _sse(event: AskEvent) -> str:
@@ -282,9 +282,9 @@ async def ask(body: AskIn, request: Request, cu: AskerDep, db: DbDep) -> Streami
                 )
             )
         except Exception:
-            log.exception("Ask TCFL failed")
+            log.exception("Ask Campus failed")
             yield _sse(
-                AskEvent(type="error", error="Ask TCFL couldn't answer just now. Try again in a minute.")
+                AskEvent(type="error", error="Ask Campus couldn't answer just now. Try again in a minute.")
             )
 
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})

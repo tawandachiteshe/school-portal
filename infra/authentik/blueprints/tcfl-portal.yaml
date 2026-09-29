@@ -1,10 +1,10 @@
-# TCFL Portal: groups, OIDC provider and application (docs/10 §10.3, §10.8).
+# Campus Portal: groups, OIDC provider and application (docs/10 §10.3, §10.8).
 # Flows (tcfl-authentication, tcfl-enrollment, tcfl-recovery, tcfl-invitation) live in
 # sibling files exported from the admin UI.
 # Check model/field names against the running version: /blueprints/schema.json in the container.
 version: 1
 metadata:
-  name: TCFL Portal
+  name: Campus Portal
 entries:
   - model: authentik_core.group
     id: staff
@@ -68,6 +68,6 @@ entries:
   - model: authentik_core.application
     identifiers: { slug: tcfl-portal }
     attrs:
-      name: TCFL Portal
+      name: Campus Portal
       provider: !KeyOf provider
       meta_launch_url: !Format ["%s/", !Env [APP_URL, "http://localhost:5173"]]

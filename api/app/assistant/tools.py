@@ -1,4 +1,4 @@
-"""The only things Ask TCFL can do: read the asker's own records and TCFL documents.
+"""The only things Ask Campus can do: read the asker's own records and TCFL documents.
 
 Every tool calls the same code the portal's own pages use, with the student or applicant taken from
 the session (Context), never from the model. Inputs are validated here before anything runs; none

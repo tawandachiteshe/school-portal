@@ -1,7 +1,7 @@
 export function Wordmark() {
   return (
     <span className="flex items-baseline gap-1.5">
-      <span className="font-bold tracking-[0.02em]">TCFL</span>
+      <span className="font-bold tracking-[0.02em]">Campus</span>
       <span className="text-muted-foreground">Portal</span>
     </span>
   )

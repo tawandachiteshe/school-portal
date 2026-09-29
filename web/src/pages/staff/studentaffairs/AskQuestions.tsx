@@ -13,8 +13,8 @@ import { shortDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { staffH1, Table, td, th } from '../teaching/staff-ui'
 
-// No design: the questions students send from Ask TCFL (design/AskHandoff "Send to Student Affairs"),
-// waiting ones first. A reply is texted to the student and shown in their Ask TCFL.
+// No design: the questions students send from Ask Campus (design/AskHandoff "Send to Student Affairs"),
+// waiting ones first. A reply is texted to the student and shown in their Ask Campus.
 export default function AskQuestions() {
   const qc = useQueryClient()
   const id = useId()
@@ -27,7 +27,7 @@ export default function AskQuestions() {
         void qc.invalidateQueries({ queryKey: getAskQuestionsInboxQueryKey() })
         setOpen(null)
         setText('')
-        toast('Reply sent. The student gets an SMS and sees it in Ask TCFL.')
+        toast('Reply sent. The student gets an SMS and sees it in Ask Campus.')
       },
       onError: (e) => toast(errorMessage(e, "Couldn't send it. Try again.")),
     },
@@ -36,10 +36,10 @@ export default function AskQuestions() {
   const waiting = rows.filter((q) => !q.reply).length
   return (
     <>
-      <StaffTopBar left="Student Affairs · Ask TCFL" />
+      <StaffTopBar left="Student Affairs · Ask Campus" />
       <main className="flex flex-col gap-4 px-8 py-6">
         <div>
-          <h1 className={staffH1}>Questions from Ask TCFL</h1>
+          <h1 className={staffH1}>Questions from Ask Campus</h1>
           <p className="text-sm text-muted-foreground">
             Questions the assistant couldn't answer, sent on by the student. {waiting ? `${waiting} waiting for a reply.` : 'All answered.'}
           </p>
@@ -110,7 +110,7 @@ export default function AskQuestions() {
                   onChange={(e) => setText(e.target.value)}
                   className="rounded-sm border border-input bg-card px-3 py-2.5"
                 />
-                <span className="text-sm text-muted-foreground">The student gets an SMS saying you've replied, and reads it in Ask TCFL.</span>
+                <span className="text-sm text-muted-foreground">The student gets an SMS saying you've replied, and reads it in Ask Campus.</span>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpen(null)}>

@@ -29,22 +29,22 @@ function StudentTopBar({ avatar = true }: { avatar?: boolean }) {
   const online = useOnline()
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-card pr-2 pl-4">
-      <Link to="/" aria-label="TCFL Portal home" className="flex min-h-11 items-center">
+      <Link to="/" aria-label="Campus Portal home" className="flex min-h-11 items-center">
         <Wordmark />
       </Link>
       <div className="flex items-center">
-        {/* Ask TCFL needs the internet (design/StateOffline). */}
+        {/* Ask Campus needs the internet (design/StateOffline). */}
         {online ? (
           <Button variant="ghost" asChild>
             <Link to="/ask">
               <MessageSquare strokeWidth={1.5} />
-              Ask TCFL
+              Ask Campus
             </Link>
           </Button>
         ) : (
           <Button variant="ghost" disabled className="bg-transparent disabled:bg-transparent">
             <MessageSquare strokeWidth={1.5} />
-            Ask TCFL
+            Ask Campus
           </Button>
         )}
         {avatar && me && (

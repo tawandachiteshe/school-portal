@@ -21,21 +21,21 @@ from the college, and what will need work as the data grows. Update it when any 
 ## 12.2 Needs a decision
 
 - **Registry and admin roles** have no pages and no designs. They can sign in and are allowed into Find a student and some admissions actions, but have no home of their own.
-- **Ask TCFL content.** It answers from the student's own records and announcements only. The retrieval index in §4.2 (`kb_documents`, `kb_chunks`, embeddings) isn't built, so policy questions go to Student Affairs. It needs the Student Handbook and other policies as documents, and a decision on where they're maintained.
-- **Replies from Student Affairs** appear in Ask TCFL, not under Announcements as design/AskHandoff shows: that would need announcements addressed to one person.
+- **Ask Campus content.** It answers from the student's own records and announcements only. The retrieval index in §4.2 (`kb_documents`, `kb_chunks`, embeddings) isn't built, so policy questions go to Student Affairs. It needs the Student Handbook and other policies as documents, and a decision on where they're maintained.
+- **Replies from Student Affairs** appear in Ask Campus, not under Announcements as design/AskHandoff shows: that would need announcements addressed to one person.
 
 ## 12.3 Not built yet
 
 - **SMS worker**: sends what's queued in `sms_outbox` and `notification_deliveries` once a provider is chosen.
 - **Retention job**: deletes rejected applicants' documents and old chat transcripts after the agreed periods.
-- **Ask TCFL retrieval index** (above).
+- **Ask Campus retrieval index** (above).
 - **Audit log**: staff views of applications, ID and certificate images, payment proofs and student profiles, decisions and payment actions are recorded (`app/services/audit.py`). Other staff edits (marks, announcements, library desk) are recorded in their own tables but not in `audit_log`, and there's no page to read the log.
 - **Push notifications** (`push_subscriptions` exists; nothing sends).
 
 ## 12.4 Search: fine now, slow with real data
 
 The search boxes (Find a student, the library catalogue, the student search, announcement search in
-Ask TCFL) are fast today because the development data is tiny: about 80 students, 15 books and
+Ask Campus) are fast today because the development data is tiny: about 80 students, 15 books and
 5 announcements, on a local database. They are not built for a college's worth of records:
 
 - **Queries are substring matches** (`ILIKE '%moyo%'`) over several columns. Postgres can't use an
@@ -47,7 +47,7 @@ Ask TCFL) are fast today because the development data is tiny: about 80 students
 - **No trigram index** on student numbers, book authors or copy barcodes.
 - **The browser searches on every keystroke** (`useDeferredValue`, no pause), so a fast typist on
   3G sends several requests where one would do. TanStack Query caches repeated terms.
-- **Announcement search in Ask TCFL** loads every announcement the student can see and scores them
+- **Announcement search in Ask Campus** loads every announcement the student can see and scores them
   in Python. Fine for tens, not for thousands.
 
 To fix, in order: search the indexed full-name expression; add `gin_trgm_ops` indexes on

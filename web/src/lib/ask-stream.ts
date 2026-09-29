@@ -17,7 +17,7 @@ export async function askStream(body: AskIn, onEvent: (e: AskEvent) => void, sig
     signal,
   })
   if (!res.ok || !res.body) {
-    let message = "Ask TCFL couldn't answer just now. Try again in a minute."
+    let message = "Ask Campus couldn't answer just now. Try again in a minute."
     try {
       const b = await res.json()
       if (typeof b.detail === 'string') message = b.detail

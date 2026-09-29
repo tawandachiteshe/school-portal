@@ -1,4 +1,4 @@
-"""Ask TCFL, the student assistant (docs/04), sandboxed:
+"""Ask Campus, the student assistant (docs/04), sandboxed:
 
 1. Tools only read. They run on a database connection Postgres keeps read-only (sandbox.py), so a
    write fails even if a tool tried one.

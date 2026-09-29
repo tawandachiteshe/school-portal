@@ -1,7 +1,7 @@
 [project]
 name = "tcfl-portal-api"
 version = "0.1.0"
-description = "TCFL Portal API: onboarding, OCR, academics, assistant"
+description = "Campus Portal API: onboarding, OCR, academics, assistant"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115",

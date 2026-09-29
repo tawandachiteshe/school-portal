@@ -60,7 +60,7 @@ Authentik is served **under `/auth/` on the portal origin** (`AUTHENTIK_WEB__PAT
 
 Everything below is created by the blueprint in `infra/authentik/blueprints/tcfl-portal.yaml` (§10.8).
 
-**Application:** `TCFL Portal` (slug `tcfl-portal`)
+**Application:** `Campus Portal` (slug `tcfl-portal`)
 
 **OAuth2/OpenID provider:** `tcfl-portal`
 
@@ -262,7 +262,7 @@ AUTHENTIK_EMAIL__PORT=587
 AUTHENTIK_EMAIL__USERNAME=
 AUTHENTIK_EMAIL__PASSWORD=
 AUTHENTIK_EMAIL__USE_TLS=true
-AUTHENTIK_EMAIL__FROM=TCFL Portal <no-reply@tcfl.ac.zw>
+AUTHENTIK_EMAIL__FROM=Campus Portal <no-reply@tcfl.ac.zw>
 AUTHENTIK_BOOTSTRAP_PASSWORD=change-me          # first akadmin password (dev/CI only)
 AUTHENTIK_BOOTSTRAP_TOKEN=change-me             # first API token (dev/CI only)
 ```
@@ -274,7 +274,7 @@ AUTHENTIK_BOOTSTRAP_TOKEN=change-me             # first API token (dev/CI only)
 ```yaml
 version: 1
 metadata:
-  name: TCFL Portal
+  name: Campus Portal
 entries:
   - model: authentik_core.group
     id: staff
@@ -315,7 +315,7 @@ entries:
   - model: authentik_core.application
     identifiers: { slug: tcfl-portal }
     attrs:
-      name: TCFL Portal
+      name: Campus Portal
       provider: !KeyOf provider
       meta_launch_url: https://portal.tcfl.ac.zw/
 ```

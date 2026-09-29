@@ -54,13 +54,13 @@ export default function Ask() {
         (e) => {
           if (e.type === 'status' && e.status) update(i, { status: e.status })
           if (e.type === 'answer' && e.answer) update(i, { answer: e.answer, status: undefined })
-          if (e.type === 'error') update(i, { error: e.error ?? "Ask TCFL couldn't answer just now.", status: undefined })
+          if (e.type === 'error') update(i, { error: e.error ?? "Ask Campus couldn't answer just now.", status: undefined })
         },
         ctrl.signal,
       )
     } catch (err) {
       if (ctrl.signal.aborted) update(i, { status: undefined, error: 'Stopped.' })
-      else update(i, { status: undefined, error: errorMessage(err, "Ask TCFL couldn't answer just now. Try again in a minute.") })
+      else update(i, { status: undefined, error: errorMessage(err, "Ask Campus couldn't answer just now. Try again in a minute.") })
     } finally {
       setBusy(false)
       abort.current = null
@@ -167,7 +167,7 @@ export default function Ask() {
   if (desktop)
     return (
       <>
-        <DeskBar left={<span className="font-semibold text-foreground">Ask TCFL</span>} right={newQuestion} />
+        <DeskBar left={<span className="font-semibold text-foreground">Ask Campus</span>} right={newQuestion} />
         <main aria-live="polite" className="flex grow flex-col items-center px-8 pt-8">
           <div className="flex w-full max-w-[720px] flex-col gap-6 pb-6">
             {turns.length === 0 ? start : conversation}
@@ -184,7 +184,7 @@ export default function Ask() {
         <Link to="/" aria-label="Back to home" className="inline-flex size-11 items-center justify-center">
           <ArrowLeft className="size-5" strokeWidth={1.5} />
         </Link>
-        <span className="grow font-semibold">Ask TCFL</span>
+        <span className="grow font-semibold">Ask Campus</span>
         {newQuestion}
       </header>
       <main aria-live="polite" className="flex grow flex-col gap-6 px-4 py-6">

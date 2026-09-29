@@ -151,7 +151,7 @@ export function AnnouncementDetail() {
             </dl>
             <div className="flex flex-col gap-1 border-t pt-4">
               {data.contact_line && <p className="text-muted-foreground">{data.contact_line}</p>}
-              <TextLink to={`/ask?about=announcement:${data.id}`}>Ask TCFL about this</TextLink>
+              <TextLink to={`/ask?about=announcement:${data.id}`}>Ask Campus about this</TextLink>
             </div>
           </aside>
         </div>
@@ -194,7 +194,7 @@ export function AnnouncementDetail() {
             </article>
             <div className="flex flex-col gap-1 border-t pt-4">
               {data.contact_line && <p className="text-sm text-muted-foreground">{data.contact_line}</p>}
-              <TextLink to={`/ask?about=announcement:${data.id}`}>Ask TCFL about this</TextLink>
+              <TextLink to={`/ask?about=announcement:${data.id}`}>Ask Campus about this</TextLink>
             </div>
           </>
         )}

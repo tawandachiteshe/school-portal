@@ -13,7 +13,8 @@ from app.assistant.tools import Context, Source, Tool, run
 from app.config import get_settings
 from app.services import clock
 
-SYSTEM = """You are Ask TCFL, the assistant in the TelOne Centre for Learning (TCFL) portal in Harare.
+SYSTEM = """You are Ask Campus, the assistant in Campus Portal, the TelOne Centre for Learning (TCFL)
+portal in Harare.
 You answer questions from one signed-in {who} about their own studies or application and about TCFL.
 
 How to answer:

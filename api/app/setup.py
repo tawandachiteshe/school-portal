@@ -150,7 +150,7 @@ async def check(db: AsyncSession) -> int:
 
     notes.append("Email: " + ("SMTP_HOST set" if mail.configured() else "no SMTP_HOST, nothing is emailed"))
     notes.append(
-        "Ask TCFL: "
+        "Ask Campus: "
         + ("configured" if s.anthropic_api_key else "no ANTHROPIC_API_KEY, it says it isn't set up")
     )
     notes.append("Google sign-in: " + ("on" if s.google_client_id else "off"))

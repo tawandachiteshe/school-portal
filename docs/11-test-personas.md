@@ -26,8 +26,8 @@ Two students in the same class, DIT-1A (Diploma in Information Technology, Semes
 
 | Persona | Sign in as | Their situation | Use them to test |
 | --- | --- | --- | --- |
-| Tariro Moyo | `TCFL/2027/0142` | 4 things due in the next week, including DCN201 Test 1. Fees balance US$ 310.00, second instalment due Wednesday 4 November. One overdue book (Engineering Mathematics), one on loan, one reservation ready to collect. Unread announcements. Also an applicant whose application is still in review. Phone +263 77 318 4521 | Everything a student sees: dashboard, timetable, deadlines and submitting work, notes, library and renewing, fees, student card, Ask TCFL |
-| Thandeka Mpofu | `TCFL/2027/0147` | Same classes and deadlines as Tariro. One overdue book (Data Communications and Networking). No fees statement and no reservations. Phone +263 77 210 0147 | That students only see their own records, in the portal and in Ask TCFL. A student with little on their account |
+| Tariro Moyo | `TCFL/2027/0142` | 4 things due in the next week, including DCN201 Test 1. Fees balance US$ 310.00, second instalment due Wednesday 4 November. One overdue book (Engineering Mathematics), one on loan, one reservation ready to collect. Unread announcements. Also an applicant whose application is still in review. Phone +263 77 318 4521 | Everything a student sees: dashboard, timetable, deadlines and submitting work, notes, library and renewing, fees, student card, Ask Campus |
+| Thandeka Mpofu | `TCFL/2027/0147` | Same classes and deadlines as Tariro. One overdue book (Data Communications and Networking). No fees statement and no reservations. Phone +263 77 210 0147 | That students only see their own records, in the portal and in Ask Campus. A student with little on their account |
 
 Neither has published results unless you reseed with `--results-published`. The other 79 students (36 in DIT-1A, 41 in DTE-1A and 2 in other classes) have records for the lecturer and library screens, but no sign-in.
 
@@ -60,7 +60,7 @@ One persona for each staff role that has pages, used on a laptop (1280 px). Regi
 | Chipo Marufu | `cmarufu` | Admissions officer | The applications queue, reviewing Tariro's application, asking for information, offering places |
 | Nyasha Mapfumo | `nmapfumo` | Accounts officer (placeholder name) | Confirming or rejecting Tatenda's cash payment |
 | Shamiso Chinembiri | `schinembiri` | Librarian, Block A desk | Issuing and returning books, overdue loans (Tariro and Thandeka have one each), reservations |
-| Takudzwa Mushonga | `tmushonga` | Student Affairs officer | Writing announcements, replying to questions students send from Ask TCFL |
+| Takudzwa Mushonga | `tmushonga` | Student Affairs officer | Writing announcements, replying to questions students send from Ask Campus |
 
 ## Which persona for what
 
@@ -70,7 +70,7 @@ One persona for each staff role that has pages, used on a laptop (1280 px). Regi
 | Paying and Accounts confirming | Tatenda (`263772100894`), then Nyasha (`nmapfumo`) | After Accounts confirms, Tatenda's application moves to the review queue and they get an SMS |
 | Reviewing and deciding | Chipo (`cmarufu`), then the applicant | Tafadzwa sees the request, Munashe the offer, Simba the reason |
 | The student day | Tariro (`TCFL/2027/0142`) | Dashboard, due items within 48 hours in amber, overdue book, fees due |
-| Ask TCFL | Tariro, then Thandeka (`TCFL/2027/0147`) | Answers cite their source; each sees only their own loans and deadlines; questions sent to Student Affairs reach Takudzwa (`tmushonga`) |
+| Ask Campus | Tariro, then Thandeka (`TCFL/2027/0147`) | Answers cite their source; each sees only their own loans and deadlines; questions sent to Student Affairs reach Takudzwa (`tmushonga`) |
 | Teaching | Eng. Chikore (`fchikore`) | Register and marks for DIT-1A; DTE-1A shows only DCN201 |
 | Library desk | Shamiso (`schinembiri`) | Issue to Tariro, return Thandeka's overdue book |
 | Catalogue and reading lists | Shamiso (`schinembiri`) | Search by barcode (`TCFL-B-003390`), add a book and its copies, add it to a module's reading list |

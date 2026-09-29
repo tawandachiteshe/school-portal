@@ -258,11 +258,11 @@ function DashboardView({
         )}
       </section>
 
-      <section aria-label="Ask TCFL">
+      <section aria-label="Ask Campus">
         <Link to="/ask" className="flex min-h-16 items-center gap-3 rounded-md border bg-card py-3 pr-3 pl-4">
           <MessageSquare className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.5} aria-hidden />
           <div className="min-w-0 grow">
-            <div className="font-medium">Ask TCFL</div>
+            <div className="font-medium">Ask Campus</div>
             <div className="text-sm text-muted-foreground">
               Fees, timetables, exam rules and college procedures. Answers link to the official source.
             </div>

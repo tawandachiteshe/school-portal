@@ -1,4 +1,4 @@
-# TCFL Portal
+# Campus Portal
 
 A modern student onboarding and student-life portal for TelOne Centre for Learning (TCFL).
 
@@ -9,7 +9,7 @@ It replaces the manual, paper-heavy onboarding process with:
 - **A student dashboard.** It shows results, current modules and their lecturers, upcoming tests, assignments due, lecture notes, library information and announcements.
 - **An AI assistant.** A chat helper answers questions about the student's own timetable, deadlines, notes and college policies, using only portal data the student is allowed to see.
 
-> **Status:** every screen in [design/](design/) is built: the public landing page, sign-in and sign-up through Authentik, the applicant steps (programme, national ID, birth certificate, ZIMSEC results, review, payment, status, offer), the student app (home, modules, deadlines, timetable, results, fees, library, announcements, student card, Ask TCFL), and the staff pages for admissions, lecturers, Accounts, the library desk and Student Affairs. What still needs a provider, a detail from the college or a decision (SMS, email, payments, retention, the Ask TCFL policy index) is listed in [docs/12](docs/12-status-and-gaps.md).
+> **Status:** every screen in [design/](design/) is built: the public landing page, sign-in and sign-up through Authentik, the applicant steps (programme, national ID, birth certificate, ZIMSEC results, review, payment, status, offer), the student app (home, modules, deadlines, timetable, results, fees, library, announcements, student card, Ask Campus), and the staff pages for admissions, lecturers, Accounts, the library desk and Student Affairs. What still needs a provider, a detail from the college or a decision (SMS, email, payments, retention, the Ask Campus policy index) is listed in [docs/12](docs/12-status-and-gaps.md).
 
 ## Documentation
 

@@ -16,7 +16,7 @@ export default function Foundations() {
       <header className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl leading-8 font-semibold tracking-[-0.01em]">Foundations</h1>
-          <p className="text-muted-foreground">Tokens and primitives for the TCFL Portal.</p>
+          <p className="text-muted-foreground">Tokens and primitives for the Campus Portal.</p>
         </div>
         <div className="flex items-center gap-2">
           <Label htmlFor="dark">Dark</Label>

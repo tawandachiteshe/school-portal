@@ -1,4 +1,4 @@
-"""Ask TCFL: the sandbox first (read-only, own records only, fixed tools, no identity from the
+"""Ask Campus: the sandbox first (read-only, own records only, fixed tools, no identity from the
 model), then the chat loop with a fake Claude, then the pages' endpoints."""
 
 import json

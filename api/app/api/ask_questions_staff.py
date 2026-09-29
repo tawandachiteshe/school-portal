@@ -1,5 +1,5 @@
-"""The Student Affairs inbox (no design) for questions students send on from Ask TCFL
-(design/AskHandoff "Send to Student Affairs"). A reply is texted to the student and shown in Ask TCFL."""
+"""The Student Affairs inbox (no design) for questions students send on from Ask Campus
+(design/AskHandoff "Send to Student Affairs"). A reply is texted to the student and shown in Ask Campus."""
 
 import uuid
 from datetime import datetime
@@ -84,7 +84,7 @@ async def reply_to_question(
         db.add(
             SmsOutbox(
                 to_phone=asker_user.phone,
-                body=f"TCFL Student Affairs replied to {q.reference}. Read it in Ask TCFL on the portal.",
+                body=f"TCFL Student Affairs replied to {q.reference}. Read it in Ask Campus on the portal.",
                 purpose="ask_reply",
             )
         )

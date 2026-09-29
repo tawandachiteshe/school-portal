@@ -1,5 +1,5 @@
 /*
- * TCFL Portal — Tailwind CSS v4 + shadcn/ui theme
+ * Campus Portal — Tailwind CSS v4 + shadcn/ui theme
  * Source of truth: design/tcfl.css and the Foundations board on the design canvas.
  *
  * NOTE on "accent": shadcn uses --accent for hover/selected backgrounds on menus.
@@ -93,7 +93,7 @@
   --radius-md: 6px;   /* buttons, cards, alerts */
   --radius-lg: 6px;
   --radius-xl: 12px;  /* bottom sheets only */
-  --radius-2xl: 16px; /* Ask TCFL composer only */
+  --radius-2xl: 16px; /* Ask Campus composer only */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

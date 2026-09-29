@@ -11,7 +11,7 @@ describe('what a phone keeps offline', () => {
     expect(keptOffline(q('/student/dashboard'))).toBe(true)
     expect(keptOffline(q('/library/home'))).toBe(true)
   })
-  it('never keeps staff pages, Ask TCFL, search or failed requests', () => {
+  it('never keeps staff pages, Ask Campus, search or failed requests', () => {
     expect(keptOffline(q('/staff/admissions/applications'))).toBe(false)
     expect(keptOffline(q('/assistant'))).toBe(false)
     expect(keptOffline(q('/student/search'))).toBe(false)

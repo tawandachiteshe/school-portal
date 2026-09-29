@@ -20,7 +20,7 @@ export function SessionExpired() {
         <span aria-hidden className="h-1 w-10 self-center rounded-full bg-border-strong md:hidden" />
         <DialogTitle className="text-lg leading-6">You've been signed out</DialogTitle>
         <DialogDescription className="text-base text-foreground">
-          Your session ended, so TCFL Portal signed you out. Sign in again to carry on.
+          Your session ended, so Campus Portal signed you out. Sign in again to carry on.
         </DialogDescription>
         <Button block onClick={() => window.location.assign(`/login?next=${encodeURIComponent(pathname + search)}`)}>
           Sign in again

@@ -51,7 +51,7 @@ Single mobile-first page, cards in this order:
 4. **New notes** — latest uploads from my modules.
 5. **Library** — books on loan, due dates, fines.
 6. **Latest results** — when published.
-7. **Ask TCFL** — assistant shortcut.
+7. **Ask Campus** — assistant shortcut.
 
 ## 5.4 Modules & lecturers
 

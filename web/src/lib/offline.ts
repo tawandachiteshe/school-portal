@@ -11,7 +11,7 @@ export const KEEP_MS = 7 * 24 * 3600_000
 export const keepsDataOnDevice =
   typeof window !== 'undefined' && typeof window.matchMedia === 'function' && !window.matchMedia('(min-width: 1024px)').matches
 
-// Only the asker's own student pages (and who they are). Never staff pages or Ask TCFL.
+// Only the asker's own student pages (and who they are). Never staff pages or Ask Campus.
 export function keptOffline(q: Pick<Query, 'queryKey' | 'state'>): boolean {
   const k = q.queryKey[0]
   return (

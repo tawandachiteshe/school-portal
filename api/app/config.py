@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    smtp_from: str = "TCFL Portal <portal@tcfl.ac.zw>"
+    smtp_from: str = "Campus Portal <portal@tcfl.ac.zw>"
     smtp_use_tls: bool = True
     # Set for Authentik's Google source too (infra/authentik/blueprints/tcfl-flows.yaml): shows
     # "Continue with Google" on sign-in and sign-up.
@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     ocr_min_confidence: float = 0.80
     anthropic_api_key: str = ""
     ocr_claude_model: str = "claude-haiku-4-5-20251001"
-    # Ask TCFL (docs/04). ASSISTANT_ENABLED=false hides it everywhere. Without ANTHROPIC_API_KEY it
+    # Ask Campus (docs/04). ASSISTANT_ENABLED=false hides it everywhere. Without ANTHROPIC_API_KEY it
     # says it isn't set up yet.
     # First release is applications only (docs/12): until students are imported, the landing page
     # doesn't advertise the student portal.

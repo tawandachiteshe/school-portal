@@ -42,7 +42,7 @@ class ChatMessage(Base):
 
 
 class AskQuestion(Base):
-    """A question the student sent to Student Affairs from Ask TCFL."""
+    """A question the student sent to Student Affairs from Ask Campus."""
 
     __tablename__ = "ask_questions"
 

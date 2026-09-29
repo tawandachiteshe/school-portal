@@ -153,7 +153,7 @@ async def reset_start(body: ResetStartIn, db: DbDep) -> ResetStarted:
     if found.email:
         await mail.send(
             found.email,
-            "TCFL Portal: your password reset code",
+            "Campus Portal: your password reset code",
             f"{text}\n\nIf you didn't ask to reset your password, you can ignore this email.",
         )
     return ResetStarted(minutes=CODE_MINUTES)

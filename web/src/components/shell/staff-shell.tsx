@@ -78,7 +78,7 @@ const NAV: Partial<Record<Role, Group[]>> = {
       title: 'Student Affairs',
       items: [
         announcements,
-        { to: '/staff/ask-questions', label: 'Questions from Ask TCFL', icon: MessageSquare },
+        { to: '/staff/ask-questions', label: 'Questions from Ask Campus', icon: MessageSquare },
         findStudent,
       ],
     },

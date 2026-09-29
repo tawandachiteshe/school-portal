@@ -207,7 +207,7 @@ async def timetable_ics(student: StudentDep, db: DbDep) -> Response:
     occ = await timetable.occurrences(db, [o.id for o in offerings], days)
     stamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")
     fmt = "%Y%m%dT%H%M%S"
-    lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TCFL Portal//Timetable//EN", "CALSCALE:GREGORIAN"]
+    lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Campus Portal//Timetable//EN", "CALSCALE:GREGORIAN"]
     for o in occ:
         if o.cancelled:
             continue
